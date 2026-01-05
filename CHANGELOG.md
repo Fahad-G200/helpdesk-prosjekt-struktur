@@ -7,3 +7,8 @@
 
 ## 2026-01-05
 - Skrev behovskartlegging og funksjonelle krav i krav.md
+
+## 2026-01-05
+- Skrev arkitektur for prosjektet
+- Beskrev hvordan systemet er bygget opp med webapp og database
+- Forklarte roller, drift med Docker og enkel segmentering
