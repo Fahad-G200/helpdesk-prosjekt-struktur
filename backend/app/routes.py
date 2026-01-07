@@ -81,4 +81,4 @@ def tickets():
     else:
         visible = [t for t in TICKETS if t["owner"] == user]
 
-    return render_template("tickets.html", user=user, role=role, tickets=visible)
+    return render_template("_tickets.html", user=user, role=role, tickets=visible)
