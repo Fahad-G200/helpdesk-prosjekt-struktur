@@ -6,15 +6,25 @@ bp = Blueprint("main", __name__)
 # Enkelt demo-oppsett (MVP)
 # Senere flytter vi dette til database.
 USERS = {
-    "bruker": generate_password_hash("passord123", method="pbkdf2:sha256"),
-    "support": generate_password_hash("support123", method="pbkdf2:sha256"),
+    "bruker": {
+        "pw": generate_password_hash("passord123", method="pbkdf2:sha256"),
+        "role": "user",
+    },
+    "support": {
+        "pw": generate_password_hash("support123", method="pbkdf2:sha256"),
+        "role": "support",
+    },
 }
 
-TICKETS = []  # hver ticket: {"title": "...", "desc": "...", "owner": "bruker", "status": "Åpen"}
+TICKETS = []  # {"title": "...", "desc": "...", "owner": "...", "status": "Åpen"}
 
 
 def current_user():
     return session.get("user")
+
+
+def current_role():
+    return session.get("role")
 
 
 @bp.route("/")
@@ -31,9 +41,11 @@ def login():
         username = request.form.get("username", "").strip()
         password = request.form.get("password", "")
 
-        if username in USERS and check_password_hash(USERS[username], password):
+        if username in USERS and check_password_hash(USERS[username]["pw"], password):
             session["user"] = username
+            session["role"] = USERS[username]["role"]
             return redirect(url_for("main.tickets"))
+
         error = "Feil brukernavn eller passord."
 
     return render_template("login.html", error=error)
@@ -51,6 +63,8 @@ def tickets():
     if not user:
         return redirect(url_for("main.login"))
 
+    role = current_role()
+
     if request.method == "POST":
         title = request.form.get("title", "").strip()
         desc = request.form.get("desc", "").strip()
@@ -62,5 +76,9 @@ def tickets():
 
         return redirect(url_for("main.tickets"))
 
-    mine = [t for t in TICKETS if t["owner"] == user]
-    return render_template("tickets.html", user=user, tickets=mine)
+    if role == "support":
+        visible = TICKETS
+    else:
+        visible = [t for t in TICKETS if t["owner"] == user]
+
+    return render_template("tickets.html", user=user, role=role, tickets=visible)

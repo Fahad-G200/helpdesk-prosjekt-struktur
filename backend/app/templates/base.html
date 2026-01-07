@@ -20,7 +20,9 @@
       <strong>Helpdesk</strong>
       <nav>
         {% if session.get("user") %}
-          <span class="muted">Innlogget: {{ session.get("user") }}</span>
+          <span class="muted">
+            Innlogget: {{ session.get("user") }} ({{ session.get("role") }})
+          </span>
           <a href="{{ url_for('main.tickets') }}">Mine saker</a>
           <a href="{{ url_for('main.logout') }}">Logg ut</a>
         {% endif %}
