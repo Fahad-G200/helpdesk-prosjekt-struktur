@@ -14,3 +14,9 @@
 - Forklarte roller, drift med Docker og enkel segmentering
 - Skrev personvern og sikkerhet (hvilke data som lagres og tiltak for å beskytte dem)
 - Skrev brukerveiledning for vanlige brukere (innlogging, saker og kunnskapsbase)
+
+
+
+## 2026-01-07
+- Skrev testplan for helpdesk-løsningen (testmiljø, metoder og testtilfeller)
+
