@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>Mine saker</h1>
+
+  <div class="card">
+    <h2>Opprett ny sak</h2>
+    <form method="post">
+      <label>Tittel</label>
+      <input name="title" required />
+
+      <label>Beskrivelse</label>
+      <textarea name="desc" rows="4" required></textarea>
+
+      <button type="submit">Send inn</button>
+    </form>
+  </div>
+
+  {% if tickets|length == 0 %}
+    <p class="muted">Du har ingen saker enda.</p>
+  {% endif %}
+
+  {% for t in tickets %}
+    <div class="card">
+      <strong>{{ t.title }}</strong>
+      <p>{{ t.desc }}</p>
+      <p class="muted">Status: {{ t.status }}</p>
+    </div>
+  {% endfor %}
+{% endblock %}

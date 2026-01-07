@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="no">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Helpdesk</title>
+    <style>
+      body { font-family: Arial, sans-serif; max-width: 900px; margin: 40px auto; padding: 0 16px; }
+      header { display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px; }
+      nav a { margin-left: 12px; }
+      .card { border: 1px solid #ddd; border-radius: 10px; padding: 16px; margin: 12px 0; }
+      input, textarea { width:100%; padding:10px; margin: 6px 0 12px; border-radius: 8px; border: 1px solid #ccc; }
+      button { padding: 10px 14px; border: 0; border-radius: 8px; cursor: pointer; }
+      .error { color: #b00020; }
+      .muted { color: #666; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <strong>Helpdesk</strong>
+      <nav>
+        {% if session.get("user") %}
+          <span class="muted">Innlogget: {{ session.get("user") }}</span>
+          <a href="{{ url_for('main.tickets') }}">Mine saker</a>
+          <a href="{{ url_for('main.logout') }}">Logg ut</a>
+        {% endif %}
+      </nav>
+    </header>
+
+    {% block content %}{% endblock %}
+  </body>
+</html>
