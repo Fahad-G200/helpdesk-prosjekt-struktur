@@ -81,3 +81,31 @@ Prosjektet brukes for å vise kompetanse i **utvikling**, **driftsstøtte** og *
 Prosjektet er under utvikling.  
 Denne versjonen viser planlegging, struktur og start på implementasjon.  
 Løsningen bygges videre i neste periode.
+
+
+# Helpdesk‑prosjekt
+
+Dette prosjektet er et tverrfaglig arbeid hvor du designer og dokumenterer en enkel helpdesk‑løsning for en skole eller liten organisasjon. Målet er å kombinere IT‑ferdigheter (struktur, teknologi), yrkesfaglige serviceferdigheter (kundebehandling) og norsk (tydelig og korrekt fagspråk).
+
+## Innhold
+
+Dette repositoriet inneholder følgende:
+
+| Mappestruktur | Beskrivelse |
+| --- | --- |
+| `README.md` | Kort introduksjon til prosjektet (denne filen). |
+| `docs/prosjektbeskrivelse.md` | Detaljert beskrivelse av bakgrunn, mål og fremgangsmåte for prosjektet. |
+| `docs/refleksjon.md` | Mal (nå med eksempel) for refleksjon rundt eget arbeid. |
+| `system/level1.md` | Veiledning til nivå 1: selvhjelp og standardløsninger. |
+| `system/level2.md` | Veiledning til nivå 2: dypere feilsøking. |
+| `system/level3.md` | Veiledning til nivå 3: sende inn sak/eskalering. |
+| `system/index.html` | Enkel nettside som viser kunnskapsbase og skjema for innmelding. |
+
+## Hvordan bruke
+
+1. **Les prosjektbeskrivelsen** (`docs/prosjektbeskrivelse.md`) for å forstå mål og vurderingskriterier.
+2. **Les og rediger veiledningene** i `system`‑mappen. Disse beskriver hvordan brukere løser problemer på ulike nivåer (selvhjelp, teknikerstøtte, eskalering).
+3. **Åpne `system/index.html`** i en nettleser for å se et eksempel på en enkel kunnskapsbase med de tre nivåene. Her kan du legge til flere kategorier og forbedre utseendet.
+4. **Les og eventuelt tilpass refleksjonen** i `docs/refleksjon.md` når prosjektet er ferdig eller underveis.
+
+Prosjektet kan brukes som basis for en tverrfaglig oppgave der du både viser teknisk forståelse, evne til å planlegge og dokumentere, samt bruk av fagspråk og serviceinnstilling.

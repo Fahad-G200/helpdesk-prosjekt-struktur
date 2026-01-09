@@ -20,3 +20,30 @@
 ## 2026-01-07
 - Skrev testplan for helpdesk-løsningen (testmiljø, metoder og testtilfeller)
 
+# Changelog
+
+Alle viktige endringer i dette prosjektet dokumenteres her.
+
+## [1.0.0] – 2026-01-09
+### Lagt til
+- Opprettet grunnstruktur for helpdesk-prosjektet
+- Implementert helpdesk med tre støttenivåer (nivå 1, 2 og 3)
+- Skrevet selvhjelpsinstruksjoner for vanlige problemer:
+  - Feide-pålogging
+  - Nettverk (Wi-Fi)
+  - Utskrift
+  - Glemt eller låst passord
+- Laget refleksjon skrevet i førsteperson
+- Dokumentert prosjektbeskrivelse, mål og fremgangsmåte
+- Laget enkel HTML-side som demonstrerer helpdesk-flyten
+
+### Endret
+- Forbedret struktur og språk for å gjøre prosjektet mer profesjonelt
+- Tilpasset dokumentasjon til tverrfaglig vurdering
+
+### Planlagt
+- Utvide kunnskapsbasen med flere problemtyper
+- Forbedre design og brukervennlighet
+- Eventuelt implementere lagring av innsendte saker
+
+
