@@ -1,0 +1,12 @@
+{% for t in tickets %}
+  <div class="card">
+    <strong>{{ t.title }}</strong>
+    <p>{{ t.desc }}</p>
+    <p class="muted">Status: {{ t.status }}</p>
+    {% if role == 'support' and t.status != 'Lukket' %}
+      <form action="{{ url_for('main.close_ticket_view', ticket_id=t.id) }}" method="post" style="margin-top: 8px;">
+        <button type="submit">Lukk sak</button>
+      </form>
+    {% endif %}
+  </div>
+{% endfor %}

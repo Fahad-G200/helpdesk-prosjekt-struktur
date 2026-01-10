@@ -29,6 +29,68 @@
       </nav>
     </header>
 
+    <style>
+  body {
+    font-family: Arial, sans-serif;
+    max-width: 960px;
+    margin: 40px auto;
+    padding: 0 16px;
+    background-color: #f4f6f8;
+    color: #333;
+  }
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+  }
+  nav a {
+    margin-left: 12px;
+    text-decoration: none;
+    color: #007bff;
+  }
+  nav a:hover {
+    text-decoration: underline;
+  }
+  .card {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 16px 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+  input, textarea {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0 16px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    font-size: 1rem;
+  }
+  button {
+    padding: 10px 18px;
+    border: 0;
+    border-radius: 8px;
+    cursor: pointer;
+    background-color: #007bff;
+    color: #fff;
+    font-size: 0.9rem;
+  }
+  button:hover {
+    background-color: #0056b3;
+  }
+  .error {
+    color: #b00020;
+  }
+  .muted {
+    color: #666;
+    font-size: 0.9em;
+  }
+</style>
+
+
     {% block content %}{% endblock %}
   </body>
 </html>

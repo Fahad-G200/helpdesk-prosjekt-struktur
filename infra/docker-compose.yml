@@ -1,0 +1,18 @@
+version: "3.9"
+
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile
+    ports:
+      - "8000:5000"
+    volumes:
+      - ../backend/app:/app/app
+      - ../backend/database.db:/app/database.db
+    networks:
+      - backend_net
+
+networks:
+  backend_net:
+    driver: bridge
