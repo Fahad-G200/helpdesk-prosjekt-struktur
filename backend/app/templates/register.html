@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="card">
+  <h1>Registrer bruker</h1>
+  <p class="muted">Opprett en ny bruker for å sende inn og følge opp supportsaker.</p>
+
+  {% if error %}
+    <p class="error">{{ error }}</p>
+  {% endif %}
+
+  <form method="post">
+    <label>Brukernavn</label>
+    <input type="text" name="username" placeholder="minbruker" required>
+
+    <label>Passord</label>
+    <input type="password" name="password" placeholder="Minst 8 tegn" required>
+
+    <label>Gjenta passord</label>
+    <input type="password" name="password2" placeholder="Gjenta passord" required>
+
+    <button type="submit">Registrer</button>
+  </form>
+
+  <p class="muted" style="margin-top:14px;">
+    Har du allerede bruker?
+    <a href="{{ url_for('main.login') }}">Logg inn</a>
+  </p>
+</div>
+
+{% endblock %}

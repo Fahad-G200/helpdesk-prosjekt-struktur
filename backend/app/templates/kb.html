@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="card">
+  <h1>Kunnskapsbase (nivå 1–3)</h1>
+  <p class="muted">
+    Start alltid med nivå 1. Hvis problemet ikke løses, gå videre til nivå 2.
+    Nivå 3 brukes når du må sende inn en sak.
+  </p>
+</div>
+
+<div class="card">
+  <h2>Nivå 1 – Selvbetjening</h2>
+  <p>Vanlige problemer du kan prøve å løse selv:</p>
+
+  <h3>Feide-pålogging</h3>
+  <ul>
+    <li>Sjekk brukernavn/passord (Caps Lock)</li>
+    <li>Velg riktig skole/organisasjon</li>
+    <li>Prøv inkognito/privat vindu</li>
+    <li>Tøm cache/cookies og prøv igjen</li>
+  </ul>
+
+  <h3>Wi-Fi / Nettverk</h3>
+  <ul>
+    <li>Slå Wi-Fi av og på</li>
+    <li>Koble til riktig nettverk</li>
+    <li>Restart enheten</li>
+  </ul>
+
+  <h3>Utskrift</h3>
+  <ul>
+    <li>Velg riktig skriver</li>
+    <li>Sjekk papir/toner</li>
+    <li>Restart skriver og PC</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2>Nivå 2 – Videre feilsøking</h2>
+  <p>Før du kontakter support, samle denne informasjonen:</p>
+  <ul>
+    <li>Tidspunkt for feilen</li>
+    <li>Nøyaktig feilmelding</li>
+    <li>Skjermbilde av feilen</li>
+    <li>Hva du har prøvd (nivå 1)</li>
+    <li>Enhet/OS + nettleser</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2>Nivå 3 – Send inn sak</h2>
+  <p>Hvis nivå 1 og 2 ikke løser problemet, opprett en supportsak med all info.</p>
+  <a class="btn" href="{{ url_for('main.tickets') }}">Gå til Mine saker</a>
+</div>
+
+{% endblock %}

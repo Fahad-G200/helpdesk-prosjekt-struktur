@@ -75,7 +75,8 @@
 
     input[type="text"],
     input[type="email"],
-    textarea {
+    textarea,
+    select {
       padding: 0.5rem;
       border: 1px solid #ccc;
       border-radius: 4px;
@@ -102,6 +103,12 @@
       font-size: 0.9rem;
       color: #555;
     }
+
+    .controls {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 1rem;
+    }
   </style>
 </head>
 
@@ -112,14 +119,15 @@
   </header>
 
   <nav>
-    <a href="#level1">Nivå 1: Selvbetjening</a>
-    <a href="#level2">Nivå 2: Videre støtte</a>
-    <a href="#level3">Nivå 3: Send inn sak</a>
+    <a href="#level1">Nivå 1</a>
+    <a href="#level2">Nivå 2</a>
+    <a href="#level3">Nivå 3</a>
   </nav>
 
-  <!-- 🔍 SØK + FILTER (rett etter nav) -->
-  <section>
+  <!-- 🔍 SØK + FILTER (viser/skjuler kun ekstra seksjoner – nivåene forsvinner aldri) -->
+  <section class="controls">
     <h2>Finn riktig hjelp</h2>
+
     <input id="search" type="text" placeholder="Søk (f.eks. Feide, passord, Wi-Fi)..." />
 
     <select id="filter">
@@ -134,26 +142,43 @@
   </section>
 
   <main>
-    <section id="level1" data-category="Feide">
-      <h2>Nivå 1 – selvhjelp</h2>
 
-      <h3>Feide-pålogging</h3>
+    <!-- 📄 DOKUMENTER (alltid synlig) -->
+    <section class="always" data-category="Alle">
+      <h2>Dokumenter og veiledninger</h2>
+      <ul>
+        <li><a href="level1.md">Nivå 1 – Selvbetjening</a></li>
+        <li><a href="level2.md">Nivå 2 – Videre feilsøking</a></li>
+        <li><a href="level3.md">Nivå 3 – Innsending og eskalering</a></li>
+        <li><a href="brukerveiledning.md">Brukerveiledning</a></li>
+        <li><a href="testplan.md">Testplan</a></li>
+        <li><a href="krav.md">Krav</a></li>
+        <li><a href="arkitektur.md">Arkitektur</a></li>
+        <li><a href="personvern.md">Personvern</a></li>
+        <li><a href="prosjektbeskrivelse.md">Prosjektbeskrivelse</a></li>
+        <li><a href="refleksjon.md">Refleksjon</a></li>
+        <li><a href="feilsoking.md">Feilsøking</a></li>
+        <li><a href="ai-logg.md">AI-logg</a></li>
+      </ul>
+      <p class="note">Dokumentene åpnes som Markdown-filer. Det er ok for demo, siden de ligger i prosjektet.</p>
+    </section>
+
+    <!-- ✅ NIVÅ 1 (alltid synlig) -->
+    <section id="level1" class="always" data-category="Feide">
+      <h2>Nivå 1 – selvhjelp</h2>
+      <p>Prøv dette først. Det løser de fleste problemer uten at du må kontakte support.</p>
       <ul>
         <li>Sjekk brukernavn og passord</li>
         <li>Velg riktig organisasjon</li>
-        <li>Prøv inkognito-vindu</li>
-      </ul>
-
-      <h3>Wi-Fi</h3>
-      <ul>
-        <li>Sjekk at Wi-Fi er aktivert</li>
-        <li>Koble til riktig nettverk</li>
-        <li>Start enheten på nytt</li>
+        <li>Prøv inkognito-vindu og slett cache/cookies</li>
+        <li>Sjekk at internett fungerer</li>
       </ul>
     </section>
 
-    <section id="level2" data-category="Wi-Fi">
+    <!-- ✅ NIVÅ 2 (alltid synlig) -->
+    <section id="level2" class="always" data-category="Wi-Fi">
       <h2>Nivå 2 – videre støtte</h2>
+      <p>Hvis nivå 1 ikke fungerer, samle informasjon før du går videre.</p>
       <ul>
         <li>Ta skjermbilde av feilmelding</li>
         <li>Noter tidspunkt og hva du har prøvd</li>
@@ -161,31 +186,36 @@
       </ul>
     </section>
 
-    <section id="level3" data-category="Alle">
+    <!-- ✅ NIVÅ 3 (alltid synlig) -->
+    <section id="level3" class="always" data-category="Alle">
       <h2>Nivå 3 – send inn sak</h2>
+      <p>Send inn saken kun hvis nivå 1 og 2 ikke fungerer.</p>
 
       <form method="post">
         <label>Navn</label>
-        <input type="text" name="name" required>
+        <input type="text" required>
 
         <label>E-post</label>
-        <input type="email" name="email" required>
+        <input type="email" required>
 
         <label>Kategori</label>
-        <input type="text" name="category" required>
+        <input type="text" placeholder="F.eks. Feide / Wi-Fi / Utskrift" required>
 
         <label>Beskrivelse</label>
-        <textarea name="description" rows="5" required></textarea>
+        <textarea rows="5" placeholder="Hva skjer? Når? Hva har du prøvd på nivå 1 og 2?" required></textarea>
 
         <label>Enhet</label>
-        <input type="text" name="device" required>
+        <input type="text" placeholder="F.eks. Mac + Safari / Windows + Chrome" required>
 
         <input type="submit" value="Send inn">
       </form>
+
+      <p class="note"><em>Hvis du har brukt “mottatt sak”-visning i en annen versjon, kan vi legge det inn her igjen etterpå.</em></p>
     </section>
+
   </main>
 
-  <!-- ✅ JAVASCRIPT – SKAL LIGGE HER, RETT FØR </body> -->
+  <!-- ✅ JAVASCRIPT (filtrerer kun seksjoner som IKKE er always) -->
   <script>
     const search = document.getElementById("search");
     const filter = document.getElementById("filter");
@@ -196,6 +226,12 @@
       const f = filter.value;
 
       sections.forEach(s => {
+        // Alltid synlige seksjoner skjules aldri
+        if (s.classList.contains("always")) {
+          s.style.display = "";
+          return;
+        }
+
         const text = s.innerText.toLowerCase();
         const cat = s.getAttribute("data-category") || "Alle";
 
