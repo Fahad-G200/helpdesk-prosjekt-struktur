@@ -52,39 +52,46 @@ Alle viktige endringer i dette prosjektet dokumenteres her.
 
 Alle vesentlige endringer i prosjektet dokumenteres i denne filen.
 
-## [1.0.0] – 2026-01-10
+2026-01-10
 ### Nytt
-- Opprettet komplett prosjektstruktur for helpdesk og kunnskapsbase (docs, backend, infra)
+- Opprettet komplett prosjektstruktur for helpdesk og kunnskapsbase (docs, backend, infra, site)
 - Implementert nivåbasert brukerstøtte (nivå 1–3) med tydelig eskaleringsflyt
+- Lagt til kunnskapsbase i backend (/kb) integrert med innlogging og felles design
 - Lagt til innsendingsskjema på nivå 3 med kategori, prioritet og enhet/programvare
-- Implementert visning av mottatt sak på nettsiden (demonstrasjon uten backend-lagring)
-- Lagt til database for lagring av saker
-- Implementert roller for bruker og support
-- Support-bruker kan se og lukke saker
-- Oppdatert testplan, personvern og arkitektur-dokumentasjon
-- Satt opp Docker (nginx) for lokal kjøring av prosjektet
+- Implementert ticketsystem med opprettelse, visning og lukking av saker
+- Lagt til SQLite-database for lagring av brukere og saker
+- Implementert registreringsside for nye brukere
+- Implementert roller (bruker og support/admin)
+- Lagt til fast admin/support-bruker som kan se og håndtere alle saker
+- Support-bruker kan lukke saker og følge status
+- Satt opp Docker (nginx) for lokal kjøring av prosjektet uavhengig av skolens nettverk
+- Oppdatert og fullført dokumentasjon (testplan, personvern, arkitektur, refleksjon)
 
 ### Endret
-- Gått fra midlertidig lagring til database for saker
-- Forbedret struktur i backend-koden
-- Forbedret design og brukeropplevelse på nettsiden
-- Forbedret oversikt over saker og status
-- Rettet Dockerfile fra feil mappe (`system/`) til riktig mappe (`docs/`)
-- Forbedret innhold og struktur i dokumentasjon (README, prosjektbeskrivelse og refleksjon)
+- Gått fra midlertidig/demonstrasjonslagring til databasebasert lagring
+- Forbedret struktur i backend-koden (routes, database, templates)
+- Forbedret navigasjon og brukeropplevelse i backend (felles layout og meny)
+- Forbedret design og struktur på nettsiden for mer profesjonelt uttrykk
+- Rettet Dockerfile fra feil mappe (`system/`) til korrekt innhold (`docs` / `site`)
+- Forbedret innhold og sammenheng i README, prosjektbeskrivelse og refleksjon
 
 ### Fikset
-- Rettet feil der saker forsvant ved omstart
-- Forbedret tilgangskontroll (bruker vs. support)
-- Rettet feil der `localhost` ikke fungerte som forventet ved testing
-  - Prosjektet kjøres nå via `http://127.0.0.1:8080`
-- Ryddet opp i HTML-struktur slik at skjema vises korrekt
+- Rettet feil der saker forsvant ved omstart (manglende database)
+- Rettet feil der admin-bruker manglet i databasen
+- Forbedret tilgangskontroll mellom bruker og support/admin
+- Rettet problemer med lokal kjøring (`localhost`) ved testing
+  - Prosjektet kjøres nå stabilt via `http://127.0.0.1:8080`
+- Ryddet opp i HTML- og CSS-struktur for å sikre korrekt visning
 
 ### Notater
 - Dette er første ferdige hovedversjon av prosjektet (versjon 1.0.0)
-- Prosjektet dekker kompetansemål innen utvikling, drift og brukerstøtte
+- Prosjektet viser en helhetlig helpdesk-løsning med brukerstøtte, roller og saksbehandling
 - Løsningen kan kjøres lokalt og er uavhengig av skolens nettverk
+- Standard admin for demo/testing:
+  - Brukernavn: `admin`
+  - Passord: `admin123`
 
 ### Planlagt videre arbeid
-- Koble nivå 3-innsendingsskjema direkte til backend for full saksbehandling
-- Utvide kunnskapsbasen med flere artikler og søk/filtrering
-- Gjennomføre og dokumentere flere tester og feilrettinger
+- Koble nivå 3-innsendingsskjema enda tettere mot backend (for eksempel forhåndsvalgt kategori)
+- Utvide kunnskapsbasen med flere artikler og bedre søk
+- Gjennomføre flere tester og dokumentere testresultater
