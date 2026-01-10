@@ -47,3 +47,7 @@ Alle viktige endringer i dette prosjektet dokumenteres her.
 - Eventuelt implementere lagring av innsendte saker
 
 
+
+2026-01-10
+
+- Satt opp Docker (nginx) for å kjøre helpdesk lokalt hjemme via localhost

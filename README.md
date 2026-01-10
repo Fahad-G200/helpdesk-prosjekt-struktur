@@ -109,3 +109,25 @@ Dette repositoriet inneholder følgende:
 4. **Les og eventuelt tilpass refleksjonen** i `docs/refleksjon.md` når prosjektet er ferdig eller underveis.
 
 Prosjektet kan brukes som basis for en tverrfaglig oppgave der du både viser teknisk forståelse, evne til å planlegge og dokumentere, samt bruk av fagspråk og serviceinnstilling.
+
+
+## Kjøring hjemme med Docker (lokalt miljø)
+
+Dette prosjektet kan kjøres lokalt hjemme uten skolens nettverk ved hjelp av Docker.
+
+### Start
+1. Bygg image:
+   docker build -t helpdesk-app .
+2. Start container:
+   docker run --name helpdesk -p 8080:80 helpdesk-app
+3. Åpne i nettleser:
+   http://localhost:8080
+
+### Stopp
+docker stop helpdesk
+
+### Start igjen
+docker start helpdesk
+
+### Slett container (hvis du vil kjøre på nytt)
+docker rm -f helpdesk

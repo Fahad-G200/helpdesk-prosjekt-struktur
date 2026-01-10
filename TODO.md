@@ -18,3 +18,4 @@
 - [ ] Lage system for lagring av innsendinger
 - [ ] Automatisk svar ved innsending av sak
 - [ ] Søkemulighet i kunnskapsbasen
+- [x] Sette opp Docker for å kjøre helpdesk lokalt hjemme
