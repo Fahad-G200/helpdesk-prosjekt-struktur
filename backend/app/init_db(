@@ -1,13 +1,14 @@
 # backend/app/__init__.py
 from flask import Flask
-from .db import init_db   # legg til denne importen
+from .db import init_db
 
 def create_app():
     app = Flask(__name__)
     app.config["SECRET_KEY"] = "bytt-meg-senere"
 
-    init_db()  # opprett tabellen hvis den mangler
+    init_db()  # oppretter tabeller + admin-bruker hvis de mangler
 
     from .routes import bp
     app.register_blueprint(bp)
+
     return app
