@@ -9,87 +9,179 @@
     header{background:#2c3e50;color:#fff;padding:18px;text-align:center}
     nav{background:#34495e;padding:10px;text-align:center}
     nav a{color:#fff;margin:0 10px;text-decoration:none;font-weight:600}
+    nav a:hover{text-decoration:underline}
     main{max-width:900px;margin:0 auto;padding:18px}
     section{background:#fff;border-radius:10px;padding:16px;margin:14px 0;box-shadow:0 2px 6px rgba(0,0,0,.08)}
     h2{margin:0 0 10px;color:#2c3e50}
     ul{line-height:1.6}
     .note{color:#555;font-size:.95rem}
-    input, textarea, select, button{padding:8px;width:100%;max-width:400px}
-    button{background:#2c3e50;color:#fff;border:none;cursor:pointer}
+    label{display:block;font-weight:600;margin-top:10px}
+    input, select, textarea{
+      width:100%;
+      max-width:520px;
+      padding:10px;
+      margin-top:6px;
+      border:1px solid #cfd6df;
+      border-radius:8px;
+      box-sizing:border-box;
+      font-size:1rem;
+    }
+    button{
+      margin-top:14px;
+      padding:10px 14px;
+      border-radius:8px;
+      border:none;
+      background:#2c3e50;
+      color:#fff;
+      font-weight:700;
+      cursor:pointer;
+    }
+    button:hover{opacity:.92}
+    .success{border-left:6px solid #27ae60}
+    .muted{opacity:.9}
+    .small{font-size:.9rem}
   </style>
 </head>
 <body>
+  <header>
+    <h1>Helpdesk</h1>
+    <p>Følg nivåene under for å løse problemet raskt</p>
+  </header>
 
-<header>
-  <h1>Helpdesk</h1>
-  <p>Følg nivåene under for å løse problemet raskt</p>
-</header>
+  <nav>
+    <a href="#n1">Nivå 1</a>
+    <a href="#n2">Nivå 2</a>
+    <a href="#n3">Nivå 3</a>
+    <a href="#send">Send inn sak</a>
+  </nav>
 
-<nav>
-  <a href="#n1">Nivå 1</a>
-  <a href="#n2">Nivå 2</a>
-  <a href="#n3">Nivå 3</a>
-</nav>
+  <main>
+    <section id="n1">
+      <h2>Nivå 1 – selvhjelp</h2>
+      <p>Prøv dette først. Det løser de fleste problemer uten at du må sende melding.</p>
 
-<main>
-  <section id="n1">
-    <h2>Nivå 1 – selvhjelp</h2>
-    <p>Prøv dette først. Det løser de fleste problemer uten at du må sende melding.</p>
+      <h3>Feide-pålogging</h3>
+      <ul>
+        <li>Sjekk brukernavn/passord (Caps Lock)</li>
+        <li>Velg riktig organisasjon/skole</li>
+        <li>Prøv inkognito og tøm cache/cookies</li>
+        <li>Sjekk internett</li>
+      </ul>
 
-    <h3>Feide-pålogging</h3>
-    <ul>
-      <li>Sjekk brukernavn/passord</li>
-      <li>Velg riktig skole</li>
-      <li>Prøv inkognito og tøm cache</li>
-      <li>Sjekk internett</li>
-    </ul>
-  </section>
+      <h3>Wi-Fi</h3>
+      <ul>
+        <li>Slå Wi-Fi av/på</li>
+        <li>Koble til riktig nettverk</li>
+        <li>Restart enheten</li>
+      </ul>
 
-  <section id="n2">
-    <h2>Nivå 2 – videre feilsøking</h2>
-    <ul>
-      <li>Noter tidspunkt og feilmelding</li>
-      <li>Ta skjermbilde</li>
-      <li>Beskriv hva du har prøvd</li>
-    </ul>
-  </section>
+      <p class="note">Hvis det ikke løser problemet, gå videre til nivå 2.</p>
+    </section>
 
-  <section id="n3">
-    <h2>Nivå 3 – send inn sak</h2>
-    <p>Bruk skjemaet under kun hvis nivå 1 og 2 ikke fungerer.</p>
-  </section>
+    <section id="n2">
+      <h2>Nivå 2 – videre feilsøking</h2>
+      <ul>
+        <li>Noter tidspunkt og nøyaktig feilmelding</li>
+        <li>Ta skjermbilde</li>
+        <li>Skriv hvilke steg du allerede har prøvd</li>
+        <li>Oppgi enhet og nettleser</li>
+      </ul>
+      <p class="note">Hvis det fortsatt ikke går, send inn sak på nivå 3.</p>
+    </section>
 
-  <section id="send">
-    <h2>Send inn sak (nivå 3)</h2>
+    <section id="n3">
+      <h2>Nivå 3 – send inn sak</h2>
+      <p>Send inn saken kun hvis nivå 1 og 2 ikke fungerer. Skjemaet under sørger for at du sender med riktig informasjon, slik at IT-ansvarlig (meg) slipper unødvendige meldinger.</p>
+      <ul>
+        <li>Navn + kontaktinfo</li>
+        <li>Beskrivelse av problemet + hva du har prøvd</li>
+        <li>Feilmelding + skjermbilde</li>
+        <li>Enhet/OS + nettleser</li>
+      </ul>
+    </section>
 
-    <form>
-      <label>Navn:<br>
-        <input type="text" required>
-      </label><br><br>
+    <section id="send">
+      <h2>Send inn sak (nivå 3)</h2>
+      <p class="muted">Dette er en demonstrasjon. Saken blir ikke lagret i database – men vises på skjermen som “mottatt sak”, slik at jeg kan se den.</p>
 
-      <label>E-post:<br>
-        <input type="email" required>
-      </label><br><br>
+      <form id="ticketForm">
+        <label for="name">Navn</label>
+        <input id="name" name="name" type="text" placeholder="Ditt navn" required />
 
-      <label>Kategori:<br>
-        <select>
-          <option>Feide</option>
-          <option>Wi-Fi</option>
-          <option>Utskrift</option>
-          <option>Annet</option>
+        <label for="email">E-post</label>
+        <input id="email" name="email" type="email" placeholder="din.epost@eksempel.no" required />
+
+        <label for="category">Kategori</label>
+        <select id="category" name="category" required>
+          <option value="Feide">Feide</option>
+          <option value="Wi-Fi">Wi-Fi</option>
+          <option value="Utskrift">Utskrift</option>
+          <option value="Passord">Passord</option>
+          <option value="Annet">Annet</option>
         </select>
-      </label><br><br>
 
-      <label>Beskrivelse:<br>
-        <textarea rows="5" required></textarea>
-      </label><br><br>
+        <label for="priority">Prioritet</label>
+        <select id="priority" name="priority" required>
+          <option value="Lav">Lav</option>
+          <option value="Middels">Middels</option>
+          <option value="Høy">Høy</option>
+        </select>
 
-      <button type="submit">Send inn</button>
-    </form>
+        <label for="description">Beskrivelse av problemet</label>
+        <textarea id="description" name="description" rows="6" placeholder="Hva skjer? Når? Hva har du prøvd på nivå 1 og 2?" required></textarea>
 
-    <p><em>Dette er kun en demonstrasjon. Innsendingen lagres ikke.</em></p>
-  </section>
-</main>
+        <button type="submit">Send inn</button>
 
+        <p class="note small"><em>Når du trykker “Send inn” vises saken under som mottatt av IT-ansvarlig (meg).</em></p>
+      </form>
+
+      <!-- Her vises saken etter innsending -->
+      <div id="result" style="display:none; margin-top:16px;"></div>
+    </section>
+  </main>
+
+  <script>
+    const form = document.getElementById("ticketForm");
+    const result = document.getElementById("result");
+
+    function escapeHtml(text) {
+      return text
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const category = document.getElementById("category").value;
+      const priority = document.getElementById("priority").value;
+      const description = document.getElementById("description").value.trim();
+
+      const timestamp = new Date().toLocaleString("no-NO");
+
+      result.style.display = "block";
+      result.innerHTML = `
+        <section class="success">
+          <h2>Mottatt sak (nivå 3)</h2>
+          <p><strong>Tidspunkt:</strong> ${escapeHtml(timestamp)}</p>
+          <p><strong>Navn:</strong> ${escapeHtml(name)}</p>
+          <p><strong>E-post:</strong> ${escapeHtml(email)}</p>
+          <p><strong>Kategori:</strong> ${escapeHtml(category)}</p>
+          <p><strong>Prioritet:</strong> ${escapeHtml(priority)}</p>
+          <p><strong>Beskrivelse:</strong><br>${escapeHtml(description).replaceAll("\\n","<br>")}</p>
+          <p class="note"><em>Saken er mottatt av IT-ansvarlig (meg). Neste steg er å feilsøke eller eskalere ved behov.</em></p>
+        </section>
+      `;
+
+      form.reset();
+      // Scroll ned til mottatt sak
+      result.scrollIntoView({ behavior: "smooth" });
+    });
+  </script>
 </body>
 </html>
