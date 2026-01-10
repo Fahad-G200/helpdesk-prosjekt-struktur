@@ -48,31 +48,43 @@ Alle viktige endringer i dette prosjektet dokumenteres her.
 
 
 
-2026-01-10
+# Changelog
 
-- Satt opp Docker (nginx) for å kjøre helpdesk lokalt hjemme via localhost
-- Satt opp Docker (nginx) for å kjøre helpdesk lokalt via http://127.0.0.1:8080
+Alle vesentlige endringer i prosjektet dokumenteres i denne filen.
 
-
-2026-01-10
-
+## [1.0.0] – 2026-01-10
 ### Nytt
+- Opprettet komplett prosjektstruktur for helpdesk og kunnskapsbase (docs, backend, infra)
+- Implementert nivåbasert brukerstøtte (nivå 1–3) med tydelig eskaleringsflyt
+- Lagt til innsendingsskjema på nivå 3 med kategori, prioritet og enhet/programvare
+- Implementert visning av mottatt sak på nettsiden (demonstrasjon uten backend-lagring)
 - Lagt til database for lagring av saker
-- Roller for bruker og support
-- Support kan lukke saker
-- Docker-oppsett for kjøring av prosjektet
-- Script for database-oppsett og backup
+- Implementert roller for bruker og support
+- Support-bruker kan se og lukke saker
+- Oppdatert testplan, personvern og arkitektur-dokumentasjon
+- Satt opp Docker (nginx) for lokal kjøring av prosjektet
 
 ### Endret
-- Gått fra midlertidig lagring til database
-- Forbedret struktur i koden
-- Forbedret design og brukeropplevelse
-- Bedre oversikt over saker og status
+- Gått fra midlertidig lagring til database for saker
+- Forbedret struktur i backend-koden
+- Forbedret design og brukeropplevelse på nettsiden
+- Forbedret oversikt over saker og status
+- Rettet Dockerfile fra feil mappe (`system/`) til riktig mappe (`docs/`)
+- Forbedret innhold og struktur i dokumentasjon (README, prosjektbeskrivelse og refleksjon)
 
 ### Fikset
-- Saker forsvinner ikke lenger ved omstart
-- Bedre kontroll på hvem som kan gjøre hva i systemet
+- Rettet feil der saker forsvant ved omstart
+- Forbedret tilgangskontroll (bruker vs. support)
+- Rettet feil der `localhost` ikke fungerte som forventet ved testing
+  - Prosjektet kjøres nå via `http://127.0.0.1:8080`
+- Ryddet opp i HTML-struktur slik at skjema vises korrekt
 
-### Notat
-- Dette er første ferdige versjon av prosjektet (versjon 1.0)
-- Prosjektet dekker kompetansemål i utvikling, drift og brukerstøtte
+### Notater
+- Dette er første ferdige hovedversjon av prosjektet (versjon 1.0.0)
+- Prosjektet dekker kompetansemål innen utvikling, drift og brukerstøtte
+- Løsningen kan kjøres lokalt og er uavhengig av skolens nettverk
+
+### Planlagt videre arbeid
+- Koble nivå 3-innsendingsskjema direkte til backend for full saksbehandling
+- Utvide kunnskapsbasen med flere artikler og søk/filtrering
+- Gjennomføre og dokumentere flere tester og feilrettinger
