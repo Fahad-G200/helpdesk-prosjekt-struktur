@@ -72,9 +72,19 @@ def tickets():
     if request.method == "POST":
         title = request.form.get("title", "").strip()
         desc = request.form.get("desc", "").strip()
+        category = request.form.get("category", "Annet").strip()
+        priority = request.form.get("priority", "Middels").strip()
+        device = request.form.get("device", "").strip()
 
         if title and desc:
-            add_ticket(owner=user, title=title, desc=desc)
+            add_ticket(
+                owner=user,
+                title=title,
+                desc=desc,
+                category=category,
+                priority=priority,
+                device=device,
+            )
 
         return redirect(url_for("main.tickets"))
 

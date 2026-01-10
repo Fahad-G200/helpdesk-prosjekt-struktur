@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Helpdesk – nivå 1–3</title>
+
   <style>
     body {
       font-family: sans-serif;
@@ -12,12 +13,14 @@
       background-color: #f7f9fc;
       color: #2d2d2d;
     }
+
     header {
       background-color: #2c3e50;
       color: white;
       padding: 1rem;
       text-align: center;
     }
+
     nav {
       display: flex;
       justify-content: center;
@@ -25,19 +28,23 @@
       background-color: #34495e;
       padding: 0.5rem 0;
     }
+
     nav a {
       color: white;
       text-decoration: none;
       font-weight: bold;
     }
+
     nav a:hover {
       text-decoration: underline;
     }
+
     main {
       max-width: 900px;
       margin: 0 auto;
       padding: 1rem;
     }
+
     section {
       margin-bottom: 2rem;
       padding: 1rem;
@@ -45,22 +52,27 @@
       border-radius: 8px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
+
     h2 {
       margin-top: 0;
       color: #2c3e50;
     }
+
     ul {
       line-height: 1.6;
       margin-left: 1rem;
     }
+
     form {
       display: flex;
       flex-direction: column;
       gap: 0.75rem;
     }
+
     label {
       font-weight: bold;
     }
+
     input[type="text"],
     input[type="email"],
     textarea {
@@ -71,6 +83,7 @@
       width: 100%;
       box-sizing: border-box;
     }
+
     input[type="submit"] {
       background-color: #27ae60;
       color: white;
@@ -80,90 +93,122 @@
       border-radius: 4px;
       cursor: pointer;
     }
+
     input[type="submit"]:hover {
       background-color: #1e8449;
     }
+
     .note {
       font-size: 0.9rem;
       color: #555;
     }
   </style>
 </head>
+
 <body>
   <header>
     <h1>Helpdesk</h1>
     <p>Løs problemer raskt ved å følge nivåene under</p>
   </header>
+
   <nav>
-    <a href="#level1">Nivå 1: Selvbetjening</a>
-    <a href="#level2">Nivå 2: Videre støtte</a>
-    <a href="#level3">Nivå 3: Send inn sak</a>
+    <a href="#level1">Nivå 1: Selvbetjening</a>
+    <a href="#level2">Nivå 2: Videre støtte</a>
+    <a href="#level3">Nivå 3: Send inn sak</a>
   </nav>
+
+  <!-- 🔍 SØK + FILTER (rett etter nav) -->
+  <section>
+    <h2>Finn riktig hjelp</h2>
+    <input id="search" type="text" placeholder="Søk (f.eks. Feide, passord, Wi-Fi)..." />
+
+    <select id="filter">
+      <option value="Alle">Alle</option>
+      <option value="Feide">Feide</option>
+      <option value="Wi-Fi">Wi-Fi</option>
+      <option value="Utskrift">Utskrift</option>
+      <option value="Passord">Passord</option>
+    </select>
+
+    <p class="note">Tips: prøv nivå 1 først før du sender inn sak.</p>
+  </section>
+
   <main>
-    <section id="level1">
-      <h2>Nivå 1 – selvhjelp</h2>
-      <p>Her finner du raske løsninger på de vanligste problemene. Følg hvert trinn nøye før du går videre.</p>
-      <h3>1. Feide‑pålogging</h3>
+    <section id="level1" data-category="Feide">
+      <h2>Nivå 1 – selvhjelp</h2>
+
+      <h3>Feide-pålogging</h3>
       <ul>
-        <li>Kontroller brukernavn og passord.</li>
-        <li>Velg riktig organisasjon i innloggingsvinduet.</li>
-        <li>Sjekk at du er tilkoblet internett.</li>
-        <li>Prøv inkognito‑vindu og tøm informasjonskapsler.</li>
-        <li>Hvis du har byttet skole, sjekk at tjenesten er aktivert for din nye skole.</li>
+        <li>Sjekk brukernavn og passord</li>
+        <li>Velg riktig organisasjon</li>
+        <li>Prøv inkognito-vindu</li>
       </ul>
-      <h3>2. Nettverksproblemer</h3>
+
+      <h3>Wi-Fi</h3>
       <ul>
-        <li>Sjekk at Wi‑Fi er aktivert og at du er tilkoblet riktig nettverk.</li>
-        <li>Start enheten på nytt og glem nettverket og koble til på nytt.</li>
-        <li>Sjekk om det er driftsmeldinger om nettverket.</li>
-      </ul>
-      <h3>3. Utskriftsproblemer</h3>
-      <ul>
-        <li>Kontroller at skriveren er på og koblet til.</li>
-        <li>Velg riktig skriver i utskriftsdialogen.</li>
-        <li>Fyll på papir og blekk.</li>
-        <li>Start skriveren på nytt og rydd utskriftskøen.</li>
-      </ul>
-      <h3>4. Glemt eller låst passord</h3>
-      <ul>
-        <li>Bruk “Glemt passord”‑funksjonen.</li>
-        <li>Husk at det kan ta opptil 30 minutter før nytt passord aktiveres.</li>
-      </ul>
-      <p class="note">Hvis problemet vedvarer, gå videre til <a href="#level2">nivå 2</a>.</p>
-    </section>
-    <section id="level2">
-      <h2>Nivå 2 – videre støtte</h2>
-      <p>Dersom nivå 1 ikke løser problemet, samler vi mer informasjon og prøver dypere feilsøking.</p>
-      <ul>
-        <li>Noter tid, nøyaktig feilmelding (inkludert sporingsnummer) og ta skjermbilde.</li>
-        <li>Beskriv hvilke steg du har prøvd og hva som skjedde.</li>
-        <li>Oppgi hvilken enhet og nettleser du bruker.</li>
-        <li>Supportperson vil kontakte deg for mer detaljert feilsøking. Hvis vi ikke finner en løsning, eskaleres saken til nivå 3.</li>
+        <li>Sjekk at Wi-Fi er aktivert</li>
+        <li>Koble til riktig nettverk</li>
+        <li>Start enheten på nytt</li>
       </ul>
     </section>
-    <section id="level3">
-      <h2>Nivå 3 – send inn sak</h2>
-      <p>Når problemet ikke kan løses på nivå 1 eller 2, sender du inn en sak til IT‑ansvarlig. Fyll ut alle feltene nedenfor slik at vi kan hjelpe deg raskt:</p>
-      <form action="#" method="post">
-        <label for="name">Navn:</label>
-        <input type="text" id="name" name="name" required>
 
-        <label for="email">E‑post:</label>
-        <input type="email" id="email" name="email" required>
+    <section id="level2" data-category="Wi-Fi">
+      <h2>Nivå 2 – videre støtte</h2>
+      <ul>
+        <li>Ta skjermbilde av feilmelding</li>
+        <li>Noter tidspunkt og hva du har prøvd</li>
+        <li>Oppgi enhet og nettleser</li>
+      </ul>
+    </section>
 
-        <label for="category">Kategori:</label>
-        <input type="text" id="category" name="category" placeholder="F.eks. Feide, nettverk, utskrift" required>
+    <section id="level3" data-category="Alle">
+      <h2>Nivå 3 – send inn sak</h2>
 
-        <label for="description">Beskrivelse av problemet:</label>
-        <textarea id="description" name="description" rows="6" placeholder="Forklar nøyaktig hva som skjer, når det skjedde, og hvilke trinn du har prøvd." required></textarea>
+      <form method="post">
+        <label>Navn</label>
+        <input type="text" name="name" required>
 
-        <label for="device">Enhet/Programvare:</label>
-        <input type="text" id="device" name="device" placeholder="F.eks. Windows 10, Chrome 120, iPhone" required>
+        <label>E-post</label>
+        <input type="email" name="email" required>
+
+        <label>Kategori</label>
+        <input type="text" name="category" required>
+
+        <label>Beskrivelse</label>
+        <textarea name="description" rows="5" required></textarea>
+
+        <label>Enhet</label>
+        <input type="text" name="device" required>
 
         <input type="submit" value="Send inn">
       </form>
-      <p class="note">NB! Dette skjemaet er kun et eksempel; tilpass det til skolens rutiner. Du kan også sende e‑post med samme informasjon.</p>
     </section>
   </main>
+
+  <!-- ✅ JAVASCRIPT – SKAL LIGGE HER, RETT FØR </body> -->
+  <script>
+    const search = document.getElementById("search");
+    const filter = document.getElementById("filter");
+    const sections = Array.from(document.querySelectorAll("main section"));
+
+    function apply() {
+      const q = (search.value || "").toLowerCase();
+      const f = filter.value;
+
+      sections.forEach(s => {
+        const text = s.innerText.toLowerCase();
+        const cat = s.getAttribute("data-category") || "Alle";
+
+        const matchText = text.includes(q);
+        const matchFilter = (f === "Alle") || (cat === f);
+
+        s.style.display = (matchText && matchFilter) ? "" : "none";
+      });
+    }
+
+    search.addEventListener("input", apply);
+    filter.addEventListener("change", apply);
+  </script>
+
 </body>
 </html>

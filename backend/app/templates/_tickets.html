@@ -6,12 +6,36 @@
     <h2>Opprett ny sak</h2>
     <form method="post">
       <label>Tittel</label>
-      <input name="title" required />
+      <input type="text" name="title" required />
 
       <label>Beskrivelse</label>
-      <textarea name="desc" rows="4" required></textarea>
+      <textarea name="desc" rows="5" required></textarea>
 
-      <button type="submit">Send inn</button>
+      <label>Kategori</label>
+      <select name="category" required>
+        <option>Feide</option>
+        <option>Wi-Fi</option>
+        <option>Utskrift</option>
+        <option>Passord</option>
+        <option selected>Annet</option>
+      </select>
+
+      <label>Prioritet</label>
+      <select name="priority" required>
+        <option>Lav</option>
+        <option selected>Middels</option>
+        <option>Høy</option>
+      </select>
+
+      <label>Enhet/Programvare</label>
+      <input
+        type="text"
+        name="device"
+        placeholder="F.eks. Mac + Safari / Windows + Chrome"
+        required
+      />
+
+      <button type="submit">Opprett sak</button>
     </form>
   </div>
 
@@ -23,7 +47,22 @@
     <div class="card">
       <strong>{{ t.title }}</strong>
       <p>{{ t.desc }}</p>
-      <p class="muted">Status: {{ t.status }}</p>
+
+      <p>
+        <strong>Kategori:</strong> {{ t.category }} |
+        <strong>Prioritet:</strong> {{ t.priority }}
+      </p>
+      <p><strong>Enhet:</strong> {{ t.device }}</p>
+      <p>
+        <strong>Status:</strong> {{ t.status }} |
+        <strong>Opprettet:</strong> {{ t.created_at }}
+      </p>
+
+      {% if role == "support" and t.status != "closed" %}
+        <form method="post" action="{{ url_for('main.close_ticket_view', ticket_id=t.id) }}">
+          <button type="submit">Lukk sak</button>
+        </form>
+      {% endif %}
     </div>
   {% endfor %}
 {% endblock %}

@@ -95,3 +95,8 @@ Hvis en test feiler:
 Etter hvert som nye funksjoner legges til, skal:
 - nye tester legges inn i denne testplanen
 - gamle tester kjøres på nytt for å sikre at ingenting har blitt ødelagt
+
+
+- **Dato:** 2026-01-10
+- **Resultat:** OK
+- **Kommentar:** Innlogging fungerer for både bruker og support.
