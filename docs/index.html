@@ -14,64 +14,82 @@
     h2{margin:0 0 10px;color:#2c3e50}
     ul{line-height:1.6}
     .note{color:#555;font-size:.95rem}
+    input, textarea, select, button{padding:8px;width:100%;max-width:400px}
+    button{background:#2c3e50;color:#fff;border:none;cursor:pointer}
   </style>
 </head>
 <body>
-  <header>
-    <h1>Helpdesk</h1>
-    <p>Følg nivåene under for å løse problemet raskt</p>
-  </header>
 
-  <nav>
-    <a href="#n1">Nivå 1</a>
-    <a href="#n2">Nivå 2</a>
-    <a href="#n3">Nivå 3</a>
-  </nav>
+<header>
+  <h1>Helpdesk</h1>
+  <p>Følg nivåene under for å løse problemet raskt</p>
+</header>
 
-  <main>
-    <section id="n1">
-      <h2>Nivå 1 – selvhjelp</h2>
-      <p>Prøv dette først. Det løser de fleste problemer uten at du må sende melding.</p>
+<nav>
+  <a href="#n1">Nivå 1</a>
+  <a href="#n2">Nivå 2</a>
+  <a href="#n3">Nivå 3</a>
+</nav>
 
-      <h3>Feide-pålogging</h3>
-      <ul>
-        <li>Sjekk brukernavn/passord (Caps Lock)</li>
-        <li>Velg riktig organisasjon/skole</li>
-        <li>Prøv inkognito og tøm cache/cookies</li>
-        <li>Sjekk internett</li>
-      </ul>
+<main>
+  <section id="n1">
+    <h2>Nivå 1 – selvhjelp</h2>
+    <p>Prøv dette først. Det løser de fleste problemer uten at du må sende melding.</p>
 
-      <h3>Wi-Fi</h3>
-      <ul>
-        <li>Slå Wi-Fi av/på</li>
-        <li>Koble til riktig nettverk</li>
-        <li>Restart enheten</li>
-      </ul>
+    <h3>Feide-pålogging</h3>
+    <ul>
+      <li>Sjekk brukernavn/passord</li>
+      <li>Velg riktig skole</li>
+      <li>Prøv inkognito og tøm cache</li>
+      <li>Sjekk internett</li>
+    </ul>
+  </section>
 
-      <p class="note">Hvis det ikke løser problemet, gå videre til nivå 2.</p>
-    </section>
+  <section id="n2">
+    <h2>Nivå 2 – videre feilsøking</h2>
+    <ul>
+      <li>Noter tidspunkt og feilmelding</li>
+      <li>Ta skjermbilde</li>
+      <li>Beskriv hva du har prøvd</li>
+    </ul>
+  </section>
 
-    <section id="n2">
-      <h2>Nivå 2 – videre feilsøking</h2>
-      <ul>
-        <li>Noter tidspunkt og nøyaktig feilmelding</li>
-        <li>Ta skjermbilde</li>
-        <li>Skriv hvilke steg du allerede har prøvd</li>
-        <li>Oppgi enhet og nettleser</li>
-      </ul>
-      <p class="note">Hvis det fortsatt ikke går, send inn sak på nivå 3.</p>
-    </section>
+  <section id="n3">
+    <h2>Nivå 3 – send inn sak</h2>
+    <p>Bruk skjemaet under kun hvis nivå 1 og 2 ikke fungerer.</p>
+  </section>
 
-    <section id="n3">
-      <h2>Nivå 3 – send inn sak</h2>
-      <p>Send inn saken kun hvis nivå 1 og 2 ikke fungerer.</p>
-      <ul>
-        <li>Navn + kontaktinfo</li>
-        <li>Beskrivelse av problemet + hva du har prøvd</li>
-        <li>Feilmelding + skjermbilde</li>
-        <li>Enhet/OS + nettleser</li>
-      </ul>
-    </section>
-  </main>
+  <section id="send">
+    <h2>Send inn sak (nivå 3)</h2>
+
+    <form>
+      <label>Navn:<br>
+        <input type="text" required>
+      </label><br><br>
+
+      <label>E-post:<br>
+        <input type="email" required>
+      </label><br><br>
+
+      <label>Kategori:<br>
+        <select>
+          <option>Feide</option>
+          <option>Wi-Fi</option>
+          <option>Utskrift</option>
+          <option>Annet</option>
+        </select>
+      </label><br><br>
+
+      <label>Beskrivelse:<br>
+        <textarea rows="5" required></textarea>
+      </label><br><br>
+
+      <button type="submit">Send inn</button>
+    </form>
+
+    <p><em>Dette er kun en demonstrasjon. Innsendingen lagres ikke.</em></p>
+  </section>
+</main>
+
 </body>
 </html>
