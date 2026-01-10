@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session
+from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from .db import (
@@ -15,19 +15,15 @@ def current_user():
 def current_role():
     return session.get("role")
 
-
 @bp.before_app_request
 def ensure_db():
-    # Sørger for at DB/tabeller finnes
     init_db()
-
 
 @bp.route("/")
 def home():
     if not current_user():
         return redirect(url_for("main.login"))
-    return redirect(url_for("main.tickets"))
-
+    return redirect(url_for("main.kb"))
 
 @bp.route("/login", methods=["GET", "POST"])
 def login():
@@ -40,23 +36,19 @@ def login():
         if u and check_password_hash(u["pw_hash"], password):
             session["user"] = u["username"]
             session["role"] = u["role"]
-            return redirect(url_for("main.tickets"))
+            return redirect(url_for("main.kb"))
 
         error = "Feil brukernavn eller passord."
-
     return render_template("login.html", error=error)
-
 
 @bp.route("/register", methods=["GET", "POST"])
 def register():
     error = None
-
     if request.method == "POST":
         username = request.form.get("username", "").strip()
         password = request.form.get("password", "")
         password2 = request.form.get("password2", "")
 
-        # Enkle regler (profesjonelt, men ikke overkomplisert)
         if len(username) < 3:
             error = "Brukernavn må være minst 3 tegn."
         elif len(password) < 8:
@@ -68,24 +60,21 @@ def register():
         else:
             pw_hash = generate_password_hash(password, method="pbkdf2:sha256")
             create_user(username=username, pw_hash=pw_hash, role="user")
+            flash("Bruker opprettet. Du kan logge inn nå.")
             return redirect(url_for("main.login"))
 
     return render_template("register.html", error=error)
-
 
 @bp.route("/logout")
 def logout():
     session.clear()
     return redirect(url_for("main.login"))
 
-
 @bp.route("/kb")
 def kb():
-    user = current_user()
-    if not user:
+    if not current_user():
         return redirect(url_for("main.login"))
     return render_template("kb.html")
-
 
 @bp.route("/tickets", methods=["GET", "POST"])
 def tickets():
@@ -104,12 +93,14 @@ def tickets():
 
         if title and desc:
             add_ticket(owner=user, title=title, desc=desc, category=category, priority=priority, device=device)
+            flash("Saken er sendt til support. Du finner den i oversikten under.")
+        else:
+            flash("Du må fylle ut tittel og beskrivelse.")
 
         return redirect(url_for("main.tickets"))
 
     visible = get_tickets() if role == "support" else get_tickets(owner=user)
     return render_template("_tickets.html", tickets=visible, role=role)
-
 
 @bp.route("/tickets/<int:ticket_id>/close", methods=["POST"])
 def close_ticket_view(ticket_id):
@@ -120,4 +111,5 @@ def close_ticket_view(ticket_id):
         return redirect(url_for("main.tickets"))
 
     close_ticket(ticket_id)
+    flash(f"Sak #{ticket_id} er lukket.")
     return redirect(url_for("main.tickets"))

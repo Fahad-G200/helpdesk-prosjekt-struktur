@@ -1,68 +1,85 @@
 {% extends "base.html" %}
 {% block content %}
+
+<div class="card">
   <h1>Mine saker</h1>
+  <p class="muted">
+    Opprett en sak hvis nivå 1 og 2 ikke løser problemet. Skriv så detaljert som mulig.
+  </p>
+</div>
 
-  <div class="card">
-    <h2>Opprett ny sak</h2>
-    <form method="post">
-      <label>Tittel</label>
-      <input type="text" name="title" required />
+<div class="card">
+  <h2>Opprett ny sak</h2>
+  <form method="post">
+    <label>Tittel</label>
+    <input type="text" name="title" placeholder="F.eks. Feide-innlogging fungerer ikke" required>
 
-      <label>Beskrivelse</label>
-      <textarea name="desc" rows="5" required></textarea>
+    <label>Kategori</label>
+    <select name="category" required>
+      <option>Feide</option>
+      <option>Wi-Fi</option>
+      <option>Utskrift</option>
+      <option>Passord</option>
+      <option>Annet</option>
+    </select>
 
-      <label>Kategori</label>
-      <select name="category" required>
-        <option>Feide</option>
-        <option>Wi-Fi</option>
-        <option>Utskrift</option>
-        <option>Passord</option>
-        <option selected>Annet</option>
-      </select>
+    <label>Prioritet</label>
+    <select name="priority" required>
+      <option>Lav</option>
+      <option selected>Middels</option>
+      <option>Høy</option>
+    </select>
 
-      <label>Prioritet</label>
-      <select name="priority" required>
-        <option>Lav</option>
-        <option selected>Middels</option>
-        <option>Høy</option>
-      </select>
+    <label>Enhet/Programvare</label>
+    <input type="text" name="device" placeholder="F.eks. Mac + Safari / Windows + Chrome" required>
 
-      <label>Enhet/Programvare</label>
-      <input
-        type="text"
-        name="device"
-        placeholder="F.eks. Mac + Safari / Windows + Chrome"
-        required
-      />
+    <label>Beskrivelse</label>
+    <textarea name="desc" rows="5" placeholder="Hva skjer? Når? Hva har du prøvd på nivå 1 og 2?" required></textarea>
 
-      <button type="submit">Opprett sak</button>
-    </form>
-  </div>
+    <button type="submit">Send inn sak</button>
+  </form>
+</div>
+
+<div class="card">
+  <h2>Oversikt</h2>
 
   {% if tickets|length == 0 %}
-    <p class="muted">Du har ingen saker enda.</p>
+    <p class="muted">Du har ingen saker enda. Start i Kunnskapsbase og opprett sak hvis det ikke løser problemet.</p>
+  {% else %}
+    {% for t in tickets %}
+      <div class="card" style="margin:12px 0;">
+        <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+          <div>
+            <h3 style="margin-bottom:6px;">#{{ t.id }} – {{ t.title }}</h3>
+
+            {% if t.status == "Åpen" %}
+              <span class="badge badge-open">Åpen</span>
+            {% else %}
+              <span class="badge badge-closed">Lukket</span>
+            {% endif %}
+
+            <p class="muted" style="margin:10px 0 0;">
+              <strong>Kategori:</strong> {{ t.category }} |
+              <strong>Prioritet:</strong> {{ t.priority }} |
+              <strong>Eier:</strong> {{ t.owner }}
+            </p>
+            <p class="muted" style="margin:6px 0 0;">
+              <strong>Enhet:</strong> {{ t.device }}
+            </p>
+            <p style="margin-top:10px;">{{ t.desc }}</p>
+          </div>
+
+          {% if role == "support" and t.status != "Lukket" %}
+            <div>
+              <form method="post" action="{{ url_for('main.close_ticket_view', ticket_id=t.id) }}">
+                <button type="submit" class="btn-secondary">Lukk sak</button>
+              </form>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
   {% endif %}
+</div>
 
-  {% for t in tickets %}
-    <div class="card">
-      <strong>{{ t.title }}</strong>
-      <p>{{ t.desc }}</p>
-
-      <p>
-        <strong>Kategori:</strong> {{ t.category }} |
-        <strong>Prioritet:</strong> {{ t.priority }}
-      </p>
-      <p><strong>Enhet:</strong> {{ t.device }}</p>
-      <p>
-        <strong>Status:</strong> {{ t.status }} |
-        <strong>Opprettet:</strong> {{ t.created_at }}
-      </p>
-
-      {% if role == "support" and t.status != "closed" %}
-        <form method="post" action="{{ url_for('main.close_ticket_view', ticket_id=t.id) }}">
-          <button type="submit">Lukk sak</button>
-        </form>
-      {% endif %}
-    </div>
-  {% endfor %}
 {% endblock %}

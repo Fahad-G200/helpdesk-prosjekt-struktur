@@ -1,4 +1,3 @@
-# backend/app/db.py
 from __future__ import annotations
 import sqlite3
 from pathlib import Path
@@ -7,19 +6,16 @@ from werkzeug.security import generate_password_hash
 
 DB_PATH = Path(__file__).resolve().parents[1] / "database.db"
 
-
 def _conn():
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
 
-
 def init_db() -> None:
     conn = _conn()
     cur = conn.cursor()
 
-    # Users
     cur.execute("""
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -30,7 +26,6 @@ def init_db() -> None:
         )
     """)
 
-    # Tickets
     cur.execute("""
         CREATE TABLE IF NOT EXISTS tickets (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -45,7 +40,7 @@ def init_db() -> None:
         )
     """)
 
-    # Opprett admin/support-bruker hvis den ikke finnes
+    # Fast admin/support-bruker
     cur.execute("SELECT 1 FROM users WHERE username = 'admin'")
     if not cur.fetchone():
         cur.execute(
@@ -56,7 +51,6 @@ def init_db() -> None:
     conn.commit()
     conn.close()
 
-
 def user_exists(username: str) -> bool:
     conn = _conn()
     cur = conn.cursor()
@@ -64,7 +58,6 @@ def user_exists(username: str) -> bool:
     row = cur.fetchone()
     conn.close()
     return row is not None
-
 
 def create_user(username: str, pw_hash: str, role: str = "user") -> None:
     conn = _conn()
@@ -76,7 +69,6 @@ def create_user(username: str, pw_hash: str, role: str = "user") -> None:
     conn.commit()
     conn.close()
 
-
 def get_user(username: str) -> Optional[Dict[str, str]]:
     conn = _conn()
     cur = conn.cursor()
@@ -84,7 +76,6 @@ def get_user(username: str) -> Optional[Dict[str, str]]:
     row = cur.fetchone()
     conn.close()
     return dict(row) if row else None
-
 
 def add_ticket(owner: str, title: str, desc: str, category: str, priority: str, device: str) -> int:
     conn = _conn()
@@ -101,7 +92,6 @@ def add_ticket(owner: str, title: str, desc: str, category: str, priority: str, 
     conn.close()
     return ticket_id
 
-
 def get_tickets(owner: Optional[str] = None) -> List[Dict[str, str]]:
     conn = _conn()
     cur = conn.cursor()
@@ -112,7 +102,6 @@ def get_tickets(owner: Optional[str] = None) -> List[Dict[str, str]]:
     rows = cur.fetchall()
     conn.close()
     return [dict(r) for r in rows]
-
 
 def close_ticket(ticket_id: int) -> None:
     conn = _conn()

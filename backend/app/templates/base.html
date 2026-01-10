@@ -6,106 +6,102 @@
     <title>Helpdesk</title>
 
     <style>
-      :root {
-        --bg: #f4f6f8;
-        --text: #333;
-        --muted: #666;
-        --card: #fff;
-        --border: #ddd;
-        --primary: #007bff;
-        --primaryHover: #0056b3;
+      :root{
+        --bg:#f4f6f8; --text:#222; --muted:#666;
+        --card:#fff; --border:#e5e7eb;
+        --primary:#2563eb; --primaryHover:#1d4ed8;
+        --green:#16a34a; --yellow:#ca8a04; --red:#dc2626;
       }
-
-      body {
+      body{
         font-family: Arial, sans-serif;
-        max-width: 960px;
+        max-width: 980px;
         margin: 40px auto;
         padding: 0 16px;
-        background-color: var(--bg);
+        background: var(--bg);
         color: var(--text);
       }
-
-      header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 32px;
+      header{
+        display:flex; justify-content:space-between; align-items:center;
+        margin-bottom: 18px;
       }
-
-      nav {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        flex-wrap: wrap;
-      }
-
-      nav a {
-        text-decoration: none;
+      nav{ display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+      nav a{
         color: var(--primary);
-        font-weight: 600;
+        text-decoration:none;
+        font-weight:700;
+      }
+      nav a:hover{ text-decoration:underline; }
+
+      .pill{
+        background:#eef2ff;
+        border:1px solid #dbeafe;
+        color:#1e3a8a;
+        padding:6px 10px;
+        border-radius:999px;
+        font-size:.9rem;
+        white-space:nowrap;
+      }
+      .card{
+        background:var(--card);
+        border:1px solid var(--border);
+        border-radius:12px;
+        padding:16px;
+        margin:14px 0;
+        box-shadow:0 2px 6px rgba(0,0,0,.05);
+      }
+      .muted{ color: var(--muted); }
+      h1,h2,h3{ margin-top:0; }
+
+      input, textarea, select{
+        width:100%;
+        padding:12px;
+        margin:8px 0 14px;
+        border-radius:10px;
+        border:1px solid #cfd6df;
+        box-sizing:border-box;
+        font-size:1rem;
       }
 
-      nav a:hover {
-        text-decoration: underline;
+      .btn, button{
+        display:inline-block;
+        background: var(--primary);
+        color:#fff;
+        border:0;
+        border-radius:10px;
+        padding:10px 14px;
+        font-weight:800;
+        cursor:pointer;
+        text-decoration:none;
+      }
+      .btn:hover, button:hover{ background: var(--primaryHover); }
+
+      .btn-secondary{
+        background:#475569;
+      }
+      .btn-secondary:hover{
+        background:#334155;
       }
 
-      .card {
-        background-color: var(--card);
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        padding: 20px;
-        margin: 16px 0;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      .flash{
+        border-left:6px solid var(--green);
       }
 
-      input, textarea, select {
-        width: 100%;
-        padding: 12px;
-        margin: 8px 0 16px;
-        border-radius: 8px;
-        border: 1px solid #ccc;
-        box-sizing: border-box;
-        font-size: 1rem;
+      .badge{
+        display:inline-block;
+        padding:4px 10px;
+        border-radius:999px;
+        font-size:.85rem;
+        font-weight:800;
       }
+      .badge-open{ background:#dcfce7; color:#14532d; border:1px solid #bbf7d0; }
+      .badge-closed{ background:#fee2e2; color:#7f1d1d; border:1px solid #fecaca; }
 
-      button, .btn {
-        display: inline-block;
-        padding: 10px 18px;
-        border: 0;
-        border-radius: 8px;
-        cursor: pointer;
-        background-color: var(--primary);
-        color: #fff;
-        font-size: 0.95rem;
-        font-weight: 700;
-        text-decoration: none;
-      }
+      .level1{ border-left:6px solid var(--green); }
+      .level2{ border-left:6px solid var(--yellow); }
+      .level3{ border-left:6px solid var(--red); }
 
-      button:hover, .btn:hover {
-        background-color: var(--primaryHover);
-      }
-
-      .error {
-        color: #b00020;
-        font-weight: 600;
-      }
-
-      .muted {
-        color: var(--muted);
-        font-size: 0.9em;
-      }
-
-      h1, h2, h3 { margin-top: 0; }
-      ul { line-height: 1.6; }
-      .pill {
-        background: #e9eef6;
-        border: 1px solid #d7e2f2;
-        color: #1f3a66;
-        padding: 6px 10px;
-        border-radius: 999px;
-        font-size: 0.9em;
-        white-space: nowrap;
-      }
+      .row{ display:flex; gap:12px; flex-wrap:wrap; }
+      .row > *{ flex: 1 1 260px; }
     </style>
   </head>
 
@@ -115,18 +111,22 @@
 
       <nav>
         {% if session.get("user") %}
-          <span class="pill">
-            Innlogget: {{ session.get("user") }} ({{ session.get("role") }})
-          </span>
-
-          <!-- NYTT: Kunnskapsbase-lenke -->
+          <span class="pill">Innlogget: {{ session.get("user") }} ({{ session.get("role") }})</span>
           <a href="{{ url_for('main.kb') }}">Kunnskapsbase</a>
-
           <a href="{{ url_for('main.tickets') }}">Mine saker</a>
           <a href="{{ url_for('main.logout') }}">Logg ut</a>
         {% endif %}
       </nav>
     </header>
+
+    {# Flash-meldinger (f.eks. “Sak opprettet”) #}
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for m in messages %}
+          <div class="card flash">{{ m }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
 
     {% block content %}{% endblock %}
   </body>

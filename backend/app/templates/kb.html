@@ -2,18 +2,22 @@
 {% block content %}
 
 <div class="card">
-  <h1>Kunnskapsbase (nivå 1–3)</h1>
+  <h1>Velkommen til Helpdesk</h1>
   <p class="muted">
-    Start alltid med nivå 1. Hvis problemet ikke løses, gå videre til nivå 2.
-    Nivå 3 brukes når du må sende inn en sak.
+    Start med nivå 1 (selvhjelp). Hvis det ikke løser problemet, gå videre til nivå 2.
+    Nivå 3 brukes når du må sende inn sak til support.
   </p>
+  <div style="margin-top:12px;">
+    <a class="btn" href="#niva1">Start med nivå 1</a>
+    <a class="btn btn-secondary" href="{{ url_for('main.tickets') }}" style="margin-left:8px;">Gå til Mine saker</a>
+  </div>
 </div>
 
-<div class="card">
-  <h2>Nivå 1 – Selvbetjening</h2>
-  <p>Vanlige problemer du kan prøve å løse selv:</p>
+<div id="niva1" class="card level1">
+  <h2>🟢 Nivå 1 – Selvbetjening</h2>
+  <p>Dette er ting du kan prøve før du kontakter support.</p>
 
-  <h3>Feide-pålogging</h3>
+  <h3>Feide</h3>
   <ul>
     <li>Sjekk brukernavn/passord (Caps Lock)</li>
     <li>Velg riktig skole/organisasjon</li>
@@ -21,9 +25,9 @@
     <li>Tøm cache/cookies og prøv igjen</li>
   </ul>
 
-  <h3>Wi-Fi / Nettverk</h3>
+  <h3>Wi-Fi / Nett</h3>
   <ul>
-    <li>Slå Wi-Fi av og på</li>
+    <li>Slå Wi-Fi av/på</li>
     <li>Koble til riktig nettverk</li>
     <li>Restart enheten</li>
   </ul>
@@ -36,9 +40,9 @@
   </ul>
 </div>
 
-<div class="card">
-  <h2>Nivå 2 – Videre feilsøking</h2>
-  <p>Før du kontakter support, samle denne informasjonen:</p>
+<div class="card level2">
+  <h2>🟡 Nivå 2 – Videre feilsøking</h2>
+  <p>Samle denne informasjonen før du går videre:</p>
   <ul>
     <li>Tidspunkt for feilen</li>
     <li>Nøyaktig feilmelding</li>
@@ -48,10 +52,10 @@
   </ul>
 </div>
 
-<div class="card">
-  <h2>Nivå 3 – Send inn sak</h2>
-  <p>Hvis nivå 1 og 2 ikke løser problemet, opprett en supportsak med all info.</p>
-  <a class="btn" href="{{ url_for('main.tickets') }}">Gå til Mine saker</a>
+<div class="card level3">
+  <h2>🔴 Nivå 3 – Send inn sak</h2>
+  <p>Hvis nivå 1 og 2 ikke løser problemet, opprett en supportsak med god beskrivelse.</p>
+  <a class="btn" href="{{ url_for('main.tickets') }}">Opprett / se saker</a>
 </div>
 
 {% endblock %}
