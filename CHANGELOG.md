@@ -24,7 +24,7 @@
 
 Alle viktige endringer i dette prosjektet dokumenteres her.
 
-## [1.0.0] – 2026-01-09
+2026-01-09
 ### Lagt til
 - Opprettet grunnstruktur for helpdesk-prosjektet
 - Implementert helpdesk med tre støttenivåer (nivå 1, 2 og 3)
@@ -52,3 +52,27 @@ Alle viktige endringer i dette prosjektet dokumenteres her.
 
 - Satt opp Docker (nginx) for å kjøre helpdesk lokalt hjemme via localhost
 - Satt opp Docker (nginx) for å kjøre helpdesk lokalt via http://127.0.0.1:8080
+
+
+2026-01-10
+
+### Nytt
+- Lagt til database for lagring av saker
+- Roller for bruker og support
+- Support kan lukke saker
+- Docker-oppsett for kjøring av prosjektet
+- Script for database-oppsett og backup
+
+### Endret
+- Gått fra midlertidig lagring til database
+- Forbedret struktur i koden
+- Forbedret design og brukeropplevelse
+- Bedre oversikt over saker og status
+
+### Fikset
+- Saker forsvinner ikke lenger ved omstart
+- Bedre kontroll på hvem som kan gjøre hva i systemet
+
+### Notat
+- Dette er første ferdige versjon av prosjektet (versjon 1.0)
+- Prosjektet dekker kompetansemål i utvikling, drift og brukerstøtte
