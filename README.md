@@ -131,3 +131,24 @@ docker start helpdesk
 
 ### Slett container (hvis du vil kjøre på nytt)
 docker rm -f helpdesk
+
+
+## Kjøring lokalt hjemme (Docker)
+
+Prosjektet kan kjøres lokalt uten skolens nettverk ved hjelp av Docker.
+
+### Bygg image
+docker build -t helpdesk-app .
+
+### Start container
+docker run -d --name helpdesk -p 8080:80 helpdesk-app
+
+### Åpne i nettleser
+http://127.0.0.1:8080
+
+### Stoppe / starte igjen
+docker stop helpdesk
+docker start helpdesk
+
+### Slette container (hvis du vil kjøre på nytt)
+docker rm -f helpdesk

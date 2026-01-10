@@ -51,3 +51,4 @@ Alle viktige endringer i dette prosjektet dokumenteres her.
 2026-01-10
 
 - Satt opp Docker (nginx) for å kjøre helpdesk lokalt hjemme via localhost
+- Satt opp Docker (nginx) for å kjøre helpdesk lokalt via http://127.0.0.1:8080
