@@ -35,4 +35,15 @@ Målet med arkitekturen er å holde løsningen enkel, men samtidig vise god stru
 [Flask-webapp]  --->  [Database]
    (logikk)             (data)
 
-   
+
+## Skytjenester og nettverkssegmentering
+
+Helpdesk-løsningen kan driftes i en skytjeneste eller på en lokal server. I et mer realistisk driftsmiljø vil løsningen bestå av flere komponenter som er logisk adskilt for bedre sikkerhet og stabilitet.
+
+En mulig arkitektur er:
+- Webapplikasjonen (Flask) kjører i én sone (applikasjonssone)
+- Databasen kjører i en egen sone (databasesone)
+- Brukere får kun tilgang til webapplikasjonen via HTTP/HTTPS
+- Databasen er ikke tilgjengelig direkte fra brukere
+
+Denne typen segmentering reduserer risikoen for at et angrep på webapplikasjonen også gir direkte tilgang til databasen. Løsningen kan kjøres i en skyplattform som for eksempel Azure, AWS eller Google Cloud, der nettverkssoner og brannmurregler kan styres sentralt.

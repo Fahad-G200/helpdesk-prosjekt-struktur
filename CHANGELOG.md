@@ -95,3 +95,11 @@ Alle vesentlige endringer i prosjektet dokumenteres i denne filen.
 - Koble nivå 3-innsendingsskjema enda tettere mot backend (for eksempel forhåndsvalgt kategori)
 - Utvide kunnskapsbasen med flere artikler og bedre søk
 - Gjennomføre flere tester og dokumentere testresultater
+
+
+
+## 2026-01-11
+- Lagt til beskrivelse av skytjenester og nettverkssegmentering
+- Gjennomført risikoanalyse av helpdesk-løsningen
+- Utviklet kursmateriell for brukere
+- Dokumentert valg av programmeringsspråk og rammeverk
