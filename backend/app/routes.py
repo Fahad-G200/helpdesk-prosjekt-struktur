@@ -1,3 +1,6 @@
+import os
+from openai import OpenAI
+
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -6,6 +9,10 @@ from .db import (
     add_ticket, get_tickets, close_ticket,
     user_exists, create_user, get_user
 )
+
+# OpenAI-klient (API key leses fra miljøvariabelen OPENAI_API_KEY)
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+MODEL = "gpt-4o-mini"
 
 bp = Blueprint("main", __name__)
 
@@ -117,60 +124,8 @@ def close_ticket_view(ticket_id):
 
 
 # --------------------------------------------------
-# Chatbot-innhold (regelbasert, støtter setninger)
+# Chatbot (AI via OpenAI) – ingen UI-endringer nødvendig
 # --------------------------------------------------
-
-FAQ = [
-    {
-        "tags": ["feide", "innlogging", "login", "passord", "konto"],
-        "answer": (
-            "Feide-problemer (Nivå 1):\n"
-            "1) Sjekk brukernavn/passord\n"
-            "2) Velg riktig skole/organisasjon\n"
-            "3) Prøv inkognito/privat vindu\n"
-            "4) Tøm cache/cookies\n"
-            "Hvis det fortsatt feiler: noter feilmelding og tidspunkt."
-        ),
-    },
-    {
-        "tags": ["wifi", "nett", "internett", "nettverk"],
-        "answer": (
-            "Wi-Fi-problemer (Nivå 1):\n"
-            "1) Slå Wi-Fi av/på\n"
-            "2) Koble til riktig nettverk\n"
-            "3) Restart enheten\n"
-            "Hvis det feiler videre: gå til nivå 2 eller opprett sak."
-        ),
-    },
-    {
-        "tags": ["utskrift", "printer", "skriver"],
-        "answer": (
-            "Utskrift (Nivå 1):\n"
-            "1) Velg riktig skriver\n"
-            "2) Sjekk papir/toner\n"
-            "3) Restart skriver og PC"
-        ),
-    },
-]
-
-def chatbot_reply(message: str) -> str:
-    import re
-    text = (message or "").lower()
-    words = set(re.findall(r"\w+", text))
-
-    for item in FAQ:
-        if any(tag in words or tag in text for tag in item["tags"]):
-            return item["answer"]
-
-    return (
-        "Jeg er ikke helt sikker på problemet ennå.\n"
-        "Prøv å beskrive:\n"
-        "- hvilken tjeneste\n"
-        "- feilmelding\n"
-        "- tidspunkt\n"
-        "- enhet/OS\n"
-        "Eller opprett en sak under «Mine saker»."
-    )
 
 @bp.route("/chat", methods=["POST"])
 def chat():
@@ -178,5 +133,41 @@ def chat():
         return jsonify({"reply": "Du må være innlogget for å bruke chat."}), 401
 
     data = request.get_json(silent=True) or {}
-    msg = data.get("message", "")
-    return jsonify({"reply": chatbot_reply(msg)})
+    user_msg = (data.get("message") or "").strip()
+
+    if not user_msg:
+        return jsonify({"reply": "Skriv hva du trenger hjelp med."})
+
+    # historikk per bruker (i session)
+    history = session.get("chat_history", [])
+
+    system_prompt = (
+        "Du er en profesjonell helpdesk-assistent for en skole. "
+        "Svar alltid på norsk. "
+        "Du skal kun hjelpe med IT-support (Feide/innlogging, Wi-Fi, utskrift, passord, Teams/Office, nettleserproblemer). "
+        "Gi konkrete steg i riktig rekkefølge (nivå 1, nivå 2, nivå 3). "
+        "Hvis du mangler informasjon, still 1-2 korte oppfølgingsspørsmål. "
+        "Hvis problemet krever systemtilgang eller virker avansert, anbefal å opprette en sak og si hva som må inkluderes: "
+        "feilmelding, tidspunkt, enhet/OS, nettleser og hva som er prøvd."
+    )
+
+    messages = [{"role": "system", "content": system_prompt}]
+    messages.extend(history[-10:])  # begrens historikk for kostnad/stabilitet
+    messages.append({"role": "user", "content": user_msg})
+
+    try:
+        resp = client.chat.completions.create(
+            model=MODEL,
+            messages=messages,
+            temperature=0.4,
+            max_tokens=250
+        )
+        reply = resp.choices[0].message.content.strip()
+    except Exception:
+        reply = "Beklager, jeg klarte ikke å kontakte AI-tjenesten akkurat nå. Prøv igjen om litt."
+
+    history.append({"role": "user", "content": user_msg})
+    history.append({"role": "assistant", "content": reply})
+    session["chat_history"] = history
+
+    return jsonify({"reply": reply})
