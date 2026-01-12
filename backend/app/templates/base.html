@@ -129,5 +129,89 @@
     {% endwith %}
 
     {% block content %}{% endblock %}
+
+    <!-- Enkel chatbot-widget -->
+<div id="chatbot" style="position:fixed; right:18px; bottom:18px; width:320px; max-width:92vw; z-index:9999;">
+  <div class="card" style="margin:0;">
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+      <strong>Helpdesk-chat</strong>
+      <button id="chatToggle" class="btn-secondary" type="button" style="padding:6px 10px; border-radius:10px;">Skjul</button>
+    </div>
+
+    <div id="chatBody" style="margin-top:10px;">
+      <div id="chatLog" style="height:180px; overflow:auto; border:1px solid #e5e7eb; border-radius:10px; padding:10px; background:#fff;">
+        <div class="muted" style="margin-bottom:8px;">
+          Hei! Skriv hva du trenger hjelp med (Feide, Wi-Fi, utskrift, passord).
+        </div>
+      </div>
+
+      <div style="display:flex; gap:8px; margin-top:10px;">
+        <input id="chatInput" type="text" placeholder="Skriv her..." style="margin:0;" />
+        <button id="chatSend" type="button">Send</button>
+      </div>
+
+      <p class="muted" style="margin-top:8px; font-size:.9rem;">
+        Chat er regelbasert (ikke ekte AI). Den gir forslag basert på nøkkelord.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    const log = document.getElementById("chatLog");
+    const input = document.getElementById("chatInput");
+    const sendBtn = document.getElementById("chatSend");
+    const toggleBtn = document.getElementById("chatToggle");
+    const body = document.getElementById("chatBody");
+
+    function addMsg(who, text) {
+      const wrap = document.createElement("div");
+      wrap.style.margin = "8px 0";
+      wrap.innerHTML = `<strong>${who}:</strong> <span style="white-space:pre-wrap;"></span>`;
+      wrap.querySelector("span").textContent = text;
+      log.appendChild(wrap);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    async function send() {
+      const msg = (input.value || "").trim();
+      if (!msg) return;
+      addMsg("Du", msg);
+      input.value = "";
+      input.focus();
+
+      try {
+        const res = await fetch("/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: msg })
+        });
+
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          addMsg("Bot", data.reply || "Noe gikk galt. Prøv igjen.");
+          return;
+        }
+        addMsg("Bot", data.reply || "Ingen svar.");
+      } catch (e) {
+        addMsg("Bot", "Kunne ikke kontakte serveren. Er du pålogget og kjører appen?");
+      }
+    }
+
+    sendBtn.addEventListener("click", send);
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") send();
+    });
+
+    toggleBtn.addEventListener("click", () => {
+      const hidden = body.style.display === "none";
+      body.style.display = hidden ? "" : "none";
+      toggleBtn.textContent = hidden ? "Skjul" : "Vis";
+    });
+  })();
+</script>
+
+  
   </body>
 </html>
