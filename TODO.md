@@ -9,7 +9,7 @@
 - [x] Dokumentere prosjektbeskrivelse
 
 ## Bør forbedres
-- [ ] Legge til flere problemtyper i nivå 1
+- [] Legge til flere problemtyper i nivå 1
 - [ ] Forenkle språket i enkelte instruksjoner
 - [ ] Forbedre design på HTML-siden
 - [ ] Teste løsningen på flere brukere
