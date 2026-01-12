@@ -103,3 +103,11 @@ Alle vesentlige endringer i prosjektet dokumenteres i denne filen.
 - Gjennomført risikoanalyse av helpdesk-løsningen
 - Utviklet kursmateriell for brukere
 - Dokumentert valg av programmeringsspråk og rammeverk
+
+
+
+## 2026-01-12
+### Endret
+- Erstattet OpenAI-basert chat (krever billing) med lokal helpdesk-chatbot
+- Chatboten kan nå håndtere fritekst/setninger og gir trinnvis veiledning (nivå 1–3)
+- Lagt til enkle oppfølgingsspørsmål (OS/nettleser/feilmelding) for mer presis feilsøking
