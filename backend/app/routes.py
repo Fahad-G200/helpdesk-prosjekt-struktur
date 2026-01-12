@@ -113,3 +113,77 @@ def close_ticket_view(ticket_id):
     close_ticket(ticket_id)
     flash(f"Sak #{ticket_id} er lukket.")
     return redirect(url_for("main.tickets"))
+
+
+    from flask import jsonify
+
+FAQ = [
+    {
+        "tags": ["feide", "innlogging", "login", "passord", "konto"],
+        "answer": (
+            "Feide: Prøv dette først (Nivå 1):\n"
+            "1) Sjekk brukernavn/passord (Caps Lock)\n"
+            "2) Velg riktig skole/organisasjon\n"
+            "3) Prøv inkognito/privat vindu\n"
+            "4) Tøm cache/cookies\n"
+            "Hvis det fortsatt feiler: noter tidspunkt + feilmelding og gå til Nivå 2."
+        ),
+    },
+    {
+        "tags": ["wifi", "nett", "internett", "nettverk"],
+        "answer": (
+            "Wi-Fi/Nett: Prøv dette (Nivå 1):\n"
+            "1) Slå Wi-Fi av/på\n"
+            "2) Koble til riktig nettverk\n"
+            "3) Restart enheten\n"
+            "Hvis det fortsatt feiler: sjekk IP/ping på Nivå 2 eller opprett sak (Nivå 3)."
+        ),
+    },
+    {
+        "tags": ["utskrift", "printer", "skriver", "print"],
+        "answer": (
+            "Utskrift: Prøv dette (Nivå 1):\n"
+            "1) Velg riktig skriver\n"
+            "2) Sjekk papir/toner\n"
+            "3) Restart skriver og PC\n"
+            "Hvis det fortsatt feiler: noter feilkode og gå til Nivå 2."
+        ),
+    },
+    {
+        "tags": ["sak", "ticket", "support", "hjelp", "innmelding"],
+        "answer": (
+            "Hvis Nivå 1 og 2 ikke løser problemet: Opprett en sak (Nivå 3).\n"
+            "Husk å skrive: feilmelding, tidspunkt, enhet/OS, nettleser og hva du har prøvd."
+        ),
+    },
+]
+
+def chatbot_reply(message: str) -> str:
+    text = (message or "").lower().strip()
+    if not text:
+        return "Skriv hva du trenger hjelp med (f.eks. Feide, Wi-Fi, utskrift, passord)."
+
+    # Enkel matching: finn første FAQ der minst én tag finnes i teksten
+    for item in FAQ:
+        if any(tag in text for tag in item["tags"]):
+            return item["answer"]
+
+    # Fallback
+    return (
+        "Jeg fant ikke en direkte match. Skriv gjerne:\n"
+        "- hvilken tjeneste (Feide/Wi-Fi/utskrift)\n"
+        "- feilmelding\n"
+        "- tidspunkt\n"
+        "- enhet og nettleser\n"
+        "Hvis du fortsatt står fast: opprett sak under «Mine saker»."
+    )
+
+@bp.route("/chat", methods=["POST"])
+def chat():
+    if not current_user():
+        return jsonify({"reply": "Du må være innlogget for å bruke chat."}), 401
+
+    data = request.get_json(silent=True) or {}
+    msg = data.get("message", "")
+    reply = chatbot_reply(msg)
+    return jsonify({"reply": reply})
