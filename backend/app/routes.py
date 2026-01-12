@@ -1,5 +1,4 @@
 import os
-from openai import OpenAI
 
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -10,9 +9,179 @@ from .db import (
     user_exists, create_user, get_user
 )
 
-# OpenAI-klient (API key leses fra miljøvariabelen OPENAI_API_KEY)
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-MODEL = "gpt-4o-mini"
+# Lokal "AI-opplevelse" (ingen ekstern API / ingen billing)
+# Botten gir trinnvis helpdesk (nivå 1–3), kan håndtere hele setninger og stiller 1–2 oppfølgingsspørsmål.
+
+def _norm(s: str) -> str:
+    return (s or "").strip().lower()
+
+def _detect_topic(text: str) -> str:
+    t = _norm(text)
+    if any(k in t for k in ["feide", "innlogging", "login", "logge inn", "pålogging"]):
+        return "feide"
+    if any(k in t for k in ["wifi", "wi-fi", "nett", "internett", "nettverk", "tilkobling"]):
+        return "wifi"
+    if any(k in t for k in ["utskrift", "skriver", "printer", "print", "skrive ut"]):
+        return "utskrift"
+    if any(k in t for k in ["passord", "glemt", "låst", "reset", "tilbakestill"]):
+        return "passord"
+    if any(k in t for k in ["teams", "office", "word", "excel", "onedrive", "m365", "365"]):
+        return "m365"
+    if any(k in t for k in ["chrome", "edge", "safari", "firefox", "nettleser", "cache", "cookies"]):
+        return "nettleser"
+    return "ukjent"
+
+def _extract_context(text: str) -> dict:
+    t = _norm(text)
+    ctx = {"os": None, "browser": None, "error": None}
+
+    # OS
+    if any(k in t for k in ["windows", "win10", "win11"]):
+        ctx["os"] = "Windows"
+    elif any(k in t for k in ["mac", "macos", "osx", "macbook"]):
+        ctx["os"] = "macOS"
+    elif any(k in t for k in ["iphone", "ios"]):
+        ctx["os"] = "iOS"
+    elif "android" in t:
+        ctx["os"] = "Android"
+
+    # Browser
+    if "chrome" in t:
+        ctx["browser"] = "Chrome"
+    elif "edge" in t:
+        ctx["browser"] = "Edge"
+    elif "safari" in t:
+        ctx["browser"] = "Safari"
+    elif "firefox" in t:
+        ctx["browser"] = "Firefox"
+
+    # Enkel feilmelding-uttrekk (hvis brukeren skriver i anførselstegn)
+    if '"' in text:
+        parts = text.split('"')
+        if len(parts) >= 3:
+            maybe = parts[1].strip()
+            if 3 <= len(maybe) <= 180:
+                ctx["error"] = maybe
+
+    return ctx
+
+def _topic_steps(topic: str) -> str:
+    if topic == "feide":
+        return (
+            "**Nivå 1 (Feide/innlogging)**\n"
+            "1) Sjekk brukernavn/passord (Caps Lock)\n"
+            "2) Velg riktig skole/organisasjon i Feide\n"
+            "3) Prøv inkognito/privat vindu\n"
+            "4) Tøm cache/cookies og prøv igjen\n"
+            "\n**Nivå 2 (hvis fortsatt feil)**\n"
+            "- Noter tidspunkt + nøyaktig feilmelding\n"
+            "- Test i en annen nettleser\n"
+            "\n**Nivå 3**\n"
+            "- Opprett sak hvis det fortsatt ikke fungerer."
+        )
+    if topic == "wifi":
+        return (
+            "**Nivå 1 (Wi-Fi/Nett)**\n"
+            "1) Slå Wi-Fi av/på\n"
+            "2) Koble til riktig nettverk\n"
+            "3) Restart enheten\n"
+            "\n**Nivå 2**\n"
+            "- Sjekk IP-adresse (ipconfig/ifconfig)\n"
+            "- Test ping mot gateway hvis du kan\n"
+            "\n**Nivå 3**\n"
+            "- Opprett sak hvis problemet gjelder mange eller ikke lar seg løse."
+        )
+    if topic == "utskrift":
+        return (
+            "**Nivå 1 (Utskrift)**\n"
+            "1) Velg riktig skriver\n"
+            "2) Sjekk papir/toner\n"
+            "3) Restart skriver og PC\n"
+            "\n**Nivå 2**\n"
+            "- Sjekk utskriftskø / driver\n"
+            "- Test fra en annen PC\n"
+            "\n**Nivå 3**\n"
+            "- Opprett sak og legg ved feilkode/skjermbilde."
+        )
+    if topic == "passord":
+        return (
+            "**Nivå 1 (Passord)**\n"
+            "1) Bruk 'Glemt passord' dersom tilgjengelig\n"
+            "2) Vent litt etter passordbytte (synk kan ta tid)\n"
+            "3) Sjekk Caps Lock\n"
+            "\n**Nivå 2**\n"
+            "- Prøv på en annen enhet / nettleser\n"
+            "\n**Nivå 3**\n"
+            "- Opprett sak hvis kontoen er låst eller du ikke får reset."
+        )
+    if topic == "m365":
+        return (
+            "**Nivå 1 (Teams/Office/OneDrive)**\n"
+            "1) Logg ut og inn igjen\n"
+            "2) Sjekk nettforbindelse\n"
+            "3) Prøv web-versjon i nettleser\n"
+            "\n**Nivå 2**\n"
+            "- Slett cache for Teams/Office\n"
+            "- Test på annen enhet\n"
+            "\n**Nivå 3**\n"
+            "- Opprett sak hvis det gjelder flere eller kontoproblem mistenkes."
+        )
+    if topic == "nettleser":
+        return (
+            "**Nivå 1 (Nettleser)**\n"
+            "1) Oppdater siden (Ctrl/Cmd+R)\n"
+            "2) Prøv inkognito/privat vindu\n"
+            "3) Tøm cache/cookies\n"
+            "4) Prøv en annen nettleser\n"
+            "\n**Nivå 2**\n"
+            "- Deaktiver utvidelser midlertidig\n"
+            "\n**Nivå 3**\n"
+            "- Opprett sak hvis feilen er konsekvent og du har feilmelding/skjermbilde."
+        )
+    return (
+        "Jeg kan hjelpe! Hva gjelder det: Feide/innlogging, Wi-Fi, utskrift, passord eller Teams/Office?\n"
+        "Skriv gjerne en setning som beskriver problemet og evt. feilmelding i anførselstegn."
+    )
+
+def local_helpdesk_bot(user_msg: str) -> str:
+    topic = _detect_topic(user_msg)
+    ctx = _extract_context(user_msg)
+
+    # Husk sist tema for mer "samtale"
+    last_topic = session.get("chat_topic")
+    if topic == "ukjent" and last_topic:
+        topic = last_topic
+    session["chat_topic"] = topic
+
+    # Still maks 1-2 oppfølgingsspørsmål hvis info mangler
+    missing = []
+    if topic in {"feide", "nettleser", "m365"} and not ctx.get("browser"):
+        missing.append("Hvilken nettleser bruker du (Chrome/Edge/Safari/Firefox)?")
+    if not ctx.get("os"):
+        missing.append("Hvilken enhet/OS bruker du (Windows/macOS/iOS/Android)?")
+    if topic in {"feide", "m365"} and not ctx.get("error"):
+        missing.append("Har du en feilmelding? Hvis ja, skriv den i anførselstegn (\"...\").")
+
+    steps = _topic_steps(topic)
+
+    if missing:
+        qs = "\n".join([f"- {q}" for q in missing[:2]])
+        return f"{steps}\n\n**For at jeg skal treffe bedre:**\n{qs}"
+
+    extra = []
+    if ctx.get("os"):
+        extra.append(f"**OS:** {ctx['os']}")
+    if ctx.get("browser"):
+        extra.append(f"**Nettleser:** {ctx['browser']}")
+    if ctx.get("error"):
+        extra.append(f"**Feilmelding:** {ctx['error']}")
+
+    extra_txt = "\n".join(extra)
+    if extra_txt:
+        extra_txt = "\n\n" + extra_txt
+
+    return f"{steps}{extra_txt}"
+
 
 bp = Blueprint("main", __name__)
 
@@ -124,7 +293,7 @@ def close_ticket_view(ticket_id):
 
 
 # --------------------------------------------------
-# Chatbot (AI via OpenAI) – ingen UI-endringer nødvendig
+# Chatbot (lokal AI-opplevelse) – ingen UI-endringer nødvendig
 # --------------------------------------------------
 
 @bp.route("/chat", methods=["POST"])
@@ -138,33 +307,10 @@ def chat():
     if not user_msg:
         return jsonify({"reply": "Skriv hva du trenger hjelp med."})
 
-    # historikk per bruker (i session)
+    # (valgfritt) historikk lagres fortsatt for "chat-minne"
     history = session.get("chat_history", [])
 
-    system_prompt = (
-        "Du er en profesjonell helpdesk-assistent for en skole. "
-        "Svar alltid på norsk. "
-        "Du skal kun hjelpe med IT-support (Feide/innlogging, Wi-Fi, utskrift, passord, Teams/Office, nettleserproblemer). "
-        "Gi konkrete steg i riktig rekkefølge (nivå 1, nivå 2, nivå 3). "
-        "Hvis du mangler informasjon, still 1-2 korte oppfølgingsspørsmål. "
-        "Hvis problemet krever systemtilgang eller virker avansert, anbefal å opprette en sak og si hva som må inkluderes: "
-        "feilmelding, tidspunkt, enhet/OS, nettleser og hva som er prøvd."
-    )
-
-    messages = [{"role": "system", "content": system_prompt}]
-    messages.extend(history[-10:])  # begrens historikk for kostnad/stabilitet
-    messages.append({"role": "user", "content": user_msg})
-
-    try:
-        resp = client.chat.completions.create(
-            model=MODEL,
-            messages=messages,
-            temperature=0.4,
-            max_tokens=250
-        )
-        reply = resp.choices[0].message.content.strip()
-    except Exception:
-        reply = "Beklager, jeg klarte ikke å kontakte AI-tjenesten akkurat nå. Prøv igjen om litt."
+    reply = local_helpdesk_bot(user_msg)
 
     history.append({"role": "user", "content": user_msg})
     history.append({"role": "assistant", "content": reply})
