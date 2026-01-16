@@ -111,3 +111,23 @@ Alle vesentlige endringer i prosjektet dokumenteres i denne filen.
 - Erstattet OpenAI-basert chat (krever billing) med lokal helpdesk-chatbot
 - Chatboten kan nå håndtere fritekst/setninger og gir trinnvis veiledning (nivå 1–3)
 - Lagt til enkle oppfølgingsspørsmål (OS/nettleser/feilmelding) for mer presis feilsøking
+
+## Changelog
+
+## 2026-01-16
+
+### Endret
+- Rettet ugyldig HTML i `base.html` ved å flytte CSS-regler inn i `<style>`-taggen.
+- Forbedret navigasjonen med aktive menypunkter basert på nåværende side.
+- Standardisert navigasjonslenker ved å bruke felles CSS-klassen `nav-link`.
+
+### Forbedret
+- Brukergrensesnittet fremstår mer profesjonelt og konsistent.
+- Navigasjonen gir tydeligere tilbakemelding på hvor brukeren befinner seg i systemet.
+
+### Fikset
+- CSS som tidligere lå utenfor `<style>`-taggen og ikke ble tolket korrekt av nettleseren.
+
+### Filer endret
+- `backend/app/templates/base.html`
+

@@ -152,3 +152,24 @@ docker start helpdesk
 
 ### Slette container (hvis du vil kjøre på nytt)
 docker rm -f helpdesk
+
+
+## Dekning av kompetansemål (LK20)
+
+### Brukerstøtte
+- Systemet implementerer et ticketsystem med nivå 1–3 brukerstøtte.
+- Brukere kan opprette, følge og avslutte saker.
+- Roller (bruker/support) styrer tilganger og arbeidsflyt.
+
+### Utvikling
+- Applikasjonen er utviklet i Python med Flask.
+- SQLite brukes til lagring av brukere og saker.
+- Løsningen inkluderer autentisering, hashing av passord og rollebasert tilgang.
+- HTML/CSS og Jinja brukes for brukergrensesnitt.
+- Git og GitHub brukes til versjonskontroll.
+
+### Drift
+- Applikasjonen kjøres i Docker-container via docker-compose.
+- Systemet har en enkel klient–server-arkitektur.
+- Brukere, roller og tilgangsstyring er implementert.
+- Løsningen tar hensyn til personvern og informasjonssikkerhet.

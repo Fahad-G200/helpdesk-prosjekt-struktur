@@ -61,3 +61,9 @@ I senere versjoner kan prosjektet utvides med:
 - Bedre sikkerhet (HTTPS, sterkere autentisering)
 - Varsler på e-post
 - Mer avansert statistikk og rapporter
+
+### Opprette sak
+**Akseptansekriterier**
+- Bruker kan ikke opprette sak uten tittel
+- Sak lagres i databasen
+- Sak får status "Åpen"

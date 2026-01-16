@@ -23,3 +23,14 @@ Neste steg vil være å utvide kunnskapsbasen med flere problemtyper, for eksemp
 ## Refleksjon over læringsprosess
 
 Dette prosjektet har lært meg mye om å planlegge og fullføre et større arbeid. Jeg lærte å dele opp arbeidet i mindre deler (nivåer), sette realistiske mål og dokumentere underveis. Jeg oppdaget også hvor viktig det er å teste løsningen med reelle brukere. Totalt sett har prosjektet gjort meg mer bevisst på hvordan jeg kan jobbe strukturert og kombinere IT‑ferdigheter, service og norskfaget på en praktisk måte.
+
+# Tverrfaglig refleksjon
+
+Utviklingsvalgene i prosjektet påvirker både brukerstøtte og drift.
+Et oversiktlig brukergrensesnitt og nivåbasert brukerstøtte reduserer belastningen på support.
+
+Driftsvalg som Docker gir en mer stabil og forutsigbar løsning, samtidig som det forenkler vedlikehold.
+Rollebasert tilgang og hashing av passord bidrar til bedre informasjonssikkerhet og personvern.
+
+I en virkelig virksomhet ville løsningen blitt utvidet med sikkerhetskopiering,
+logging og strengere tilgangsstyring.

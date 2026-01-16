@@ -47,3 +47,29 @@ En mulig arkitektur er:
 - Databasen er ikke tilgjengelig direkte fra brukere
 
 Denne typen segmentering reduserer risikoen for at et angrep på webapplikasjonen også gir direkte tilgang til databasen. Løsningen kan kjøres i en skyplattform som for eksempel Azure, AWS eller Google Cloud, der nettverkssoner og brannmurregler kan styres sentralt.
+
+
+# Driftsarkitektur
+
+## Oversikt
+Systemet består av en webbasert klient som kommuniserer med en Flask-applikasjon.
+Applikasjonen kjører i en Docker-container og benytter SQLite som database.
+
+## Komponenter
+- Klient: Nettleser (HTML/CSS/JavaScript)
+- Applikasjon: Flask (Python)
+- Database: SQLite
+- Containerplattform: Docker og docker-compose
+
+## Flyt
+1. Bruker åpner applikasjonen i nettleser
+2. Forespørsel sendes til Flask-server
+3. Flask behandler forespørselen og henter/lagrer data i database
+4. Respons sendes tilbake til klienten
+
+## Porter
+- Applikasjonen eksponeres via port 8000 (docker-compose)
+
+## Drift og vedlikehold
+- Løsningen kan startes og stoppes via docker-compose
+- Applikasjonen er enkel å flytte mellom miljøer
