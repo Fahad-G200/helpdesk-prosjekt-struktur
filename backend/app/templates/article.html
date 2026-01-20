@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2>{{ article.title }}</h2>
+  <p class="muted">Forfatter: {{ article.author }} | {{ article.created_at }}</p>
+  <div style="white-space: pre-wrap;">{{ article.content }}</div>
+
+  {% if role == "support" %}
+    <p style="margin-top:12px;">
+      <a href="{{ url_for('main.edit_article_view', article_id=article.id) }}">Rediger</a> |
+      <a href="{{ url_for('main.delete_article', article_id=article.id) }}" onclick="return confirm('Slette artikkel?');">Slett</a>
+    </p>
+  {% endif %}
+</div>
+{% endblock %}

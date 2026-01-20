@@ -75,35 +75,12 @@
       }
       .btn:hover, button:hover{ background: var(--primaryHover); }
 
-      .btn-secondary{
-        background:#475569;
-      }
-      .btn-secondary:hover{
-        background:#334155;
-      }
+      .btn-secondary{ background:#475569; }
+      .btn-secondary:hover{ background:#334155; }
 
-      .flash{
-        border-left:6px solid var(--green);
-      }
+      .flash{ border-left:6px solid var(--green); }
 
-      .badge{
-        display:inline-block;
-        padding:4px 10px;
-        border-radius:999px;
-        font-size:.85rem;
-        font-weight:800;
-      }
-      .badge-open{ background:#dcfce7; color:#14532d; border:1px solid #bbf7d0; }
-      .badge-closed{ background:#fee2e2; color:#7f1d1d; border:1px solid #fecaca; }
-
-      .level1{ border-left:6px solid var(--green); }
-      .level2{ border-left:6px solid var(--yellow); }
-      .level3{ border-left:6px solid var(--red); }
-
-      .row{ display:flex; gap:12px; flex-wrap:wrap; }
-      .row > *{ flex: 1 1 260px; }
-
-      /* === ADDED: Navigasjon – profesjonell “active state” + knappestil === */
+      /* navigasjon */
       .nav-link{
         padding: 8px 10px;
         border-radius: 10px;
@@ -120,20 +97,17 @@
         color: #fff;
       }
 
-      /* === ADDED: Bedre feilmeldinger og varsler === */
-      .alert{
-        border-left: 6px solid var(--yellow);
-      }
-      .error{
-        background: #fee2e2;
-        border: 1px solid #fecaca;
-        color: #7f1d1d;
-        padding: 10px 12px;
-        border-radius: 10px;
-        margin: 10px 0;
+      /* badge for varsler */
+      .badge {
+        background: #dc2626;
+        color: #fff;
+        padding: 2px 6px;
+        border-radius: 12px;
+        font-size: 0.85em;
+        vertical-align: top;
+        margin-left: 4px;
       }
 
-      /* === ADDED: Små hjelpetekster under felt === */
       .help{
         margin-top: -8px;
         margin-bottom: 14px;
@@ -151,16 +125,25 @@
         {% if session.get("user") %}
           <span class="pill">Innlogget: {{ session.get("user") }} ({{ session.get("role") }})</span>
 
-          <!-- === CHANGED: added active nav + class nav-link === -->
           {% set ep = request.endpoint or "" %}
           <a class="nav-link {% if ep == 'main.kb' %}active{% endif %}" href="{{ url_for('main.kb') }}">Kunnskapsbase</a>
           <a class="nav-link {% if ep == 'main.tickets' %}active{% endif %}" href="{{ url_for('main.tickets') }}">Mine saker</a>
+
+          <a class="nav-link {% if ep == 'main.notifications_page' %}active{% endif %}" href="{{ url_for('main.notifications_page') }}">
+            Varsler{% if notif_count and notif_count > 0 %} <span class="badge">{{ notif_count }}</span>{% endif %}
+          </a>
+
+          <a class="nav-link {% if ep == 'main.settings' %}active{% endif %}" href="{{ url_for('main.settings') }}">Innstillinger</a>
+
+          {% if session.get("role") == "support" %}
+            <a class="nav-link {% if ep == 'main.activity_log' %}active{% endif %}" href="{{ url_for('main.activity_log') }}">Aktivitetslogg</a>
+          {% endif %}
+
           <a class="nav-link" href="{{ url_for('main.logout') }}">Logg ut</a>
         {% endif %}
       </nav>
     </header>
 
-    {# Flash-meldinger (f.eks. “Sak opprettet”) #}
     {% with messages = get_flashed_messages() %}
       {% if messages %}
         {% for m in messages %}

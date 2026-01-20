@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2>Innstillinger</h2>
+  <form method="post">
+    <p>
+      <label>
+        <input type="checkbox" name="notify_email" value="1"
+               {% if preferences.notify_email %}checked{% endif %}>
+        Send meg e-postvarsler
+      </label>
+    </p>
+    <p>
+      <label>
+        <input type="checkbox" name="notify_inapp" value="1"
+               {% if preferences.notify_inapp %}checked{% endif %}>
+        Vis interne varsler i applikasjonen
+      </label>
+    </p>
+    <button type="submit">Lagre</button>
+  </form>
+</div>
+{% endblock %}

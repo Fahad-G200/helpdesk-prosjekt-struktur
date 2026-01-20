@@ -8,5 +8,29 @@
         <button type="submit">Lukk sak</button>
       </form>
     {% endif %}
+
+    {% set r = None %}
+{% if t.status == 'Lukket' %}
+  {% set r = t.rating %}
+{% endif %}
+
+{% if t.status == 'Lukket' and role == 'user' %}
+  {% if t.rating is none %}
+    <form action="{{ url_for('main.rate_ticket', ticket_id=t.id) }}" method="post" class="rating-form">
+      <label>Din vurdering:</label>
+      <select name="stars">
+        <option value="5">5 - Svært fornøyd</option>
+        <option value="4">4 - Fornøyd</option>
+        <option value="3">3 - Middels</option>
+        <option value="2">2 - Misfornøyd</option>
+        <option value="1">1 - Svært misfornøyd</option>
+      </select>
+      <input type="text" name="feedback" placeholder="Kommentar (valgfri)" />
+      <button type="submit">Send</button>
+    </form>
+  {% else %}
+    <p>Din tilbakemelding: <strong>{{ t.rating }}/5</strong> – "{{ t.feedback }}"</p>
+  {% endif %}
+{% endif %}
   </div>
 {% endfor %}

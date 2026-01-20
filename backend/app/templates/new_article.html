@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2>Ny artikkel</h2>
+  <form method="post">
+    <label>Tittel</label>
+    <input name="title" required>
+    <label>Innhold</label>
+    <textarea name="content" rows="10" required></textarea>
+    <button type="submit">Publiser</button>
+    <a class="btn btn-secondary" href="{{ url_for('main.kb') }}">Avbryt</a>
+  </form>
+</div>
+{% endblock %}

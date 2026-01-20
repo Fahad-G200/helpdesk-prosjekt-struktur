@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2>Aktivitetslogg</h2>
+
+  {% if log_entries %}
+    <table style="width:100%; border-collapse: collapse;">
+      <thead>
+        <tr>
+          <th style="text-align:left; border-bottom:1px solid #e5e7eb; padding:8px;">Tid</th>
+          <th style="text-align:left; border-bottom:1px solid #e5e7eb; padding:8px;">Bruker</th>
+          <th style="text-align:left; border-bottom:1px solid #e5e7eb; padding:8px;">Hendelse</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for e in log_entries %}
+        <tr>
+          <td style="padding:8px; border-bottom:1px solid #f1f5f9;">{{ e.created_at }}</td>
+          <td style="padding:8px; border-bottom:1px solid #f1f5f9;">{{ e.user }}</td>
+          <td style="padding:8px; border-bottom:1px solid #f1f5f9;">{{ e.details }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>Ingen loggoppføringer.</p>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2>Varsler</h2>
+
+  {% if notifications %}
+    <ul>
+      {% for n in notifications %}
+        <li style="margin-bottom:10px;">
+          <small class="muted">{{ n.created_at }}</small><br>
+          {% if n.link %}
+            <a href="{{ n.link }}">{{ n.message }}</a>
+          {% else %}
+            {{ n.message }}
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>Du har ingen varsler.</p>
+  {% endif %}
+</div>
+{% endblock %}

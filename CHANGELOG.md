@@ -155,3 +155,17 @@ Alle vesentlige endringer i prosjektet dokumenteres i denne filen.
 - `docs/risikoanalyse.md` - Ny fil
 - `docs/kvalitetssikring.md` - Ny fil
 - `backup.py` - Ny fil
+
+
+### Added
+- La til nye sider for Varsler (/notifications), Innstillinger (/settings) og Aktivitetslogg (/admin/activity).
+- La til templates: `notifications.html`, `settings.html` og `logs.html`.
+- La til visning av antall uleste varsler (badge) i navigasjonen via `notif_count`.
+
+### Changed
+- Oppdatert `routes.py` slik at lenkene i `base.html` faktisk peker på eksisterende routes (fikser 404 på Innstillinger).
+- Oppdatert `db.py` slik at eksisterende databaser automatisk får kolonnene `email`, `notify_email` og `notify_inapp` (trygge `ALTER TABLE` ved oppstart).
+
+### Fixed
+- Fikset 404 “Not Found” når man trykker på “Innstillinger” i menyen.
+- Reduserte risiko for krasj ved innstillinger/varsler hvis databasen var opprettet før disse feltene fantes.
