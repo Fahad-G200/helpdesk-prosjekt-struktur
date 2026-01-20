@@ -11,6 +11,9 @@ from .db import (
     user_exists, create_user, get_user
 )
 
+# ✅ NY: import for e-postvarsling (endring 1)
+from .email_service import send_ticket_created_email, notify_support_new_ticket
+
 bp = Blueprint("main", __name__)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -123,6 +126,19 @@ def tickets():
                 ticket_id = add_ticket(owner=user, title=title, desc=desc,
                            category=category, priority=priority, device=device)
                 logger.info(f"Ticket created: #{ticket_id} by {user}")
+
+                # ✅ NY: bygg ticket-dict + send e-post (endring 2)
+                ticket = {
+                    "id": ticket_id,
+                    "title": title,
+                    "owner": session.get("user"),
+                    "category": category,
+                    "priority": priority,
+                    "description": desc,
+                }
+                send_ticket_created_email(ticket, user_email=None)
+                notify_support_new_ticket(ticket)
+
                 flash("Saken er sendt til support. Du finner den i oversikten under.")
         except Exception as e:
             logger.error(f"Error creating ticket: {e}")
