@@ -131,3 +131,27 @@ Alle vesentlige endringer i prosjektet dokumenteres i denne filen.
 ### Filer endret
 - `backend/app/templates/base.html`
 
+## 2026-01-20
+
+### Sikkerhet
+- Byttet hardkodet SECRET_KEY til sikker, tilfeldig generert nøkkel
+- Lagt til security headers (X-Frame-Options, X-Content-Type-Options, X-XSS-Protection)
+-  Lagt til error handling i alle routes
+-  Implementert logging av viktige hendelser (innlogging, saksopprettelse, etc.)
+
+### Dokumentasjon
+-  Opprettet `docs/risikoanalyse.md` med komplett risikovurdering
+-  Opprettet `docs/kvalitetssikring.md` med ITIL-basert prosess og KPI
+-  Opprettet `backup.py` for automatisk database-backup
+
+### Kode-kvalitet
+-  Slettet tomme filer (models.py, build_site.py)
+-  Ryddet i duplikate build-scripts
+- Forbedret error messages for bedre brukeropplevelse
+
+### Filer endret
+- `backend/app/__init__.py` - Sikker SECRET_KEY og security headers
+- `backend/app/routes.py` - Error handling og logging
+- `docs/risikoanalyse.md` - Ny fil
+- `docs/kvalitetssikring.md` - Ny fil
+- `backup.py` - Ny fil

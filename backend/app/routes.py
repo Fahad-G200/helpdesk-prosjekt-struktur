@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
+import logging
 
 from .db import (
     init_db,
@@ -8,6 +9,8 @@ from .db import (
 )
 
 bp = Blueprint("main", __name__)
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 def current_user():
     return session.get("user")
@@ -17,7 +20,10 @@ def current_role():
 
 @bp.before_app_request
 def ensure_db():
-    init_db()
+    try:
+        init_db()
+    except Exception as e:
+        logger.error(f"Database initialization failed: {e}")
 
 @bp.route("/")
 def home():
@@ -29,44 +35,60 @@ def home():
 def login():
     error = None
     if request.method == "POST":
-        username = request.form.get("username", "").strip()
-        password = request.form.get("password", "")
+        try:
+            username = request.form.get("username", "").strip()
+            password = request.form.get("password", "")
 
-        u = get_user(username)
-        if u and check_password_hash(u["pw_hash"], password):
-            session["user"] = u["username"]
-            session["role"] = u["role"]
-            return redirect(url_for("main.kb"))
-
-        error = "Feil brukernavn eller passord."
+            if not username or not password:
+                error = "Brukernavn og passord er påkrevd."
+            else:
+                u = get_user(username)
+                if u and check_password_hash(u["pw_hash"], password):
+                    session["user"] = u["username"]
+                    session["role"] = u["role"]
+                    logger.info(f"User logged in: {username}")
+                    return redirect(url_for("main.kb"))
+                error = "Feil brukernavn eller passord."
+        except Exception as e:
+            logger.error(f"Login error: {e}")
+            error = "En feil oppstod. Prøv igjen senere."
+    
     return render_template("login.html", error=error)
 
 @bp.route("/register", methods=["GET", "POST"])
 def register():
     error = None
     if request.method == "POST":
-        username = request.form.get("username", "").strip()
-        password = request.form.get("password", "")
-        password2 = request.form.get("password2", "")
+        try:
+            username = request.form.get("username", "").strip()
+            password = request.form.get("password", "")
+            password2 = request.form.get("password2", "")
 
-        if len(username) < 3:
-            error = "Brukernavn må være minst 3 tegn."
-        elif len(password) < 8:
-            error = "Passord må være minst 8 tegn."
-        elif password != password2:
-            error = "Passordene er ikke like."
-        elif user_exists(username):
-            error = "Brukernavnet er allerede i bruk."
-        else:
-            pw_hash = generate_password_hash(password, method="pbkdf2:sha256")
-            create_user(username=username, pw_hash=pw_hash, role="user")
-            flash("Bruker opprettet. Du kan logge inn nå.")
-            return redirect(url_for("main.login"))
+            if len(username) < 3:
+                error = "Brukernavn må være minst 3 tegn."
+            elif len(password) < 8:
+                error = "Passord må være minst 8 tegn."
+            elif password != password2:
+                error = "Passordene er ikke like."
+            elif user_exists(username):
+                error = "Brukernavnet er allerede i bruk."
+            else:
+                pw_hash = generate_password_hash(password, method="pbkdf2:sha256")
+                create_user(username=username, pw_hash=pw_hash, role="user")
+                logger.info(f"New user registered: {username}")
+                flash("Bruker opprettet. Du kan logge inn nå.")
+                return redirect(url_for("main.login"))
+        except Exception as e:
+            logger.error(f"Registration error: {e}")
+            error = "En feil oppstod ved registrering. Prøv igjen."
 
     return render_template("register.html", error=error)
 
 @bp.route("/logout")
 def logout():
+    user = current_user()
+    if user:
+        logger.info(f"User logged out: {user}")
     session.clear()
     return redirect(url_for("main.login"))
 
@@ -85,22 +107,33 @@ def tickets():
     role = current_role()
 
     if request.method == "POST":
-        title = request.form.get("title", "").strip()
-        desc = request.form.get("desc", "").strip()
-        category = request.form.get("category", "Annet").strip()
-        priority = request.form.get("priority", "Middels").strip()
-        device = request.form.get("device", "").strip()
+        try:
+            title = request.form.get("title", "").strip()
+            desc = request.form.get("desc", "").strip()
+            category = request.form.get("category", "Annet").strip()
+            priority = request.form.get("priority", "Middels").strip()
+            device = request.form.get("device", "").strip()
 
-        if title and desc:
-            add_ticket(owner=user, title=title, desc=desc,
-                       category=category, priority=priority, device=device)
-            flash("Saken er sendt til support. Du finner den i oversikten under.")
-        else:
-            flash("Du må fylle ut tittel og beskrivelse.")
+            if not title or not desc:
+                flash("Du må fylle ut tittel og beskrivelse.")
+            else:
+                ticket_id = add_ticket(owner=user, title=title, desc=desc,
+                           category=category, priority=priority, device=device)
+                logger.info(f"Ticket created: #{ticket_id} by {user}")
+                flash("Saken er sendt til support. Du finner den i oversikten under.")
+        except Exception as e:
+            logger.error(f"Error creating ticket: {e}")
+            flash("En feil oppstod ved opprettelse av sak. Prøv igjen.")
 
         return redirect(url_for("main.tickets"))
 
-    visible = get_tickets() if role == "support" else get_tickets(owner=user)
+    try:
+        visible = get_tickets() if role == "support" else get_tickets(owner=user)
+    except Exception as e:
+        logger.error(f"Error fetching tickets: {e}")
+        visible = []
+        flash("Kunne ikke hente saker. Prøv igjen senere.")
+    
     return render_template("_tickets.html", tickets=visible, role=role)
 
 @bp.route("/tickets/<int:ticket_id>/close", methods=["POST"])
@@ -108,16 +141,26 @@ def close_ticket_view(ticket_id):
     user = current_user()
     role = current_role()
 
-    if not user or role != "support":
+    if not user:
+        return redirect(url_for("main.login"))
+    
+    if role != "support":
+        flash("Du har ikke tilgang til å lukke saker.")
         return redirect(url_for("main.tickets"))
 
-    close_ticket(ticket_id)
-    flash(f"Sak #{ticket_id} er lukket.")
+    try:
+        close_ticket(ticket_id)
+        logger.info(f"Ticket #{ticket_id} closed by {user}")
+        flash(f"Sak #{ticket_id} er lukket.")
+    except Exception as e:
+        logger.error(f"Error closing ticket {ticket_id}: {e}")
+        flash("Kunne ikke lukke saken. Prøv igjen.")
+    
     return redirect(url_for("main.tickets"))
 
 
 # -------------------------------------------------------------------
-# Chatbot (lokal AI-opplevelse) – FIKSET: ingen ** og ingen '-' bullets
+# Chatbot (lokal AI-opplevelse)
 # -------------------------------------------------------------------
 
 def _norm(s: str) -> str:
@@ -255,7 +298,7 @@ def _topic_steps(topic: str) -> str:
     return (
         "Jeg kan hjelpe, men trenger litt mer info.\n"
         "Skriv hva du har problemer med (Feide, Wi-Fi, utskrift, passord eller Teams/Office), "
-        "og gjerne feilmelding i anførselstegn (\"...\")."
+        "og gjerne feilmelding i anførselstegn (\"...)."
     )
 
 def local_helpdesk_bot(user_msg: str) -> str:
@@ -275,7 +318,7 @@ def local_helpdesk_bot(user_msg: str) -> str:
     if not ctx.get("os"):
         missing.append("Hvilken enhet/OS bruker du (Windows/macOS/iOS/Android)?")
     if topic in {"feide", "m365"} and not ctx.get("error"):
-        missing.append("Har du en feilmelding? Hvis ja, skriv den i anførselstegn (\"...\").")
+        missing.append("Har du en feilmelding? Hvis ja, skriv den i anførselstegn (\"...).")
 
     response = _topic_steps(topic)
 
@@ -302,17 +345,21 @@ def chat():
     if not current_user():
         return jsonify({"reply": "Du må være innlogget for å bruke chat."}), 401
 
-    data = request.get_json(silent=True) or {}
-    user_msg = (data.get("message") or "").strip()
+    try:
+        data = request.get_json(silent=True) or {}
+        user_msg = (data.get("message") or "").strip()
 
-    if not user_msg:
-        return jsonify({"reply": "Skriv hva du trenger hjelp med."})
+        if not user_msg:
+            return jsonify({"reply": "Skriv hva du trenger hjelp med."})
 
-    history = session.get("chat_history", [])
-    reply = local_helpdesk_bot(user_msg)
+        history = session.get("chat_history", [])
+        reply = local_helpdesk_bot(user_msg)
 
-    history.append({"role": "user", "content": user_msg})
-    history.append({"role": "assistant", "content": reply})
-    session["chat_history"] = history
+        history.append({"role": "user", "content": user_msg})
+        history.append({"role": "assistant", "content": reply})
+        session["chat_history"] = history
 
-    return jsonify({"reply": reply})
+        return jsonify({"reply": reply})
+    except Exception as e:
+        logger.error(f"Chat error: {e}")
+        return jsonify({"reply": "En feil oppstod. Prøv igjen senere."}), 500
