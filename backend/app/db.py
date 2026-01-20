@@ -1,16 +1,26 @@
 from __future__ import annotations
+
+import os
 import sqlite3
+import logging
 from pathlib import Path
 from typing import Dict, List, Optional
+
 from werkzeug.security import generate_password_hash
+from .config import Config
 
-DB_PATH = Path(__file__).resolve().parents[1] / "database.db"
+logger = logging.getLogger(__name__)
 
-def _conn():
+# Bruk DB-path fra config.py
+DB_PATH = Path(Config.DATABASE_PATH)
+
+
+def _conn() -> sqlite3.Connection:
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
+
 
 def init_db() -> None:
     conn = _conn()
@@ -22,7 +32,8 @@ def init_db() -> None:
             username TEXT NOT NULL UNIQUE,
             pw_hash TEXT NOT NULL,
             role TEXT NOT NULL DEFAULT 'user',
-            created_at TEXT NOT NULL DEFAULT (datetime('now'))
+            created_at TEXT NOT NULL DEFAULT (datetime('now')),
+            last_login TEXT
         )
     """)
 
@@ -36,20 +47,28 @@ def init_db() -> None:
             priority TEXT NOT NULL DEFAULT 'Middels',
             device TEXT NOT NULL DEFAULT '',
             status TEXT NOT NULL DEFAULT 'Åpen',
-            created_at TEXT NOT NULL DEFAULT (datetime('now'))
+            created_at TEXT NOT NULL DEFAULT (datetime('now')),
+            updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+            closed_at TEXT
         )
     """)
 
-    # Fast admin/support-bruker
+    # Opprett support/admin uten hardkodet passord
     cur.execute("SELECT 1 FROM users WHERE username = 'admin'")
     if not cur.fetchone():
-        cur.execute(
-            "INSERT INTO users (username, pw_hash, role) VALUES (?, ?, ?)",
-            ("admin", generate_password_hash("admin123", method="pbkdf2:sha256"), "support"),
-        )
+        admin_pw = os.environ.get("ADMIN_PASSWORD")
+        if not admin_pw:
+            logger.warning("ADMIN_PASSWORD ikke satt. Admin-bruker ble ikke opprettet.")
+        else:
+            cur.execute(
+                "INSERT INTO users (username, pw_hash, role) VALUES (?, ?, ?)",
+                ("admin", generate_password_hash(admin_pw, method="pbkdf2:sha256"), "support"),
+            )
+            logger.info("Admin/support bruker opprettet (admin).")
 
     conn.commit()
     conn.close()
+
 
 def user_exists(username: str) -> bool:
     conn = _conn()
@@ -58,6 +77,7 @@ def user_exists(username: str) -> bool:
     row = cur.fetchone()
     conn.close()
     return row is not None
+
 
 def create_user(username: str, pw_hash: str, role: str = "user") -> None:
     conn = _conn()
@@ -69,6 +89,7 @@ def create_user(username: str, pw_hash: str, role: str = "user") -> None:
     conn.commit()
     conn.close()
 
+
 def get_user(username: str) -> Optional[Dict[str, str]]:
     conn = _conn()
     cur = conn.cursor()
@@ -77,20 +98,33 @@ def get_user(username: str) -> Optional[Dict[str, str]]:
     conn.close()
     return dict(row) if row else None
 
+
+def update_last_login(username: str) -> None:
+    conn = _conn()
+    cur = conn.cursor()
+    cur.execute(
+        "UPDATE users SET last_login = datetime('now') WHERE username = ?",
+        (username,),
+    )
+    conn.commit()
+    conn.close()
+
+
 def add_ticket(owner: str, title: str, desc: str, category: str, priority: str, device: str) -> int:
     conn = _conn()
     cur = conn.cursor()
     cur.execute(
         """
-        INSERT INTO tickets (title, desc, owner, category, priority, device, status)
-        VALUES (?, ?, ?, ?, ?, ?, 'Åpen')
+        INSERT INTO tickets (title, desc, owner, category, priority, device, status, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, 'Åpen', datetime('now'))
         """,
-        (title, desc, owner, category, priority, device),
+        (title.strip(), desc.strip(), owner, category, priority, device),
     )
     conn.commit()
     ticket_id = cur.lastrowid
     conn.close()
     return ticket_id
+
 
 def get_tickets(owner: Optional[str] = None) -> List[Dict[str, str]]:
     conn = _conn()
@@ -103,9 +137,19 @@ def get_tickets(owner: Optional[str] = None) -> List[Dict[str, str]]:
     conn.close()
     return [dict(r) for r in rows]
 
+
 def close_ticket(ticket_id: int) -> None:
     conn = _conn()
     cur = conn.cursor()
-    cur.execute("UPDATE tickets SET status = 'Lukket' WHERE id = ?", (ticket_id,))
+    cur.execute(
+        """
+        UPDATE tickets
+        SET status = 'Lukket',
+            updated_at = datetime('now'),
+            closed_at = datetime('now')
+        WHERE id = ?
+        """,
+        (ticket_id,),
+    )
     conn.commit()
     conn.close()
