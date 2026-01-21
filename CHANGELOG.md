@@ -201,4 +201,37 @@ Alle vesentlige endringer i prosjektet dokumenteres i denne filen.
 - Brukernavn er fortsatt **unik** (kan ikke registreres flere ganger)
 - Applikasjonen starter trygt selv uten SMS-konfigurasjon
 
+### Added
+- Støtte for filvedlegg på saker (attachments)
+- Mulighet for å laste opp skjermbilder, PDF-er og dokumenter til en sak
+- Ny database-tabell for vedlegg knyttet til tickets
+- Unike filnavn ved opplasting for å unngå overskriving
+- Nedlasting av vedlegg med tilgangskontroll
+- SMS-varsling via Twilio (valgfritt)
+- Telefonnummer lagret på brukerprofil
+- Nye brukerinnstillinger for:
+  - E-postvarsler
+  - Interne varsler
+  - SMS-varsler
+- Aktivitetslogging for endring av innstillinger
+
+### Changed
+- Utvidet `/settings`-siden til å håndtere flere varseltyper
+- Forbedret tickets-visning med støtte for vedlegg
+- Database-initialisering gjort mer robust (ALTER TABLE med try/except)
+- Varslingslogikk forbedret slik at appen ikke krasjer hvis eksterne tjenester mangler
+- Strukturert bedre separasjon mellom database, ruter og tjenester
+
+### Fixed
+- Innstillinger som tidligere ikke ble lagret korrekt
+- Feil ved oppstart hvis Twilio ikke var installert
+- Varsler som ikke ble markert som lest
+- Feil som oppstod ved manglende miljøvariabler
+
+### Security
+- Sikret filopplasting med `secure_filename`
+- Begrenset tillatte filtyper via konfigurasjon
+- Forhindrer path traversal ved opplasting
+- Kun sakseier eller support har tilgang til vedlegg
+
 ---
