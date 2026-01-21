@@ -1,6 +1,5 @@
 from flask import Flask
 import os
-import secrets
 
 from .config import Config
 from .email_service import init_mail
@@ -11,10 +10,6 @@ def create_app():
 
     # Last inn config.py (MAIL_*, DATABASE_PATH, osv.)
     app.config.from_object(Config)
-
-    # Secure secret key - use environment variable or generate random
-    # (OBS: for vurdering er det best å kreve SECRET_KEY i prod, men du ba ikke endre mer)
-    app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", secrets.token_hex(32))
 
     # Init Flask-Mail
     init_mail(app)

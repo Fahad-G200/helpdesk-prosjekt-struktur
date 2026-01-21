@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO
+import os
 
 socketio = SocketIO()  # opprett SocketIO-objekt (før create_app)
 

@@ -1,12 +1,20 @@
 from __future__ import annotations
 
-from flask import Blueprint, render_template, request, redirect, url_for, session, flash, jsonify, abort
+from flask import (
+    Blueprint, render_template, request, redirect, url_for, session,
+    flash, jsonify, abort, send_from_directory
+)
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
+
 import logging
+import os
 import re
+import uuid
 from datetime import datetime
 from typing import Dict, Tuple, Optional
 
+from .config import Config
 from .db import (
     init_db,
     # Users
@@ -21,6 +29,8 @@ from .db import (
     log_activity, get_activity,
     # Knowledge base
     get_articles, get_article, create_article, update_article, delete_article_db,
+    # Attachments
+    add_attachment, get_attachments, get_attachment,
 )
 
 # E-postvarsling
@@ -37,6 +47,35 @@ def current_user():
 
 def current_role():
     return session.get("role")
+
+
+# -----------------------------
+# Upload helpers
+# -----------------------------
+def allowed_file(filename: str) -> bool:
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in Config.ALLOWED_EXTENSIONS
+
+
+def save_upload(file_storage, ticket_id: int) -> tuple[str, str]:
+    """
+    Lagrer fil på disk med unikt navn.
+    Returnerer (stored_filename, original_filename)
+    """
+    original_filename = secure_filename(file_storage.filename or "")
+    if not original_filename:
+        raise ValueError("Tomt filnavn")
+
+    if not allowed_file(original_filename):
+        raise ValueError("Ugyldig filtype")
+
+    os.makedirs(Config.UPLOAD_FOLDER, exist_ok=True)
+
+    ext = original_filename.rsplit(".", 1)[1].lower()
+    stored_filename = f"ticket_{ticket_id}_{uuid.uuid4().hex}.{ext}"
+    path = os.path.join(Config.UPLOAD_FOLDER, stored_filename)
+
+    file_storage.save(path)
+    return stored_filename, original_filename
 
 
 @bp.before_app_request
@@ -232,6 +271,9 @@ def activity_log():
     return render_template("logs.html", log_entries=entries)
 
 
+# -----------------------------
+# Tickets
+# -----------------------------
 @bp.route("/tickets", methods=["GET", "POST"])
 def tickets():
     user = current_user()
@@ -264,6 +306,22 @@ def tickets():
                     log_activity(user, f"Opprettet sak #{ticket_id} – '{title}'")
                 except Exception:
                     pass
+
+                # --- NYTT: håndter vedlegg ---
+                try:
+                    files = request.files.getlist("files")
+                except Exception:
+                    files = []
+
+                for f in files:
+                    if not f or not getattr(f, "filename", ""):
+                        continue
+                    try:
+                        stored_name, original_name = save_upload(f, ticket_id)
+                        add_attachment(ticket_id, stored_name, original_name, user)
+                    except Exception as e:
+                        logger.error(f"File upload error (ticket #{ticket_id}): {e}")
+                        flash(f"Kunne ikke laste opp fil '{getattr(f, 'filename', '')}'.", "danger")
 
                 try:
                     for sup in get_support_users():
@@ -303,6 +361,13 @@ def tickets():
         logger.error(f"Error fetching tickets: {e}")
         visible = []
         flash("Kunne ikke hente saker. Prøv igjen senere.")
+
+    # --- NYTT: legg ved vedlegg på hver ticket for visning i template ---
+    for t in visible:
+        try:
+            t["attachments"] = get_attachments(t["id"])
+        except Exception:
+            t["attachments"] = []
 
     return render_template("_tickets.html", tickets=visible, role=role)
 
@@ -393,6 +458,75 @@ def rate_ticket(ticket_id: int):
     return redirect(url_for("main.tickets"))
 
 
+# -----------------------------
+# Attachments download
+# -----------------------------
+@bp.route("/attachments/<int:attachment_id>/download")
+def download_attachment(attachment_id: int):
+    user = current_user()
+    role = current_role()
+    if not user:
+        return redirect(url_for("main.login"))
+
+    att = get_attachment(attachment_id)
+    if not att:
+        abort(404)
+
+    t = get_ticket(att["ticket_id"])
+    if not t:
+        abort(404)
+
+    # tilgangskontroll: eier eller support
+    if role != "support" and t["owner"] != user:
+        abort(403)
+
+    return send_from_directory(
+        Config.UPLOAD_FOLDER,
+        att["stored_filename"],
+        as_attachment=True,
+        download_name=att["original_filename"],
+    )
+
+
+# -----------------------------
+# (Beholder din gamle upload-route urørt)
+# -----------------------------
+@bp.route("/tickets/<int:ticket_id>/upload", methods=["POST"])
+def upload_attachment(ticket_id: int):
+    if not current_user():
+        return redirect(url_for("main.login"))
+
+    if "file" not in request.files:
+        flash("Ingen fil valgt")
+        return redirect(url_for("main.tickets"))
+
+    file = request.files["file"]
+
+    if file.filename == "":
+        flash("Ingen fil valgt")
+        return redirect(url_for("main.tickets"))
+
+    # Denne bruker Config nå for konsistens
+    if not allowed_file(file.filename):
+        flash("Ugyldig filtype")
+        return redirect(url_for("main.tickets"))
+
+    original = secure_filename(file.filename)
+    unique_name = f"{uuid.uuid4()}_{original}"
+
+    os.makedirs(Config.UPLOAD_FOLDER, exist_ok=True)
+    save_path = os.path.join(Config.UPLOAD_FOLDER, unique_name)
+    file.save(save_path)
+
+    flash("Vedlegg lastet opp")
+
+    # Merk: denne gamle ruta lagrer fortsatt ikke i DB (som før)
+    return redirect(url_for("main.tickets"))
+
+
+# -----------------------------
+# Chat
+# -----------------------------
 class HelpdeskBot:
     def __init__(self):
         self.knowledge_base = self._init_knowledge_base()
@@ -414,6 +548,7 @@ class HelpdeskBot:
 
 
 _bot_instance = None
+
 
 def get_bot() -> HelpdeskBot:
     global _bot_instance

@@ -77,6 +77,16 @@
               {% if t.closed_at %} · Lukket: <strong>{{ t.closed_at }}</strong>{% endif %}
             </p>
 
+            <form
+              method="post"
+              enctype="multipart/form-data"
+              action="{{ url_for('main.upload_attachment', ticket_id=t.id) }}"
+              style="margin-top:10px;"
+            >
+              <input type="file" name="file" required>
+              <button type="submit">Last opp vedlegg</button>
+            </form>
+
             {% if t.status == 'Lukket' and role == 'user' %}
               {% if t.rating is none %}
                 <form action="{{ url_for('main.rate_ticket', ticket_id=t.id) }}" method="post" style="margin-top:10px;">
