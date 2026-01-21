@@ -169,3 +169,36 @@ Alle vesentlige endringer i prosjektet dokumenteres i denne filen.
 ### Fixed
 - Fikset 404 “Not Found” når man trykker på “Innstillinger” i menyen.
 - Reduserte risiko for krasj ved innstillinger/varsler hvis databasen var opprettet før disse feltene fantes.
+
+### Added
+- Lagt til støtte for **SMS-varslinger** via Twilio
+- Brukere kan nå lagre **telefonnummer** i profilinnstillinger
+- Nye varslingsvalg i innstillinger:
+  - E-postvarsler
+  - Interne varsler i applikasjonen
+  - SMS-varsler
+- Eksakt tidspunkt vises for:
+  - Når en sak ble opprettet
+  - Når en sak ble oppdatert
+  - Når en sak ble lukket
+- Aktivitet logges når bruker endrer varselinnstillinger
+
+### Changed
+- Oppdatert **settings-siden** til å håndtere flere typer varslinger
+- Database-struktur utvidet med:
+  - `phone`
+  - `notify_sms`
+- Oppdatert `update_preferences` slik at alle varslingsvalg lagres samlet
+- Twilio-integrasjon gjort **valgfri** slik at appen ikke krasjer hvis Twilio ikke er installert
+
+### Fixed
+- Rettet feil som gjorde at **Innstillinger-siden ikke fungerte**
+- Forhindret krasj ved manglende `twilio`-avhengighet
+- Ryddet opp i imports og fjernet direkte Twilio-import fra routes
+- Stabilisert database-initiering ved eksisterende databaser
+
+### Security
+- Brukernavn er fortsatt **unik** (kan ikke registreres flere ganger)
+- Applikasjonen starter trygt selv uten SMS-konfigurasjon
+
+---

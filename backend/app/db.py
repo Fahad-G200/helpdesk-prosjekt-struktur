@@ -25,28 +25,64 @@ def init_db() -> None:
     conn = _conn()
     cur = conn.cursor()
 
-    # USERS (grunn-tabell)
+    # USERS
     cur.execute("""
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT NOT NULL UNIQUE,
             pw_hash TEXT NOT NULL,
             role TEXT NOT NULL DEFAULT 'user',
+            email TEXT,
+            phone TEXT,
             created_at TEXT NOT NULL DEFAULT (datetime('now')),
-            last_login TEXT
+            last_login TEXT,
+            notify_email INTEGER NOT NULL DEFAULT 1,
+            notify_inapp INTEGER NOT NULL DEFAULT 1,
+            notify_sms INTEGER NOT NULL DEFAULT 0
         )
     """)
 
-    # Sørg for at disse kolonnene finnes selv om DB allerede var opprettet før
+        # Hvis DB allerede finnes fra før (uten nye kolonner), legg til kolonnene trygt:
     for stmt in [
         "ALTER TABLE users ADD COLUMN email TEXT",
+        "ALTER TABLE users ADD COLUMN phone TEXT",
         "ALTER TABLE users ADD COLUMN notify_email INTEGER NOT NULL DEFAULT 1",
         "ALTER TABLE users ADD COLUMN notify_inapp INTEGER NOT NULL DEFAULT 1",
+        "ALTER TABLE users ADD COLUMN notify_sms INTEGER NOT NULL DEFAULT 0",
+        "ALTER TABLE users ADD COLUMN last_login TEXT",
     ]:
         try:
             cur.execute(stmt)
         except sqlite3.OperationalError:
-            pass  # kolonnen finnes allerede
+            pass
+
+
+
+    # Hvis DB allerede finnes fra før (uten nye kolonner), legg til kolonnene trygt:
+    try:
+        cur.execute("ALTER TABLE users ADD COLUMN email TEXT")
+    except sqlite3.OperationalError:
+        pass
+    try:
+        cur.execute("ALTER TABLE users ADD COLUMN phone TEXT")
+    except sqlite3.OperationalError:
+        pass
+    try:
+        cur.execute("ALTER TABLE users ADD COLUMN notify_email INTEGER NOT NULL DEFAULT 1")
+    except sqlite3.OperationalError:
+        pass
+    try:
+        cur.execute("ALTER TABLE users ADD COLUMN notify_inapp INTEGER NOT NULL DEFAULT 1")
+    except sqlite3.OperationalError:
+        pass
+    try:
+        cur.execute("ALTER TABLE users ADD COLUMN notify_sms INTEGER NOT NULL DEFAULT 0")
+    except sqlite3.OperationalError:
+        pass
+    try:
+        cur.execute("ALTER TABLE users ADD COLUMN last_login TEXT")
+    except sqlite3.OperationalError:
+        pass
 
     # TICKETS
     cur.execute("""
@@ -90,7 +126,7 @@ def init_db() -> None:
         )
     """)
 
-    # ARTICLES
+    # KNOWLEDGE BASE ARTICLES
     cur.execute("""
         CREATE TABLE IF NOT EXISTS articles (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -141,27 +177,53 @@ def user_exists(username: str) -> bool:
     return ok
 
 
-def create_user(username: str, pw_hash: str, role: str = "user", email: Optional[str] = None) -> None:
+def create_user(
+    username: str,
+    pw_hash: str,
+    role: str = "user",
+    email: Optional[str] = None,
+    phone: Optional[str] = None,
+) -> None:
     conn = _conn()
     cur = conn.cursor()
     cur.execute(
-        "INSERT INTO users (username, pw_hash, role, email) VALUES (?, ?, ?, ?)",
-        (username, pw_hash, role, email),
+        """
+        INSERT INTO users (username, pw_hash, role, email, phone)
+        VALUES (?, ?, ?, ?, ?)
+        """,
+        (username, pw_hash, role, email, phone),
     )
     conn.commit()
     conn.close()
 
-
-def get_user(username: str) -> Optional[Dict[str, Any]]:
+def get_user(username: str):
     conn = _conn()
     cur = conn.cursor()
-    cur.execute(
-        "SELECT username, pw_hash, role, email, notify_email, notify_inapp, last_login FROM users WHERE username = ?",
-        (username,),
-    )
-    row = cur.fetchone()
-    conn.close()
-    return dict(row) if row else None
+
+    # Bakoverkompatibel: hvis DB-en er laget før preferansekolonner ble lagt til,
+    # kan SELECT feile. Da faller vi tilbake og setter default-verdier.
+    try:
+        cur.execute(
+            "SELECT username, pw_hash, role, email, notify_email, notify_inapp, last_login "
+            "FROM users WHERE username = ?",
+            (username,),
+        )
+        row = cur.fetchone()
+        conn.close()
+        return dict(row) if row else None
+    except sqlite3.OperationalError:
+        cur.execute(
+            "SELECT username, pw_hash, role, email, last_login FROM users WHERE username = ?",
+            (username,),
+        )
+        row = cur.fetchone()
+        conn.close()
+        if not row:
+            return None
+        d = dict(row)
+        d["notify_email"] = 1
+        d["notify_inapp"] = 1
+        return d
 
 
 def update_last_login(username: str) -> None:
@@ -172,12 +234,25 @@ def update_last_login(username: str) -> None:
     conn.close()
 
 
-def update_preferences(username: str, notify_email: int, notify_inapp: int) -> None:
+def update_preferences(
+    username: str,
+    notify_email: int,
+    notify_inapp: int,
+    notify_sms: int = 0,
+    phone: Optional[str] = None,
+) -> None:
     conn = _conn()
     cur = conn.cursor()
     cur.execute(
-        "UPDATE users SET notify_email = ?, notify_inapp = ? WHERE username = ?",
-        (int(notify_email), int(notify_inapp), username),
+        """
+        UPDATE users
+        SET notify_email = ?,
+            notify_inapp = ?,
+            notify_sms = ?,
+            phone = ?
+        WHERE username = ?
+        """,
+        (int(notify_email), int(notify_inapp), int(notify_sms), phone, username),
     )
     conn.commit()
     conn.close()
@@ -186,7 +261,14 @@ def update_preferences(username: str, notify_email: int, notify_inapp: int) -> N
 def get_support_users() -> List[Dict[str, Any]]:
     conn = _conn()
     cur = conn.cursor()
-    cur.execute("SELECT username, email, notify_email, notify_inapp FROM users WHERE role = 'support' ORDER BY username ASC")
+    cur.execute(
+        """
+        SELECT username, email, phone, notify_email, notify_inapp, notify_sms
+        FROM users
+        WHERE role = 'support'
+        ORDER BY username ASC
+        """
+    )
     rows = cur.fetchall()
     conn.close()
     return [dict(r) for r in rows]
@@ -289,7 +371,7 @@ def get_rating(ticket_id: int) -> Optional[Dict[str, Any]]:
 
 
 # -----------------------------
-# NOTIFICATIONS
+# NOTIFICATIONS (in-app)
 # -----------------------------
 def add_notification(user: str, message: str, link: Optional[str] = None) -> None:
     conn = _conn()
@@ -333,6 +415,59 @@ def count_notifications(user: str) -> int:
     row = cur.fetchone()
     conn.close()
     return int(row["c"]) if row else 0
+
+
+# -----------------------------
+# KNOWLEDGE BASE
+# -----------------------------
+def create_article(title: str, content: str, author: str) -> int:
+    conn = _conn()
+    cur = conn.cursor()
+    cur.execute(
+        "INSERT INTO articles (title, content, author) VALUES (?, ?, ?)",
+        (title.strip(), content.strip(), author),
+    )
+    conn.commit()
+    article_id = int(cur.lastrowid)
+    conn.close()
+    return article_id
+
+
+def get_articles() -> List[Dict[str, Any]]:
+    conn = _conn()
+    cur = conn.cursor()
+    cur.execute("SELECT id, title, author, created_at FROM articles ORDER BY id DESC")
+    rows = cur.fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def get_article(article_id: int) -> Optional[Dict[str, Any]]:
+    conn = _conn()
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM articles WHERE id = ?", (article_id,))
+    row = cur.fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+
+def update_article(article_id: int, title: str, content: str) -> None:
+    conn = _conn()
+    cur = conn.cursor()
+    cur.execute(
+        "UPDATE articles SET title = ?, content = ?, updated_at = datetime('now') WHERE id = ?",
+        (title.strip(), content.strip(), article_id),
+    )
+    conn.commit()
+    conn.close()
+
+
+def delete_article_db(article_id: int) -> None:
+    conn = _conn()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM articles WHERE id = ?", (article_id,))
+    conn.commit()
+    conn.close()
 
 
 # -----------------------------

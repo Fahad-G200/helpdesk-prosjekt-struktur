@@ -3,7 +3,7 @@
 <div class="card">
   <h2>Aktivitetslogg</h2>
 
-  {% if log_entries %}
+  {% if log_entries and log_entries|length > 0 %}
     <table style="width:100%; border-collapse: collapse;">
       <thead>
         <tr>
@@ -23,7 +23,7 @@
       </tbody>
     </table>
   {% else %}
-    <p>Ingen loggoppføringer.</p>
+    <p class="muted">Ingen loggoppføringer.</p>
   {% endif %}
 </div>
 {% endblock %}

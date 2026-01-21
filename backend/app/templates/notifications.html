@@ -3,10 +3,10 @@
 <div class="card">
   <h2>Varsler</h2>
 
-  {% if notifications %}
+  {% if notifications and notifications|length > 0 %}
     <ul>
       {% for n in notifications %}
-        <li style="margin-bottom:10px;">
+        <li style="margin: 10px 0;">
           <small class="muted">{{ n.created_at }}</small><br>
           {% if n.link %}
             <a href="{{ n.link }}">{{ n.message }}</a>
@@ -17,7 +17,7 @@
       {% endfor %}
     </ul>
   {% else %}
-    <p>Du har ingen varsler.</p>
+    <p class="muted">Du har ingen varsler.</p>
   {% endif %}
 </div>
 {% endblock %}

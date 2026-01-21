@@ -6,3 +6,5 @@ Flask-SQLAlchemy==3.1.1
 WTForms==3.2.1
 python-magic==0.4.27
 Pillow==10.1.0
+twilio==9.0.0   
+twilio==9.0.0

@@ -9,15 +9,21 @@ from typing import Dict, Tuple, Optional
 
 from .db import (
     init_db,
+    # Users
+    user_exists, create_user, get_user, update_last_login, update_preferences, get_support_users,
+    # Tickets
     add_ticket, get_tickets, get_ticket, close_ticket,
-    user_exists, create_user, get_user,
-    # NYTT (for base.html-lenkene dine):
-    get_notifications, mark_all_notifications_read, count_notifications,
-    update_preferences,
-    get_activity,
+    # Notifications
+    add_notification, get_notifications, mark_all_notifications_read, count_notifications,
+    # Ratings
+    add_rating, get_rating,
+    # Activity
+    log_activity, get_activity,
+    # Knowledge base
+    get_articles, get_article, create_article, update_article, delete_article_db,
 )
 
-# E-postvarsling (du har allerede email_service.py)
+# E-postvarsling
 from .email_service import send_ticket_created_email, notify_support_new_ticket
 
 bp = Blueprint("main", __name__)
@@ -39,6 +45,19 @@ def ensure_db():
         init_db()
     except Exception as e:
         logger.error(f"Database initialization failed: {e}")
+
+
+@bp.context_processor
+def inject_notification_count():
+    """
+    Gjør at base.html kan vise notif_count uten at alle routes må sende det inn manuelt.
+    """
+    if current_user():
+        try:
+            return {"notif_count": count_notifications(current_user())}
+        except Exception:
+            return {"notif_count": 0}
+    return {"notif_count": 0}
 
 
 @bp.route("/")
@@ -63,8 +82,21 @@ def login():
                 if u and check_password_hash(u["pw_hash"], password):
                     session["user"] = u["username"]
                     session["role"] = u["role"]
+                    session.permanent = True
+
+                    try:
+                        update_last_login(username)
+                    except Exception:
+                        pass
+
+                    try:
+                        log_activity(username, "Logget inn")
+                    except Exception:
+                        pass
+
                     logger.info(f"User logged in: {username}")
                     return redirect(url_for("main.kb"))
+
                 error = "Feil brukernavn eller passord."
         except Exception as e:
             logger.error(f"Login error: {e}")
@@ -93,6 +125,11 @@ def register():
             else:
                 pw_hash = generate_password_hash(password, method="pbkdf2:sha256")
                 create_user(username=username, pw_hash=pw_hash, role="user")
+                try:
+                    log_activity(username, "Opprettet ny brukerkonto")
+                except Exception:
+                    pass
+
                 logger.info(f"New user registered: {username}")
                 flash("Bruker opprettet. Du kan logge inn nå.")
                 return redirect(url_for("main.login"))
@@ -107,6 +144,10 @@ def register():
 def logout():
     user = current_user()
     if user:
+        try:
+            log_activity(user, "Logget ut")
+        except Exception:
+            pass
         logger.info(f"User logged out: {user}")
     session.clear()
     return redirect(url_for("main.login"))
@@ -116,7 +157,79 @@ def logout():
 def kb():
     if not current_user():
         return redirect(url_for("main.login"))
-    return render_template("kb.html")
+
+    try:
+        articles = get_articles()
+    except Exception:
+        articles = []
+
+    return render_template("kb.html", articles=articles, role=current_role())
+
+
+@bp.route("/notifications")
+def notifications_page():
+    user = current_user()
+    if not user:
+        return redirect(url_for("main.login"))
+
+    try:
+        notifs = get_notifications(user)
+        mark_all_notifications_read(user)
+    except Exception as e:
+        logger.error(f"Notifications error: {e}")
+        notifs = []
+
+    return render_template("notifications.html", notifications=notifs)
+
+
+@bp.route("/settings", methods=["GET", "POST"])
+def settings():
+    user = current_user()
+    if not user:
+        return redirect(url_for("main.login"))
+
+    u = get_user(user) or {}
+
+    if request.method == "POST":
+        notify_email = 1 if request.form.get("notify_email") else 0
+        notify_inapp = 1 if request.form.get("notify_inapp") else 0
+        notify_sms = 1 if request.form.get("notify_sms") else 0
+        phone = request.form.get("phone", "").strip() or None
+
+        try:
+            update_preferences(
+                user,
+                notify_email,
+                notify_inapp,
+                notify_sms,
+                phone
+            )
+            log_activity(user, "Endret varselinnstillinger")
+            flash("Innstillinger oppdatert.")
+        except Exception as e:
+            logger.error(f"Settings update error: {e}")
+            flash("Kunne ikke lagre innstillinger. Prøv igjen.")
+
+        return redirect(url_for("main.settings"))
+
+    return render_template("settings.html", preferences=u)
+
+
+@bp.route("/admin/activity")
+def activity_log():
+    user = current_user()
+    if not user:
+        return redirect(url_for("main.login"))
+    if current_role() != "support":
+        abort(403)
+
+    try:
+        entries = get_activity(200)
+    except Exception as e:
+        logger.error(f"Activity log error: {e}")
+        entries = []
+
+    return render_template("logs.html", log_entries=entries)
 
 
 @bp.route("/tickets", methods=["GET", "POST"])
@@ -147,20 +260,37 @@ def tickets():
                     device=device
                 )
                 logger.info(f"Ticket created: #{ticket_id} by {user}")
+                try:
+                    log_activity(user, f"Opprettet sak #{ticket_id} – '{title}'")
+                except Exception:
+                    pass
 
-                # E-post (user_email=None hvis du ikke bruker e-post på brukere enda)
+                try:
+                    for sup in get_support_users():
+                        add_notification(
+                            sup["username"],
+                            f"Ny sak opprettet av {user}: {title}",
+                            url_for("main.tickets")
+                        )
+                except Exception:
+                    pass
+
                 ticket = {
                     "id": ticket_id,
                     "title": title,
-                    "owner": session.get("user"),
+                    "owner": user,
                     "category": category,
                     "priority": priority,
                     "description": desc,
                 }
-                send_ticket_created_email(ticket, user_email=None)
-                notify_support_new_ticket(ticket)
+                try:
+                    send_ticket_created_email(ticket, user_email=None)
+                    notify_support_new_ticket(ticket)
+                except Exception:
+                    pass
 
                 flash("Saken er sendt til support. Du finner den i oversikten under.")
+
         except Exception as e:
             logger.error(f"Error creating ticket: {e}")
             flash("En feil oppstod ved opprettelse av sak. Prøv igjen.")
@@ -178,19 +308,35 @@ def tickets():
 
 
 @bp.route("/tickets/<int:ticket_id>/close", methods=["POST"])
-def close_ticket_view(ticket_id):
+def close_ticket_view(ticket_id: int):
     user = current_user()
     role = current_role()
 
     if not user:
         return redirect(url_for("main.login"))
-
     if role != "support":
         flash("Du har ikke tilgang til å lukke saker.")
         return redirect(url_for("main.tickets"))
 
     try:
+        t = get_ticket(ticket_id)
         close_ticket(ticket_id)
+
+        try:
+            log_activity(user, f"Lukket sak #{ticket_id}")
+        except Exception:
+            pass
+
+        if t:
+            try:
+                add_notification(
+                    t["owner"],
+                    f"Sak #{ticket_id} ble lukket av support ({user}).",
+                    url_for("main.tickets")
+                )
+            except Exception:
+                pass
+
         logger.info(f"Ticket #{ticket_id} closed by {user}")
         flash(f"Sak #{ticket_id} er lukket.")
     except Exception as e:
@@ -200,76 +346,59 @@ def close_ticket_view(ticket_id):
     return redirect(url_for("main.tickets"))
 
 
-# -----------------------------
-# NYTT: Varsler-siden (for base.html)
-# -----------------------------
-@bp.route("/notifications")
-def notifications_page():
+@bp.route("/tickets/<int:ticket_id>/rate", methods=["POST"])
+def rate_ticket(ticket_id: int):
     user = current_user()
     if not user:
         return redirect(url_for("main.login"))
 
-    notifs = get_notifications(user)
-    mark_all_notifications_read(user)
-    return render_template("notifications.html", notifications=notifs)
-
-
-# -----------------------------
-# NYTT: Innstillinger-siden (for base.html)
-# -----------------------------
-@bp.route("/settings", methods=["GET", "POST"])
-def settings():
-    user = current_user()
-    if not user:
-        return redirect(url_for("main.login"))
-
-    u = get_user(user)
-    if not u:
-        abort(404)
-
-    if request.method == "POST":
-        notify_email = 1 if request.form.get("notify_email") else 0
-        notify_inapp = 1 if request.form.get("notify_inapp") else 0
-        update_preferences(user, notify_email, notify_inapp)
-        flash("Innstillinger oppdatert.")
-        return redirect(url_for("main.settings"))
-
-    return render_template("settings.html", preferences=u)
-
-
-# -----------------------------
-# NYTT: Aktivitetslogg (kun support)
-# -----------------------------
-@bp.route("/admin/activity")
-def activity_log():
-    user = current_user()
-    if not user:
-        return redirect(url_for("main.login"))
-
-    if current_role() != "support":
+    t = get_ticket(ticket_id)
+    if not t or t["owner"] != user or t["status"] != "Lukket":
         abort(403)
 
-    log_entries = get_activity(100)
-    return render_template("logs.html", log_entries=log_entries)
+    if t.get("rating") is not None or get_rating(ticket_id) is not None:
+        flash("Denne saken er allerede vurdert.")
+        return redirect(url_for("main.tickets"))
 
+    try:
+        stars = int(request.form.get("stars", "0"))
+    except ValueError:
+        stars = 0
 
-# -----------------------------
-# NYTT: notif_count til base.html (badge)
-# -----------------------------
-@bp.context_processor
-def inject_notification_count():
-    if current_user():
-        return {"notif_count": count_notifications(current_user())}
-    return {}
+    feedback = (request.form.get("feedback") or "").strip()
 
+    if stars < 1 or stars > 5:
+        flash("Ugyldig vurdering. Velg 1–5.")
+        return redirect(url_for("main.tickets"))
 
-# -------------------------------------------------------------------
-# Chat-endepunkter (du hadde disse fra før)
-# -------------------------------------------------------------------
+    try:
+        add_rating(ticket_id, user, stars, feedback)
+        log_activity(user, f"Ga {stars}★ til sak #{ticket_id}")
+    except Exception as e:
+        logger.error(f"Rating error: {e}")
+        flash("Kunne ikke lagre vurdering. Prøv igjen.")
+        return redirect(url_for("main.tickets"))
+
+    try:
+        for sup in get_support_users():
+            add_notification(
+                sup["username"],
+                f"Sak #{ticket_id} fikk {stars}★ fra {user}",
+                url_for("main.tickets")
+            )
+    except Exception:
+        pass
+
+    flash("Takk for din tilbakemelding!")
+    return redirect(url_for("main.tickets"))
+
 
 class HelpdeskBot:
     def __init__(self):
-        self.knowledge_base = {
+        self.knowledge_base = self._init_knowledge_base()
+
+    def _init_knowledge_base(self) -> Dict:
+        return {
             "feide": {"keywords": ["feide", "innlogging", "login", "logge inn", "pålogging"]},
             "wifi": {"keywords": ["wifi", "wi-fi", "nett", "internett", "nettverk"]},
             "utskrift": {"keywords": ["utskrift", "skriver", "printer", "print"]},
@@ -277,15 +406,14 @@ class HelpdeskBot:
         }
 
     def process_message(self, message: str) -> str:
-        msg = message.lower()
+        ml = message.lower()
         for topic, data in self.knowledge_base.items():
-            if any(k in msg for k in data["keywords"]):
-                return f"Jeg ser du spør om {topic}. Beskriv feilmelding og hva du har prøvd, så hjelper jeg videre."
-        return "Jeg er ikke sikker på hva du trenger hjelp med. Beskriv problemet litt mer."
+            if any(k in ml for k in data["keywords"]):
+                return f"Jeg ser du spør om {topic}. Prøv: start på nytt, sjekk nett, og beskriv feilmelding."
+        return "Beskriv problemet litt mer (Feide / Wi-Fi / utskrift / passord), så hjelper jeg deg."
 
 
 _bot_instance = None
-
 
 def get_bot() -> HelpdeskBot:
     global _bot_instance
@@ -310,7 +438,6 @@ def chat():
         reply = bot.process_message(user_msg)
 
         return jsonify({"reply": reply})
-
     except Exception as e:
         logger.error(f"Chat error: {e}")
         return jsonify({"reply": "En feil oppstod. Prøv igjen senere."}), 500
@@ -320,8 +447,5 @@ def chat():
 def reset_chat():
     if not current_user():
         return jsonify({"status": "error"}), 401
-
-    session.pop("conversation_state", None)
     session.pop("chat_history", None)
-
     return jsonify({"status": "ok", "message": "Samtalen er tilbakestilt."})

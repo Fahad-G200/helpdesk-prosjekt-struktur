@@ -2,6 +2,7 @@
 {% block content %}
 <div class="card">
   <h2>Innstillinger</h2>
+
   <form method="post">
     <p>
       <label>
@@ -10,6 +11,7 @@
         Send meg e-postvarsler
       </label>
     </p>
+
     <p>
       <label>
         <input type="checkbox" name="notify_inapp" value="1"
@@ -17,7 +19,28 @@
         Vis interne varsler i applikasjonen
       </label>
     </p>
-    <button type="submit">Lagre</button>
+
+    <p>
+      <label>
+        <input type="checkbox" name="notify_sms" value="1"
+               {% if preferences.notify_sms %}checked{% endif %}>
+        Send meg SMS-varsler
+      </label>
+    </p>
+
+    <p>
+      <label for="phone">Telefonnummer (for SMS)</label>
+      <input
+        id="phone"
+        name="phone"
+        type="tel"
+        placeholder="+47XXXXXXXX"
+        value="{{ preferences.phone or '' }}"
+      />
+      <div class="help">Bruk internasjonalt format, f.eks. +47 12345678.</div>
+    </p>
+
+    <button type="submit">Lagre innstillinger</button>
   </form>
 </div>
 {% endblock %}
