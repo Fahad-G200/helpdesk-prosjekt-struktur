@@ -11,26 +11,32 @@
         --card:#fff; --border:#e5e7eb;
         --primary:#2563eb; --primaryHover:#1d4ed8;
         --green:#16a34a; --yellow:#ca8a04; --red:#dc2626;
+        --gray:#475569; --grayHover:#334155;
       }
+
       body{
         font-family: Arial, sans-serif;
-        max-width: 980px;
-        margin: 40px auto;
-        padding: 0 16px;
-        background: var(--bg);
-        color: var(--text);
+        font-size:16px;
+        max-width:980px;
+        margin:40px auto;
+        padding:0 16px;
+        background:var(--bg);
+        color:var(--text);
       }
+
       header{
-        display:flex; justify-content:space-between; align-items:center;
-        margin-bottom: 18px;
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        margin-bottom:18px;
       }
-      nav{ display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
-      nav a{
-        color: var(--primary);
-        text-decoration:none;
-        font-weight:700;
+
+      nav{
+        display:flex;
+        gap:12px;
+        align-items:center;
+        flex-wrap:wrap;
       }
-      nav a:hover{ text-decoration:underline; }
 
       .pill{
         background:#eef2ff;
@@ -41,6 +47,46 @@
         font-size:.9rem;
         white-space:nowrap;
       }
+
+      /* ===== MENYKNAPPER (TOPP) ===== */
+      .nav-btn{
+        display:inline-block;
+        padding:10px 14px;
+        border-radius:10px;
+        font-weight:800;
+        text-decoration:none;
+        color:#fff;
+        background:var(--gray);
+      }
+
+      .nav-btn:hover{
+        background:var(--grayHover);
+      }
+
+      .nav-btn.active{
+        background:var(--primary);
+      }
+
+      .nav-btn.active:hover{
+        background:var(--primaryHover);
+      }
+
+      /* ===== BLÅ BOKS-LENKER I INNHOLD ===== */
+      .link-box{
+        display:inline-block;
+        padding:10px 14px;
+        border-radius:10px;
+        font-weight:800;
+        text-decoration:none;
+        background:var(--primary);
+        color:#fff;
+        margin-right:10px;
+      }
+
+      .link-box:hover{
+        background:var(--primaryHover);
+      }
+
       .card{
         background:var(--card);
         border:1px solid var(--border);
@@ -49,8 +95,8 @@
         margin:14px 0;
         box-shadow:0 2px 6px rgba(0,0,0,.05);
       }
-      .muted{ color: var(--muted); }
-      h1,h2,h3{ margin-top:0; }
+
+      .muted{ color:var(--muted); }
 
       input, textarea, select{
         width:100%;
@@ -58,61 +104,45 @@
         margin:8px 0 14px;
         border-radius:10px;
         border:1px solid #cfd6df;
+        font-size:16px;
         box-sizing:border-box;
-        font-size:1rem;
       }
 
-      .btn, button{
-        display:inline-block;
-        background: var(--primary);
+      button{
+        background:var(--primary);
         color:#fff;
         border:0;
         border-radius:10px;
         padding:10px 14px;
         font-weight:800;
         cursor:pointer;
-        text-decoration:none;
-      }
-      .btn:hover, button:hover{ background: var(--primaryHover); }
-
-      .btn-secondary{ background:#475569; }
-      .btn-secondary:hover{ background:#334155; }
-
-      .flash{ border-left:6px solid var(--green); }
-
-      /* navigasjon */
-      .nav-link{
-        padding: 8px 10px;
-        border-radius: 10px;
-        text-decoration: none;
-        font-weight: 800;
-        color: var(--primary);
-      }
-      .nav-link:hover{
-        background: #eaf2ff;
-        text-decoration: none;
-      }
-      .nav-link.active{
-        background: var(--primary);
-        color: #fff;
       }
 
-      /* badge for varsler */
-      .badge {
-        background: #dc2626;
-        color: #fff;
-        padding: 2px 6px;
-        border-radius: 12px;
-        font-size: 0.85em;
-        vertical-align: top;
-        margin-left: 4px;
+      button:hover{
+        background:var(--primaryHover);
       }
 
-      .help{
-        margin-top: -8px;
-        margin-bottom: 14px;
-        font-size: .92rem;
-        color: var(--muted);
+      .flash{
+        border-left:6px solid var(--green);
+      }
+
+      .error{
+        background:#fee2e2;
+        border:1px solid #fecaca;
+        color:#7f1d1d;
+        padding:12px;
+        border-radius:10px;
+        margin:12px 0;
+        font-weight:700;
+      }
+
+      .badge{
+        background:#dc2626;
+        color:#fff;
+        padding:2px 6px;
+        border-radius:12px;
+        font-size:.85em;
+        margin-left:4px;
       }
     </style>
   </head>
@@ -123,115 +153,84 @@
 
       <nav>
         {% if session.get("user") %}
-          <span class="pill">Innlogget: {{ session.get("user") }} ({{ session.get("role") }})</span>
+          <span class="pill">
+            Innlogget: {{ session.get("user") }} ({{ session.get("role") }})
+          </span>
 
           {% set ep = request.endpoint or "" %}
-          <a class="nav-link {% if ep == 'main.kb' %}active{% endif %}" href="{{ url_for('main.kb') }}">Kunnskapsbase</a>
-          <a class="nav-link {% if ep == 'main.tickets' %}active{% endif %}" href="{{ url_for('main.tickets') }}">Mine saker</a>
 
-          <a class="nav-link {% if ep == 'main.notifications_page' %}active{% endif %}" href="{{ url_for('main.notifications_page') }}">
-            Varsler{% if notif_count and notif_count > 0 %} <span class="badge">{{ notif_count }}</span>{% endif %}
+          <a href="{{ url_for('main.kb') }}"
+             class="nav-btn {% if ep == 'main.kb' %}active{% endif %}">
+            Kunnskapsbase
           </a>
 
-          <a class="nav-link {% if ep == 'main.settings' %}active{% endif %}" href="{{ url_for('main.settings') }}">Innstillinger</a>
+          <a href="{{ url_for('main.tickets') }}"
+             class="nav-btn {% if ep == 'main.tickets' %}active{% endif %}">
+            Mine saker
+          </a>
 
-          {% if session.get("role") == "support" %}
-            <a class="nav-link {% if ep == 'main.activity_log' %}active{% endif %}" href="{{ url_for('main.activity_log') }}">Aktivitetslogg</a>
-          {% endif %}
+          <a href="{{ url_for('main.notifications_page') }}"
+             class="nav-btn {% if ep == 'main.notifications_page' %}active{% endif %}">
+            Varsler
+            {% if notif_count and notif_count > 0 %}
+              <span class="badge">{{ notif_count }}</span>
+            {% endif %}
+          </a>
 
-          <a class="nav-link" href="{{ url_for('main.logout') }}">Logg ut</a>
+          <a href="{{ url_for('main.settings') }}"
+             class="nav-btn {% if ep == 'main.settings' %}active{% endif %}">
+            Innstillinger
+          </a>
+
+          <a href="{{ url_for('main.logout') }}" class="nav-btn">
+            Logg ut
+          </a>
         {% endif %}
       </nav>
     </header>
 
     {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        {% for m in messages %}
-          <div class="card flash">{{ m }}</div>
-        {% endfor %}
-      {% endif %}
+      {% for m in messages %}
+        <div class="card flash">{{ m }}</div>
+      {% endfor %}
     {% endwith %}
 
     {% block content %}{% endblock %}
 
-    <!-- Enkel chatbot-widget -->
-    <div id="chatbot" style="position:fixed; right:18px; bottom:18px; width:320px; max-width:92vw; z-index:9999;">
-      <div class="card" style="margin:0;">
-        <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+    <!-- CHATBOT -->
+    <div id="chatbot" style="position:fixed; right:18px; bottom:18px; width:320px; z-index:9999;">
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
           <strong>Helpdesk-chat</strong>
-          <button id="chatToggle" class="btn-secondary" type="button" style="padding:6px 10px; border-radius:10px;">Skjul</button>
+          <button id="chatToggle" type="button">Skjul</button>
         </div>
 
-        <div id="chatBody" style="margin-top:10px;">
-          <div id="chatLog" style="height:180px; overflow:auto; border:1px solid #e5e7eb; border-radius:10px; padding:10px; background:#fff;">
-            <div class="muted" style="margin-bottom:8px;">
+        <div id="chatBody">
+          <div id="chatLog"
+               style="height:180px; overflow:auto; border:1px solid #e5e7eb;
+                      border-radius:10px; padding:10px; margin-top:10px;">
+            <div class="muted">
               Hei! Skriv hva du trenger hjelp med (Feide, Wi-Fi, utskrift, passord).
             </div>
           </div>
 
           <div style="display:flex; gap:8px; margin-top:10px;">
-            <input id="chatInput" type="text" placeholder="Skriv her..." style="margin:0;" />
+            <input id="chatInput" type="text" placeholder="Skriv her…" />
             <button id="chatSend" type="button">Send</button>
           </div>
-
-          <p class="muted" style="margin-top:8px; font-size:.9rem;">
-            Chat er regelbasert (ikke ekte AI). Den gir forslag basert på nøkkelord.
-          </p>
         </div>
       </div>
     </div>
 
     <script>
-      (function() {
-        const log = document.getElementById("chatLog");
-        const input = document.getElementById("chatInput");
-        const sendBtn = document.getElementById("chatSend");
-        const toggleBtn = document.getElementById("chatToggle");
+      (function(){
         const body = document.getElementById("chatBody");
+        const btn  = document.getElementById("chatToggle");
 
-        function addMsg(who, text) {
-          const wrap = document.createElement("div");
-          wrap.style.margin = "8px 0";
-          wrap.innerHTML = `<strong>${who}:</strong> <span style="white-space:pre-wrap;"></span>`;
-          wrap.querySelector("span").textContent = text;
-          log.appendChild(wrap);
-          log.scrollTop = log.scrollHeight;
-        }
-
-        async function send() {
-          const msg = (input.value || "").trim();
-          if (!msg) return;
-          addMsg("Du", msg);
-          input.value = "";
-          input.focus();
-
-          try {
-            const res = await fetch("/chat", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ message: msg })
-            });
-
-            const data = await res.json().catch(() => ({}));
-            if (!res.ok) {
-              addMsg("Bot", data.reply || "Noe gikk galt. Prøv igjen.");
-              return;
-            }
-            addMsg("Bot", data.reply || "Ingen svar.");
-          } catch (e) {
-            addMsg("Bot", "Kunne ikke kontakte serveren. Er du pålogget og kjører appen?");
-          }
-        }
-
-        sendBtn.addEventListener("click", send);
-        input.addEventListener("keydown", (e) => {
-          if (e.key === "Enter") send();
-        });
-
-        toggleBtn.addEventListener("click", () => {
+        btn.addEventListener("click", () => {
           const hidden = body.style.display === "none";
-          body.style.display = hidden ? "" : "none";
-          toggleBtn.textContent = hidden ? "Skjul" : "Vis";
+          body.style.display = hidden ? "block" : "none";
+          btn.textContent = hidden ? "Skjul" : "Vis";
         });
       })();
     </script>
