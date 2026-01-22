@@ -8,8 +8,8 @@
     Nivå 3 brukes når du må sende inn sak til support.
   </p>
   <div style="margin-top:12px;">
-    <a class="link-box" href="#niva1">Start med nivå 1</a>
-    <a class="link-box" href="{{ url_for('main.tickets') }}" style="margin-left:8px;">Gå til Mine saker</a>
+    <a class="btn" href="#niva1">Start med nivå 1</a>
+    <a class="btn" href="{{ url_for('main.tickets') }}" style="margin-left:8px;">Gå til Mine saker</a>
   </div>
 </div>
 
@@ -55,7 +55,7 @@
 <div class="card level3">
   <h2>🔴 Nivå 3 – Send inn sak</h2>
   <p>Hvis nivå 1 og 2 ikke løser problemet, opprett en supportsak med god beskrivelse.</p>
-  <a class="link-box" href="{{ url_for('main.tickets') }}">Opprett / se saker</a>
+  <a class="btn" href="{{ url_for('main.tickets') }}">Opprett / se saker</a>
 </div>
 
 {% endblock %}

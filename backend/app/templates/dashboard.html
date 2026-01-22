@@ -1,169 +1,262 @@
-<!doctype html>
-<html lang="no">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Ticket Dashboard</title>
+{% extends "base.html" %}
 
-    <!-- Tailwind CDN (enkelt for å få v0-look uten setup) -->
-    <script src="https://cdn.tailwindcss.com"></script>
-  </head>
+{% block title %}Dashboard – Helpdesk{% endblock %}
+{% block header_title %}Ticket Dashboard{% endblock %}
+{% block header_subtitle %}Oversikt over aktive saker{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
 
-  <body class="bg-slate-950 text-slate-100">
-    <div class="flex min-h-screen">
-      <!-- Sidebar -->
-      <aside class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col">
-        <div class="p-6 border-b border-slate-800">
-          <h1 class="text-xl font-bold text-sky-400 flex items-center gap-2">
-            <span class="text-2xl">🛠️</span>
-            IT Helpdesk
-          </h1>
-        </div>
+{% block content %}
 
-        <nav class="flex-1 p-4 space-y-2">
-          <a href="#" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-sky-600 text-white">
-            <span>📊</span> Dashboard
-          </a>
-          <a href="#" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-slate-200">
-            <span>📋</span> Alle saker
-          </a>
-          <a href="#" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-slate-200">
-            <span>👥</span> Team
-          </a>
-          <a href="#" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-slate-200">
-            <span>📈</span> Rapporter
-          </a>
-          <a href="#" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-slate-200">
-            <span>⚙️</span> Innstillinger
-          </a>
-        </nav>
+<style>
+  /* Dashboard-only styling (påvirker kun innholdet i dashboard-siden) */
+  .dash-wrap{
+    background:#0b1220;
+    border:1px solid #0f1a2e;
+    border-radius:16px;
+    padding:22px;
+    color:#e5e7eb;
+  }
+  .dash-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:14px;
+    flex-wrap:wrap;
+    margin-bottom:18px;
+  }
+  .dash-title h1{
+    margin:0;
+    font-size:28px;
+    font-weight:900;
+  }
+  .dash-title p{
+    margin:6px 0 0;
+    color:#94a3b8;
+  }
+  .dash-cta{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:12px 16px;
+    border-radius:12px;
+    background:#0284c7;
+    color:#fff;
+    font-weight:900;
+    text-decoration:none;
+    box-shadow:0 10px 28px rgba(2,132,199,.25);
+  }
+  .dash-cta:hover{ filter:brightness(1.06); }
 
-        <div class="p-4 border-t border-slate-800">
-          <div class="flex items-center gap-3 px-4 py-3">
-            <div class="w-10 h-10 rounded-full bg-sky-600 flex items-center justify-center font-semibold">
-              AK
-            </div>
-            <div>
-              <p class="font-medium text-sm">Admin Kristiansen</p>
-              <p class="text-xs text-slate-500">IT-leder</p>
-            </div>
-          </div>
-        </div>
-      </aside>
+  .dash-grid{
+    display:grid;
+    grid-template-columns:repeat(4, minmax(0, 1fr));
+    gap:14px;
+    margin-bottom:18px;
+  }
+  @media (max-width: 980px){
+    .dash-grid{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 560px){
+    .dash-grid{ grid-template-columns:1fr; }
+  }
 
-      <!-- Main Content -->
-      <main class="flex-1 flex flex-col">
-        <!-- Header -->
-        <header class="bg-slate-900/50 border-b border-slate-800 px-8 py-4 flex items-center justify-between">
-          <div>
-            <h2 class="text-2xl font-bold">Ticket Dashboard</h2>
-            <p class="text-slate-500 text-sm">Oversikt over aktive saker</p>
-          </div>
+  .stat{
+    background:rgba(15,23,42,.65);
+    border:1px solid rgba(148,163,184,.12);
+    border-radius:14px;
+    padding:16px;
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+  }
+  .stat .label{ color:#94a3b8; font-size:13px; }
+  .stat .value{ font-size:30px; font-weight:900; color:#38bdf8; margin-top:8px; }
+  .stat .icon{ font-size:22px; opacity:.95; }
 
-          <button class="bg-sky-600 hover:bg-sky-500 text-white font-semibold px-6 py-3 rounded-lg transition-all hover:scale-105 shadow-lg shadow-sky-600/25 flex items-center gap-2">
-            <span class="text-xl">+</span>
-            Ny sak
-          </button>
-        </header>
+  .table-card{
+    background:rgba(15,23,42,.65);
+    border:1px solid rgba(148,163,184,.12);
+    border-radius:14px;
+    overflow:hidden;
+  }
+  .table-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    padding:14px 16px;
+    border-bottom:1px solid rgba(148,163,184,.10);
+  }
+  .table-head h2{
+    margin:0;
+    font-size:16px;
+    font-weight:900;
+  }
+  .table-actions{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+  .chip{
+    background:rgba(148,163,184,.10);
+    border:1px solid rgba(148,163,184,.12);
+    color:#e5e7eb;
+    padding:7px 10px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:800;
+  }
 
-        <!-- Content -->
-        <div class="flex-1 p-8 overflow-auto">
-          <!-- Stats (hardkodet demo; kan kobles til DB senere) -->
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 hover:border-slate-700 transition-colors">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-slate-500 text-sm">Totalt aktive</span>
-                <span class="text-2xl">📋</span>
-              </div>
-              <p class="text-3xl font-bold text-sky-400">{{ stats.total_active }}</p>
-            </div>
+  table{
+    width:100%;
+    border-collapse:collapse;
+  }
+  thead th{
+    text-align:left;
+    font-size:12px;
+    letter-spacing:.02em;
+    color:#94a3b8;
+    padding:12px 16px;
+    background:rgba(148,163,184,.06);
+  }
+  tbody td{
+    padding:12px 16px;
+    border-top:1px solid rgba(148,163,184,.10);
+    font-size:14px;
+    color:#e5e7eb;
+    vertical-align:top;
+  }
+  tbody tr:hover{
+    background:rgba(56,189,248,.06);
+  }
+  .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+  .id{ color:#38bdf8; font-weight:900; }
 
-            <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 hover:border-slate-700 transition-colors">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-slate-500 text-sm">Kritiske</span>
-                <span class="text-2xl">🔴</span>
-              </div>
-              <p class="text-3xl font-bold text-sky-400">{{ stats.critical }}</p>
-            </div>
+  .pill-pri{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:6px 10px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:900;
+    border:1px solid rgba(148,163,184,.18);
+    background:rgba(148,163,184,.08);
+  }
+  .pri-critical{
+    background:rgba(239,68,68,.12);
+    border-color:rgba(239,68,68,.25);
+    color:#fca5a5;
+  }
+  .pri-medium{
+    background:rgba(234,179,8,.12);
+    border-color:rgba(234,179,8,.25);
+    color:#fde68a;
+  }
+  .pri-low{
+    background:rgba(16,185,129,.12);
+    border-color:rgba(16,185,129,.25);
+    color:#86efac;
+  }
+  .muted{ color:#94a3b8; }
+</style>
 
-            <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 hover:border-slate-700 transition-colors">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-slate-500 text-sm">Løst i dag</span>
-                <span class="text-2xl">✅</span>
-              </div>
-              <p class="text-3xl font-bold text-sky-400">{{ stats.closed_today }}</p>
-            </div>
-
-            <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 hover:border-slate-700 transition-colors">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-slate-500 text-sm">Gjennomsnittlig tid</span>
-                <span class="text-2xl">⏱️</span>
-              </div>
-              <p class="text-3xl font-bold text-sky-400">{{ stats.avg_time }}</p>
-            </div>
-          </div>
-
-          <!-- Tickets Table -->
-          <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
-            <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
-              <h3 class="font-semibold text-lg">Aktive saker</h3>
-              <div class="flex gap-2">
-                <button class="px-3 py-1.5 text-sm bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors">Filtrer</button>
-                <button class="px-3 py-1.5 text-sm bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors">Sorter</button>
-              </div>
-            </div>
-
-            <div class="overflow-x-auto">
-              <table class="w-full">
-                <thead class="bg-slate-800/50">
-                  <tr>
-                    <th class="text-left px-6 py-3 text-sm font-medium text-slate-400">ID</th>
-                    <th class="text-left px-6 py-3 text-sm font-medium text-slate-400">Sak</th>
-                    <th class="text-left px-6 py-3 text-sm font-medium text-slate-400">Prioritet</th>
-                    <th class="text-left px-6 py-3 text-sm font-medium text-slate-400">Status</th>
-                    <th class="text-left px-6 py-3 text-sm font-medium text-slate-400">Tildelt</th>
-                    <th class="text-left px-6 py-3 text-sm font-medium text-slate-400">Opprettet</th>
-                  </tr>
-                </thead>
-
-                <tbody class="divide-y divide-slate-800">
-                  {% for t in tickets %}
-                    <tr class="hover:bg-slate-800/50 transition-colors cursor-pointer">
-                      <td class="px-6 py-4 text-sm font-mono text-sky-400">{{ t.id }}</td>
-                      <td class="px-6 py-4">
-                        <span class="font-medium">{{ t.title }}</span>
-                      </td>
-
-                      <!-- Prioritet badge -->
-                      <td class="px-6 py-4">
-                        {% set p = (t.priority or 'low')|lower %}
-                        {% if p in ['critical', 'kritisk', 'høy', 'high'] %}
-                          <span class="inline-flex px-3 py-1 rounded-full text-xs font-medium border bg-red-500/20 text-red-400 border-red-500/50">
-                            Kritisk
-                          </span>
-                        {% elif p in ['medium', 'middels'] %}
-                          <span class="inline-flex px-3 py-1 rounded-full text-xs font-medium border bg-yellow-500/20 text-yellow-400 border-yellow-500/50">
-                            Middels
-                          </span>
-                        {% else %}
-                          <span class="inline-flex px-3 py-1 rounded-full text-xs font-medium border bg-emerald-500/20 text-emerald-400 border-emerald-500/50">
-                            Lav
-                          </span>
-                        {% endif %}
-                      </td>
-
-                      <td class="px-6 py-4 text-sm text-slate-400">{{ t.status }}</td>
-                      <td class="px-6 py-4 text-sm text-slate-400">{{ t.assignee or 'Ufordelt' }}</td>
-                      <td class="px-6 py-4 text-sm text-slate-500">{{ t.created_at }}</td>
-                    </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-        </div>
-      </main>
+<div class="dash-wrap">
+  <div class="dash-top">
+    <div class="dash-title">
+      <h1>Ticket Dashboard</h1>
+      <p>Oversikt over aktive saker</p>
     </div>
-  </body>
-</html>
+
+    <a class="dash-cta" href="{{ url_for('main.tickets') }}">
+      <span style="font-size:18px;">+</span> Ny sak
+    </a>
+  </div>
+
+  <div class="dash-grid">
+    <div class="stat">
+      <div>
+        <div class="label">Totalt aktive</div>
+        <div class="value">{{ stats.total_active }}</div>
+      </div>
+      <div class="icon">📋</div>
+    </div>
+
+    <div class="stat">
+      <div>
+        <div class="label">Kritiske</div>
+        <div class="value">{{ stats.critical }}</div>
+      </div>
+      <div class="icon">🔴</div>
+    </div>
+
+    <div class="stat">
+      <div>
+        <div class="label">Løst i dag</div>
+        <div class="value">{{ stats.closed_today }}</div>
+      </div>
+      <div class="icon">✅</div>
+    </div>
+
+    <div class="stat">
+      <div>
+        <div class="label">Gjennomsnittlig tid</div>
+        <div class="value">{{ stats.avg_time }}</div>
+      </div>
+      <div class="icon">⏱️</div>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-head">
+      <h2>Aktive saker</h2>
+      <div class="table-actions">
+        <span class="chip">Filtrer</span>
+        <span class="chip">Sorter</span>
+      </div>
+    </div>
+
+    <div style="overflow:auto;">
+      <table>
+        <thead>
+          <tr>
+            <th style="min-width:90px;">ID</th>
+            <th style="min-width:240px;">Sak</th>
+            <th style="min-width:130px;">Prioritet</th>
+            <th style="min-width:140px;">Status</th>
+            <th style="min-width:160px;">Eier</th>
+            <th style="min-width:170px;">Opprettet</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for t in tickets %}
+          <tr>
+            <td class="mono id">{{ t.id }}</td>
+            <td><strong>{{ t.title }}</strong></td>
+            <td>
+              {% set p = (t.priority or '')|lower %}
+              {% if p in ['kritisk','critical','høy','high'] %}
+                <span class="pill-pri pri-critical">Kritisk</span>
+              {% elif p in ['middels','medium'] %}
+                <span class="pill-pri pri-medium">Middels</span>
+              {% else %}
+                <span class="pill-pri pri-low">Lav</span>
+              {% endif %}
+            </td>
+            <td class="muted">{{ t.status }}</td>
+            <td class="muted">{{ t.owner }}</td>
+            <td class="muted">{{ t.created_at }}</td>
+          </tr>
+          {% endfor %}
+          {% if tickets|length == 0 %}
+          <tr>
+            <td colspan="6" class="muted">Ingen saker å vise.</td>
+          </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

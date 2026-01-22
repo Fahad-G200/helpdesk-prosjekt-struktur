@@ -7,215 +7,413 @@
 
     <style>
       :root{
-        --bg:#f4f6f8; --text:#222; --muted:#666;
-        --card:#fff; --border:#e5e7eb;
-        --primary:#2563eb; --primaryHover:#1d4ed8;
-        --green:#16a34a; --yellow:#ca8a04; --red:#dc2626;
-        --gray:#475569; --grayHover:#334155;
+        --bg:#0b1220;
+        --panel:#0f172a;
+        --panel2:#111c33;
+        --border:rgba(148,163,184,.14);
+        --muted:#94a3b8;
+        --text:#e5e7eb;
+
+        --primary:#0284c7;
+        --primaryHover:#0ea5e9;
+
+        --sidebarW: 280px;
+        --topbarH: 72px;
+
+        --radius: 16px;
       }
 
+      *{ box-sizing:border-box; }
+      html, body{ height:100%; }
       body{
+        margin:0;
         font-family: Arial, sans-serif;
-        font-size:16px;
-        max-width:980px;
-        margin:40px auto;
-        padding:0 16px;
         background:var(--bg);
         color:var(--text);
       }
 
-      header{
+      /* ===== APP LAYOUT ===== */
+      .app{
+        min-height:100vh;
         display:flex;
-        justify-content:space-between;
-        align-items:center;
-        margin-bottom:18px;
       }
 
-      nav{
-        display:flex;
-        gap:12px;
-        align-items:center;
-        flex-wrap:wrap;
+      /* ===== SIDEBAR ===== */
+      .sidebar{
+        width:var(--sidebarW);
+        background:linear-gradient(180deg, #0b1220 0%, #0a1020 100%);
+        border-right:1px solid var(--border);
+        position:fixed;
+        left:0; top:0; bottom:0;
+        padding:18px 14px;
+        overflow:auto;
       }
 
-      .pill{
-        background:#eef2ff;
-        border:1px solid #dbeafe;
-        color:#1e3a8a;
-        padding:6px 10px;
+      .brand{
+        display:flex;
+        align-items:center;
+        gap:10px;
+        padding:10px 10px 14px;
+        border-bottom:1px solid var(--border);
+        margin-bottom:14px;
+      }
+      .brand .logo{
+        width:40px; height:40px;
+        display:flex; align-items:center; justify-content:center;
+        border-radius:12px;
+        background:rgba(2,132,199,.18);
+        border:1px solid rgba(2,132,199,.35);
+        font-size:20px;
+      }
+      .brand .title{
+        font-weight:900;
+        letter-spacing:.2px;
+        color:#38bdf8;
+      }
+      .brand .subtitle{
+        font-size:12px;
+        color:var(--muted);
+        margin-top:2px;
+      }
+
+      .nav{
+        display:flex;
+        flex-direction:column;
+        gap:8px;
+        padding:6px 6px;
+      }
+
+      .nav a{
+        display:flex;
+        align-items:center;
+        gap:10px;
+        padding:12px 12px;
+        border-radius:12px;
+        text-decoration:none;
+        color:var(--muted);
+        font-weight:800;
+        border:1px solid transparent;
+      }
+      .nav a:hover{
+        background:rgba(148,163,184,.08);
+        color:#e2e8f0;
+        border-color:rgba(148,163,184,.10);
+      }
+      .nav a.active{
+        background:rgba(2,132,199,.22);
+        border-color:rgba(2,132,199,.35);
+        color:#ffffff;
+      }
+
+      .nav .icon{
+        width:22px;
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        opacity:.95;
+      }
+
+      .sidebar-footer{
+        margin-top:14px;
+        padding:14px 10px;
+        border-top:1px solid var(--border);
+        color:var(--muted);
+        font-size:13px;
+      }
+      .badge{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        min-width:20px;
+        height:20px;
+        padding:0 6px;
         border-radius:999px;
-        font-size:.9rem;
+        font-size:12px;
+        font-weight:900;
+        background:rgba(239,68,68,.18);
+        border:1px solid rgba(239,68,68,.35);
+        color:#fecaca;
+        margin-left:6px;
+      }
+
+      /* ===== MAIN AREA ===== */
+      .main{
+        margin-left:var(--sidebarW);
+        width:calc(100% - var(--sidebarW));
+        min-height:100vh;
+        display:flex;
+        flex-direction:column;
+      }
+
+      /* ===== TOPBAR ===== */
+      .topbar{
+        height:var(--topbarH);
+        position:sticky;
+        top:0;
+        z-index:20;
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        padding:14px 18px;
+        background:rgba(11,18,32,.86);
+        backdrop-filter: blur(10px);
+        border-bottom:1px solid var(--border);
+      }
+
+      .topbar-left{
+        display:flex;
+        flex-direction:column;
+        gap:4px;
+      }
+      .topbar-left .h1{
+        font-size:18px;
+        font-weight:900;
+        margin:0;
+        letter-spacing:.2px;
+      }
+      .topbar-left .p{
+        margin:0;
+        font-size:12px;
+        color:var(--muted);
+      }
+
+      .topbar-right{
+        display:flex;
+        align-items:center;
+        gap:10px;
+        flex-wrap:wrap;
+        justify-content:flex-end;
+      }
+      .pill{
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+        padding:8px 10px;
+        border-radius:999px;
+        background:rgba(148,163,184,.10);
+        border:1px solid rgba(148,163,184,.14);
+        color:#e2e8f0;
+        font-weight:800;
+        font-size:13px;
         white-space:nowrap;
       }
-
-      /* ===== MENYKNAPPER (TOPP) ===== */
-      .nav-btn{
-        display:inline-block;
-        padding:10px 14px;
-        border-radius:10px;
-        font-weight:800;
-        text-decoration:none;
-        color:#fff;
-        background:var(--gray);
-      }
-
-      .nav-btn:hover{
-        background:var(--grayHover);
-      }
-
-      .nav-btn.active{
-        background:var(--primary);
-      }
-
-      .nav-btn.active:hover{
-        background:var(--primaryHover);
-      }
-
-      /* ===== BLÅ BOKS-LENKER I INNHOLD ===== */
-      .link-box{
-        display:inline-block;
-        padding:10px 14px;
-        border-radius:10px;
-        font-weight:800;
-        text-decoration:none;
-        background:var(--primary);
-        color:#fff;
-        margin-right:10px;
-      }
-
-      .link-box:hover{
-        background:var(--primaryHover);
-      }
-
-      .card{
-        background:var(--card);
-        border:1px solid var(--border);
+      .btn{
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+        padding:10px 12px;
         border-radius:12px;
-        padding:16px;
-        margin:14px 0;
-        box-shadow:0 2px 6px rgba(0,0,0,.05);
+        text-decoration:none;
+        font-weight:900;
+        border:1px solid rgba(2,132,199,.35);
+        background:rgba(2,132,199,.22);
+        color:#fff;
+      }
+      .btn:hover{ filter:brightness(1.06); }
+
+      /* ===== PAGE WRAPPER ===== */
+      .page{
+        padding:22px 22px 80px;
       }
 
-      .muted{ color:var(--muted); }
+      .content-wrap{
+        background:linear-gradient(180deg, rgba(15,23,42,.85) 0%, rgba(15,23,42,.65) 100%);
+        border:1px solid rgba(148,163,184,.14);
+        border-radius:var(--radius);
+        padding:22px;
+        box-shadow:0 20px 60px rgba(0,0,0,.35);
+      }
 
+      /* Flash */
+      .flash{
+        margin-bottom:14px;
+        padding:12px 14px;
+        border-radius:14px;
+        background:rgba(16,185,129,.10);
+        border:1px solid rgba(16,185,129,.25);
+        color:#bbf7d0;
+        font-weight:800;
+      }
+
+      /* Form controls - gjør at inputs ser bra ut i mørk UI */
       input, textarea, select{
         width:100%;
         padding:12px;
         margin:8px 0 14px;
-        border-radius:10px;
-        border:1px solid #cfd6df;
+        border-radius:12px;
+        border:1px solid rgba(148,163,184,.18);
+        background:rgba(2,6,23,.35);
+        color:var(--text);
         font-size:16px;
-        box-sizing:border-box;
+        outline:none;
+      }
+      input:focus, textarea:focus, select:focus{
+        border-color:rgba(56,189,248,.55);
+        box-shadow:0 0 0 3px rgba(56,189,248,.18);
       }
 
       button{
         background:var(--primary);
         color:#fff;
         border:0;
-        border-radius:10px;
+        border-radius:12px;
         padding:10px 14px;
-        font-weight:800;
+        font-weight:900;
         cursor:pointer;
       }
-
-      button:hover{
-        background:var(--primaryHover);
-      }
-
-      .flash{
-        border-left:6px solid var(--green);
-      }
+      button:hover{ background:var(--primaryHover); }
 
       .error{
-        background:#fee2e2;
-        border:1px solid #fecaca;
-        color:#7f1d1d;
-        padding:12px;
-        border-radius:10px;
+        background:rgba(239,68,68,.12);
+        border:1px solid rgba(239,68,68,.28);
+        color:#fecaca;
+        padding:12px 14px;
+        border-radius:12px;
         margin:12px 0;
-        font-weight:700;
+        font-weight:900;
       }
 
-      .badge{
-        background:#dc2626;
-        color:#fff;
-        padding:2px 6px;
+      /* ===== CHATBOT (beholdt, bare litt tilpasset mørk bakgrunn) ===== */
+      #chatbot{
+        position:fixed;
+        right:18px;
+        bottom:18px;
+        width:340px;
+        max-width:92vw;
+        z-index:9999;
+      }
+      #chatbot .chat-card{
+        background:rgba(15,23,42,.90);
+        border:1px solid rgba(148,163,184,.16);
+        border-radius:16px;
+        box-shadow:0 20px 60px rgba(0,0,0,.38);
+        padding:14px;
+      }
+      #chatLog{
+        height:190px;
+        overflow:auto;
+        border:1px solid rgba(148,163,184,.14);
         border-radius:12px;
-        font-size:.85em;
-        margin-left:4px;
+        padding:10px;
+        margin-top:10px;
+        background:rgba(2,6,23,.28);
+      }
+      .muted{ color:var(--muted); }
+
+      @media (max-width: 920px){
+        :root{ --sidebarW: 240px; }
+      }
+      @media (max-width: 760px){
+        /* på små skjermer: sidebar blir topp? (enkelt) */
+        .sidebar{ position:static; width:100%; border-right:none; border-bottom:1px solid var(--border); }
+        .main{ margin-left:0; width:100%; }
+        .topbar{ position:static; }
       }
     </style>
   </head>
 
   <body>
-    <header>
-      <strong>Helpdesk</strong>
+    {% set ep = request.endpoint or "" %}
 
-      <nav>
-        {% if session.get("user") %}
-          <span class="pill">
-            Innlogget: {{ session.get("user") }} ({{ session.get("role") }})
-          </span>
+    <div class="app">
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="logo">🛠️</div>
+          <div>
+            <div class="title">IT Helpdesk</div>
+            <div class="subtitle">Oversikt og støtte</div>
+          </div>
+        </div>
 
-          {% set ep = request.endpoint or "" %}
-
-          <a href="{{ url_for('main.kb') }}"
-             class="nav-btn {% if ep == 'main.kb' %}active{% endif %}">
-            Kunnskapsbase
+        <nav class="nav">
+          <a href="{{ url_for('main.dashboard') }}" class="{% if ep == 'main.dashboard' %}active{% endif %}">
+            <span class="icon">📊</span> Dashboard
           </a>
 
-          <a href="{{ url_for('main.tickets') }}"
-             class="nav-btn {% if ep == 'main.tickets' %}active{% endif %}">
-            Mine saker
+          <a href="{{ url_for('main.kb') }}" class="{% if ep == 'main.kb' %}active{% endif %}">
+            <span class="icon">📚</span> Kunnskapsbase
           </a>
 
-          <a href="{{ url_for('main.notifications_page') }}"
-             class="nav-btn {% if ep == 'main.notifications_page' %}active{% endif %}">
-            Varsler
+          <a href="{{ url_for('main.tickets') }}" class="{% if ep == 'main.tickets' %}active{% endif %}">
+            <span class="icon">📋</span> Mine saker
+          </a>
+
+          <a href="{{ url_for('main.notifications_page') }}" class="{% if ep == 'main.notifications_page' %}active{% endif %}">
+            <span class="icon">🔔</span> Varsler
             {% if notif_count and notif_count > 0 %}
               <span class="badge">{{ notif_count }}</span>
             {% endif %}
           </a>
 
-          <a href="{{ url_for('main.settings') }}"
-             class="nav-btn {% if ep == 'main.settings' %}active{% endif %}">
-            Innstillinger
+          <a href="{{ url_for('main.settings') }}" class="{% if ep == 'main.settings' %}active{% endif %}">
+            <span class="icon">⚙️</span> Innstillinger
           </a>
+        </nav>
 
-          <a href="{{ url_for('main.logout') }}" class="nav-btn">
-            Logg ut
-          </a>
-        {% endif %}
-      </nav>
-    </header>
+        <div class="sidebar-footer">
+          {% if session.get("user") %}
+            Innlogget: <strong>{{ session.get("user") }}</strong>
+            <div style="margin-top:6px; color:var(--muted);">
+              Rolle: {{ session.get("role") }}
+            </div>
+          {% else %}
+            Ikke innlogget
+          {% endif %}
+        </div>
+      </aside>
 
-    {% with messages = get_flashed_messages() %}
-      {% for m in messages %}
-        <div class="card flash">{{ m }}</div>
-      {% endfor %}
-    {% endwith %}
+      <!-- MAIN -->
+      <div class="main">
+        <!-- TOPBAR -->
+        <header class="topbar">
+          <div class="topbar-left">
+            <p class="h1">Helpdesk</p>
+            <p class="p">Velg en side i menyen for å fortsette</p>
+          </div>
 
-    {% block content %}{% endblock %}
+          <div class="topbar-right">
+            {% if session.get("user") %}
+              <span class="pill">Innlogget: {{ session.get("user") }} ({{ session.get("role") }})</span>
+              <a class="btn" href="{{ url_for('main.logout') }}">Logg ut</a>
+            {% endif %}
+          </div>
+        </header>
+
+        <!-- PAGE -->
+        <main class="page">
+          {% with messages = get_flashed_messages() %}
+            {% if messages %}
+              {% for m in messages %}
+                <div class="flash">{{ m }}</div>
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
+
+          <div class="content-wrap">
+            {% block content %}{% endblock %}
+          </div>
+        </main>
+      </div>
+    </div>
 
     <!-- CHATBOT -->
-    <div id="chatbot" style="position:fixed; right:18px; bottom:18px; width:320px; z-index:9999;">
-      <div class="card">
+    <div id="chatbot">
+      <div class="chat-card">
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <strong>Helpdesk-chat</strong>
           <button id="chatToggle" type="button">Skjul</button>
         </div>
 
         <div id="chatBody">
-          <div id="chatLog"
-               style="height:180px; overflow:auto; border:1px solid #e5e7eb;
-                      border-radius:10px; padding:10px; margin-top:10px;">
+          <div id="chatLog">
             <div class="muted">
               Hei! Skriv hva du trenger hjelp med (Feide, Wi-Fi, utskrift, passord).
             </div>
           </div>
 
           <div style="display:flex; gap:8px; margin-top:10px;">
-            <input id="chatInput" type="text" placeholder="Skriv her…" />
+            <input id="chatInput" type="text" placeholder="Skriv her…" style="margin:0;" />
             <button id="chatSend" type="button">Send</button>
           </div>
         </div>
@@ -260,8 +458,15 @@
             const res = await fetch("/chat", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
+              credentials: "same-origin",
               body: JSON.stringify({ message: msg }),
             });
+
+            const ct = (res.headers.get("content-type") || "").toLowerCase();
+            if (!ct.includes("application/json")) {
+              addMsg("Bot", "Du ser ut til å være logget ut. Last siden på nytt og logg inn igjen, og prøv så på nytt.");
+              return;
+            }
 
             const data = await res.json().catch(() => ({}));
             if (!res.ok) {
