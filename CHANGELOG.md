@@ -290,3 +290,27 @@ Alle vesentlige endringer i prosjektet dokumenteres i denne filen.
 
 ### Fixed
 - Ingen eksisterende funksjonalitet endret eller fjernet
+
+
+# Changelog
+
+## [Unreleased]
+
+### Added
+- Blå primærknapper i kunnskapsbasen for viktige handlinger:
+  - "Start med nivå 1"
+  - "Gå til Mine saker"
+  - "Opprett / se saker"
+
+### Changed
+- Oppdatert kb.html slik at sentrale navigasjonslenker nå bruker
+  eksisterende knappestil (`.btn`) for bedre visuell konsistens.
+
+### Fixed
+- Fjernet inkonsistent visning av viktige handlinger som lilla
+  standardlenker i kunnskapsbasen.
+
+### Notes
+- Ingen endringer er gjort i `base.html`.
+- Ingen CSS-, JavaScript- eller backend-funksjonalitet er endret.
+- Endringen er bevisst isolert til én template for å unngå regresjoner.
