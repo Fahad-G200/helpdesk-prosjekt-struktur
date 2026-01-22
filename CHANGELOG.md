@@ -275,3 +275,18 @@ Alle vesentlige endringer i prosjektet dokumenteres i denne filen.
 - Validering av filtyper ved opplasting
 - Sikret filnavn med `secure_filename`
 - Forhindrer uautorisert tilgang til vedlegg
+
+## [Unreleased]
+
+### Added
+- Ny dashboard-side (/dashboard) med oversikt over tickets
+- Statistikk for aktive saker og kritiske saker
+- Avansert AI-basert chatbot (IntelligentHelpdeskAI)
+- Støtte for kontekstbasert chat, feilanalyse og eskalering til support
+- Bevaring av samtaletilstand via session
+
+### Changed
+- Erstattet tidligere enkel chatbot med intelligent AI-løsning
+
+### Fixed
+- Ingen eksisterende funksjonalitet endret eller fjernet
