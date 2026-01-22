@@ -525,40 +525,742 @@ def upload_attachment(ticket_id: int):
 
 
 # -----------------------------
-# Chat
+# Chat (NY: AI-bot)
 # -----------------------------
-class HelpdeskBot:
+
+import json
+from typing import List
+
+class IntelligentHelpdeskAI:
+    """
+    Advanced AI chatbot that understands natural language,
+    learns from context, and thinks like a real support agent.
+    """
+
     def __init__(self):
         self.knowledge_base = self._init_knowledge_base()
+        self.conversation_patterns = self._init_conversation_patterns()
+        self.intent_classifiers = self._init_intent_classifiers()
 
     def _init_knowledge_base(self) -> Dict:
+        """Comprehensive knowledge with real-world understanding"""
         return {
-            "feide": {"keywords": ["feide", "innlogging", "login", "logge inn", "pålogging"]},
-            "wifi": {"keywords": ["wifi", "wi-fi", "nett", "internett", "nettverk"]},
-            "utskrift": {"keywords": ["utskrift", "skriver", "printer", "print"]},
-            "passord": {"keywords": ["passord", "glemt", "låst", "reset"]},
+            "feide": {
+                "description": "Feide authentication and login system",
+                "keywords": ["feide", "innlogging", "login", "autentisering", "bruker", "konto"],
+                "natural_phrases": [
+                    "kan ikke logge inn", "får ikke tilgang", "innlogging fungerer ikke",
+                    "kommer ikke inn", "kan ikke få tilgang", "login problem",
+                    "får ikke logget meg inn", "klarer ikke å komme inn"
+                ],
+                "error_patterns": [
+                    (r"timeout|time out|tidsavbrudd", "Feide-tjenesten bruker for lang tid. Dette kan skyldes høy trafikk eller nettverksproblemer."),
+                    (r"feil brukernavn|wrong username|ugyldig bruker", "Brukernavnet er ikke riktig. Sjekk at du bruker formatet: fornavn.etternavn@skole.no"),
+                    (r"feil passord|wrong password|incorrect password", "Passordet er feil. Husk at passord er case-sensitive (store/små bokstaver betyr noe)."),
+                    (r"session.*utløpt|session expired|økten.*utløpt", "Innloggingsøkten har utløpt. Dette skjer etter 30 minutter med inaktivitet."),
+                    (r"ingen tilgang|no access|access denied", "Du mangler tilgang. Kontakt support for å sjekke brukerrettigheter."),
+                    (r"organisasjon|institution|skole", "Feil organisasjon valgt. Velg riktig skole/institusjon fra nedtrekksmenyen."),
+                ],
+                "solutions": {
+                    "basic": [
+                        "Sjekk at brukernavn er riktig format: fornavn.etternavn@skole.no",
+                        "Kontroller at passordet er riktig (Caps Lock av)",
+                        "Velg riktig organisasjon/skole fra nedtrekksmenyen",
+                        "Prøv i et inkognito-vindu (Ctrl+Shift+N)"
+                    ],
+                    "intermediate": [
+                        "Tøm nettleserens cache og cookies (Ctrl+Shift+Del)",
+                        "Prøv en annen nettleser (Chrome, Firefox, Edge)",
+                        "Sjekk at system-klokken er riktig (viktig for Feide-autentisering)",
+                        "Deaktiver VPN hvis du har det påslått"
+                    ],
+                    "advanced": [
+                        "Test med mobil data i stedet for Wi-Fi (isolerer nettverksproblemer)",
+                        "Sjekk status.feide.no for driftsmeldinger",
+                        "Kontroller at nettleseren er oppdatert til siste versjon",
+                        "Prøv å logge inn fra en annen enhet for å teste om problemet følger deg"
+                    ]
+                },
+                "questions": [
+                    "Får du en feilmelding? I så fall, hva står det?",
+                    "Hvilken nettleser bruker du?",
+                    "Skjer dette på flere enheter eller bare én?",
+                    "Har du prøvd i et inkognito-vindu?"
+                ]
+            },
+            "wifi": {
+                "description": "Wireless network connectivity issues",
+                "keywords": ["wifi", "wi-fi", "nett", "internett", "nettverk", "tilkobling", "trådløst"],
+                "natural_phrases": [
+                    "får ikke nett", "ingen internett", "nettverket fungerer ikke",
+                    "kan ikke koble til", "wifi virker ikke", "internett er nede",
+                    "kommer ikke på nett", "nettverket er tregt"
+                ],
+                "error_patterns": [
+                    (r"ingen internett|no internet|not connected", "Du er koblet til Wi-Fi, men har ingen internett-tilgang. Dette kan være DNS-problem eller ISP-problem."),
+                    (r"begrensa.*tilkobling|limited connectivity|begrenset", "Windows melder 'Begrenset tilkobling' som betyr at du er koblet til Wi-Fi, men ikke kan nå internett."),
+                    (r"finner ikke|cannot find|not found", "Nettverket vises ikke i listen. Dette kan skyldes at du er for langt unna, eller at nettverket er skjult."),
+                    (r"feil passord|wrong password|incorrect password", "Wi-Fi-passordet er feil. Dobbeltsjekk passordet, spesielt spesialtegn."),
+                    (r"ip.*adresse|ip.*address|dhcp", "Kan ikke få IP-adresse fra nettverket. Dette er et DHCP-problem på ruteren."),
+                ],
+                "solutions": {
+                    "basic": [
+                        "Slå Wi-Fi av og på igjen på enheten",
+                        "Start enheten på nytt",
+                        "Flytt nærmere Wi-Fi-routeren",
+                        "Sjekk at du kobler til riktig nettverk (ikke naboen sitt)"
+                    ],
+                    "intermediate": [
+                        "Start routeren på nytt (trekk ut strømmen i 30 sekunder)",
+                        "Glem nettverket og koble til på nytt",
+                        "Test på en annen enhet - fungerer det der? (isolerer om det er enheten eller nettverket)",
+                        "Sjekk at flymodus ikke er på"
+                    ],
+                    "advanced": [
+                        "Sjekk IP-innstillinger - sørg for at DHCP er aktivert",
+                        "Prøv å sette DNS manuelt til 8.8.8.8 og 8.8.4.4 (Google DNS)",
+                        "Sjekk om MAC-filtrering er aktivert på routeren",
+                        "Test med Ethernet-kabel hvis mulig (isolerer Wi-Fi-problemet)"
+                    ]
+                },
+                "questions": [
+                    "Ser du nettverket i listen over tilgjengelige nettverk?",
+                    "Er du koblet til, men uten internett? Eller kan du ikke koble til i det hele tatt?",
+                    "Fungerer det på andre enheter (mobil, PC)?",
+                    "Er signalstyrken god (full stripe)?"
+                ]
+            },
+            "utskrift": {
+                "description": "Printer and printing problems",
+                "keywords": ["utskrift", "skriver", "printer", "print", "skrive ut"],
+                "natural_phrases": [
+                    "kan ikke skrive ut", "skriveren fungerer ikke", "får ikke printet",
+                    "printer ikke", "utskrift virker ikke", "skriveren svarer ikke"
+                ],
+                "error_patterns": [
+                    (r"ikke funnet|not found|cannot find", "Skriveren finnes ikke i systemet. Driver mangler eller skriver er ikke på nettverket."),
+                    (r"offline|ikke.*tilkoblet|disconnected", "Skriveren viser som offline. Sjekk tilkobling og strøm."),
+                    (r"papir|paper.*jam|papirstopp", "Papirstopp i skriveren. Åpne skriveren og fjern papir forsiktig."),
+                    (r"toner|blekk|ink|cartridge", "Toner/blekk er tom eller lav. Bytt patron."),
+                    (r"kø|queue|venter", "Utskriftskøen er blokkert. Gamle dokumenter hindrer nye utskrifter."),
+                    (r"driver|drivere", "Skriverdriver er korrupt eller utdatert."),
+                ],
+                "solutions": {
+                    "basic": [
+                        "Sjekk at skriveren er slått på og koblet til strøm",
+                        "Kontroller at riktig skriver er valgt i utskriftsdialogen",
+                        "Sjekk papir - er det papir i skuffen?",
+                        "Start både skriver og PC på nytt"
+                    ],
+                    "intermediate": [
+                        "Åpne utskriftskøen og slett gamle/ventende dokumenter",
+                        "Sjekk at skriveren ikke viser feilmodus (blinkende lys/feilmelding)",
+                        "Test å printe en testside direkte fra skriveren",
+                        "Prøv å skrive ut fra et annet program (f.eks. Notisblokk)"
+                    ],
+                    "advanced": [
+                        "Reinstaller skriverdriver fra produsentens nettside",
+                        "For nettverksskriver: ping skriverens IP-adresse",
+                        "Sjekk Windows Print Spooler-tjenesten (services.msc)",
+                        "Opprett ny skriver med samme driver (fjern gammel først)"
+                    ]
+                },
+                "questions": [
+                    "Skjer det noe når du trykker print? Kommer dokumentet i køen?",
+                    "Er det en lokal skriver (USB) eller nettverksskriver?",
+                    "Viser skriveren noen feilmeldinger eller blinkende lys?",
+                    "Har det fungert før, eller er dette første gang?"
+                ]
+            },
+            "passord": {
+                "description": "Password and account access issues",
+                "keywords": ["passord", "password", "glemt", "reset", "låst", "konto"],
+                "natural_phrases": [
+                    "har glemt passordet", "kan ikke huske passordet", "passord fungerer ikke",
+                    "kontoen er låst", "må bytte passord", "feil passord"
+                ],
+                "error_patterns": [
+                    (r"låst|locked|blocked", "Kontoen din er låst etter flere feilede innloggingsforsøk. Den låses vanligvis opp automatisk etter 30 minutter."),
+                    (r"utløpt|expired|gamle", "Passordet har utløpt. De fleste systemer krever passordbytte hver 90-180 dag."),
+                    (r"kompleksitet|complexity|krav|requirements", "Det nye passordet oppfyller ikke sikkerhetskrav (lengde, tegn, etc)."),
+                    (r"brukt før|used before|previously used", "Du kan ikke gjenbruke gamle passord."),
+                    (r"ikke synk|not sync|forskjellig", "Passordet er ikke synkronisert mellom systemer ennå. Vent 5-10 minutter."),
+                ],
+                "solutions": {
+                    "basic": [
+                        "Sjekk at Caps Lock er AV (passord er case-sensitive)",
+                        "Kontroller tastaturspråk (norsk vs engelsk layout)",
+                        "Bruk 'Glemt passord'-lenken hvis tilgjengelig",
+                        "Vent 5-10 minutter hvis du nettopp har byttet passord (synkronisering)"
+                    ],
+                    "intermediate": [
+                        "Prøv å logge inn på en annen enhet (isolerer om problemet er lokalt)",
+                        "Sjekk at du bruker riktig brukernavn-format",
+                        "For låst konto: vent 30 minutter for automatisk opplåsing",
+                        "Test passordet i Notisblokk først (for å se hva du faktisk skriver)"
+                    ],
+                    "advanced": [
+                        "Husk passordkrav: Minimum 8-12 tegn, store og små bokstaver, tall, spesialtegn",
+                        "Bruk en passordbehandler (LastPass, 1Password, Bitwarden)",
+                        "For AD/domenekonto: prøv å låse og låse opp PC (Ctrl+Alt+Del)",
+                        "Kontakt support hvis kontoen fortsatt er låst etter 30 min"
+                    ]
+                },
+                "questions": [
+                    "Er kontoen låst, eller er det bare feil passord?",
+                    "Har du byttet passord nylig (siste 10 minutter)?",
+                    "Virker passordet på andre systemer/tjenester?",
+                    "Får du en spesifikk feilmelding?"
+                ]
+            },
+            "m365": {
+                "description": "Microsoft 365 applications and services",
+                "keywords": ["teams", "outlook", "onedrive", "word", "excel", "powerpoint", "office", "m365", "365"],
+                "natural_phrases": [
+                    "teams fungerer ikke", "outlook krasjer", "kan ikke åpne word",
+                    "onedrive synkroniserer ikke", "kan ikke sende epost", "teams-møte virker ikke"
+                ],
+                "error_patterns": [
+                    (r"synk.*ikke|not sync|synkronisering", "OneDrive synkroniserer ikke filer. Dette kan skyldes nettverksproblemer eller konflikt."),
+                    (r"kan ikke.*åpne|cannot open|won't open", "Kan ikke åpne Office-filer. Dette kan være lisens-, tilgangs- eller fil-problem."),
+                    (r"teams.*krasj|teams.*crash|teams freeze", "Teams krasjer eller fryser. Ofte cache-relatert."),
+                    (r"mikrofon|kamera|audio|video|lyd|bilde", "Lyd/video fungerer ikke i Teams. Dette er vanligvis en tillatelse- eller driver-issue."),
+                    (r"lisens|license|activation", "Office er ikke aktivert eller lisens mangler."),
+                    (r"epost|email|mail.*send|kan ikke sende", "Kan ikke sende/motta e-post i Outlook."),
+                ],
+                "solutions": {
+                    "basic": [
+                        "Logg helt ut og inn igjen i programmet/appen",
+                        "Start programmet på nytt",
+                        "Sjekk internettforbindelsen",
+                        "Prøv web-versjonen (office.com) - fungerer det der?"
+                    ],
+                    "intermediate": [
+                        "For Teams: Tøm cache (%appdata%\\Microsoft\\Teams\\Cache)",
+                        "For OneDrive: Pause og fortsett synkronisering",
+                        "For Outlook: Kjør i safe mode (outlook.exe /safe)",
+                        "Sjekk at du har siste versjon (Fil > Konto > Oppdateringsalternativer)"
+                    ],
+                    "advanced": [
+                        "Reparer Office-installasjonen (Kontrollpanel > Programmer)",
+                        "Tilbakestill Teams: Avinstaller fullstendig og installer på nytt",
+                        "Sjekk OneDrive-status: høyreklikk OneDrive-ikon > Innstillinger",
+                        "For Teams lyd/video: Sjekk nettleser-tillatelser og Windows personvern"
+                    ]
+                },
+                "questions": [
+                    "Hvilket program har du problemer med (Teams/Outlook/Word/etc)?",
+                    "Får du en feilmelding? Hva står det?",
+                    "Fungerer det i web-versjonen (office.com)?",
+                    "Er dette et nytt problem eller har det vært lenge?"
+                ]
+            },
+            "nettleser": {
+                "description": "Web browser issues and problems",
+                "keywords": ["chrome", "edge", "safari", "firefox", "nettleser", "browser", "nettside", "webside"],
+                "natural_phrases": [
+                    "nettleseren krasjer", "siden laster ikke", "nettleser er treg",
+                    "nettsider fungerer ikke", "browser virker ikke"
+                ],
+                "error_patterns": [
+                    (r"laster ikke|won't load|not loading", "Nettsider laster ikke. Dette kan være cache, DNS, eller nettverksproblem."),
+                    (r"treg|slow|langsom", "Nettleseren er veldig treg. Sannsynligvis for mange åpne faner eller utvidelser."),
+                    (r"krasj|crash|frys|freeze", "Nettleseren krasjer. Dette kan være korrupt cache, dårlig utvidelse, eller minne-problem."),
+                    (r"err_|dns|ssl|certificate|sertifikat", "Nettverksfeil i nettleseren (DNS, SSL, eller tilkoblingsproblem)."),
+                    (r"cookies|cache", "Cache/cookie-problemer som hindrer riktig lasting."),
+                ],
+                "solutions": {
+                    "basic": [
+                        "Oppdater siden (Ctrl+R eller F5)",
+                        "Hard refresh: Ctrl+Shift+R (tømmer cache for den siden)",
+                        "Prøv inkognito-modus (Ctrl+Shift+N)",
+                        "Test en annen nettside - er problemet generelt eller spesifikt?"
+                    ],
+                    "intermediate": [
+                        "Tøm cache og cookies: Ctrl+Shift+Del > velg 'All tid'",
+                        "Deaktiver alle utvidelser midlertidig (sjekk om én av dem er problemet)",
+                        "Test i en annen nettleser - fungerer det der?",
+                        "Oppdater nettleseren til siste versjon"
+                    ],
+                    "advanced": [
+                        "Opprett ny nettleserprofil (for å teste om profilen er korrupt)",
+                        "Tøm DNS-cache: åpne CMD og kjør 'ipconfig /flushdns'",
+                        "Deaktiver hardware-akselerasjon (Innstillinger > System)",
+                        "Reset nettleserinnstillinger til standard"
+                    ]
+                },
+                "questions": [
+                    "Hvilken nettleser bruker du?",
+                    "Er det alle nettsider eller bare én bestemt?",
+                    "Fungerer det i inkognito-modus?",
+                    "Har du mange utvidelser installert?"
+                ]
+            }
         }
 
-    def process_message(self, message: str) -> str:
-        ml = message.lower()
+    def _init_conversation_patterns(self) -> Dict:
+        """Patterns that indicate user intent and emotion"""
+        return {
+            "urgency": {
+                "high": ["haster", "akutt", "kritisk", "nå", "umiddelbart", "snarest", "raskt",
+                         "deadline", "eksamen", "presentasjon", "møte om", "fort", "emergency"],
+                "frustrated": ["irritert", "frustrert", "lei", "gir opp", "funker aldri",
+                               "dritt", "faen", "pokker", "ugh", "argh"],
+                "confused": ["forstår ikke", "skjønner ikke", "confused", "forvirret",
+                             "hva mener du", "hva betyr", "hvordan"]
+            },
+            "progress": {
+                "tried": ["har prøvd", "prøvd", "forsøkt", "tested", "gjort"],
+                "not_working": ["fungerer ikke", "virker ikke", "hjelper ikke", "samme feil",
+                                "fortsatt problem", "fremdeles"],
+                "worked": ["fungerte", "virket", "løst", "fikset", "fixed", "takk", "tusen takk"]
+            },
+            "questions": {
+                "how": ["hvordan", "how", "how do i"],
+                "why": ["hvorfor", "why", "how come"],
+                "what": ["hva", "what", "what is"],
+                "where": ["hvor", "where"]
+            }
+        }
+
+    def _init_intent_classifiers(self) -> Dict:
+        """AI intent classification rules"""
+        return {
+            "needs_immediate_help": lambda text: any(w in text for w in ["haster", "akutt", "nå", "raskt"]),
+            "frustrated": lambda text: any(w in text for w in ["irritert", "lei", "gir opp", "funker aldri"]),
+            "follow_up": lambda text: any(w in text for w in ["nei", "fortsatt", "samme", "virker ikke"]),
+            "positive_feedback": lambda text: any(w in text for w in ["takk", "fungerte", "løst", "bra"]),
+            "needs_clarification": lambda text: len(text.split()) < 4,
+            "has_error_message": lambda text: '"' in text or "feilmelding" in text.lower()
+        }
+
+    def _analyze_sentiment(self, text: str) -> Dict:
+        """Analyze user's emotional state and urgency"""
+        text_lower = text.lower()
+
+        sentiment = {
+            "urgency": "normal",
+            "emotion": "neutral",
+            "frustration_level": 0
+        }
+
+        if any(word in text_lower for word in self.conversation_patterns["urgency"]["high"]):
+            sentiment["urgency"] = "high"
+
+        frustrated_words = [w for w in self.conversation_patterns["urgency"]["frustrated"] if w in text_lower]
+        if frustrated_words:
+            sentiment["emotion"] = "frustrated"
+            sentiment["frustration_level"] = len(frustrated_words)
+
+        if any(word in text_lower for word in self.conversation_patterns["urgency"]["confused"]):
+            sentiment["emotion"] = "confused"
+
+        return sentiment
+
+    def _extract_entities(self, text: str) -> Dict:
+        """Extract key information from user message (NER-like)"""
+        entities = {
+            "os": None,
+            "browser": None,
+            "application": None,
+            "device": None,
+            "error_message": None,
+            "actions_tried": []
+        }
+
+        text_lower = text.lower()
+
+        os_map = {
+            "windows": ["windows", "win10", "win11", "pc", "laptop"],
+            "macos": ["mac", "macos", "macbook", "imac", "apple"],
+            "ios": ["iphone", "ipad", "ios"],
+            "android": ["android", "samsung", "pixel"],
+            "linux": ["linux", "ubuntu"]
+        }
+        for os_name, keywords in os_map.items():
+            if any(k in text_lower for k in keywords):
+                entities["os"] = os_name
+                break
+
+        browser_map = {
+            "Chrome": ["chrome", "google chrome"],
+            "Edge": ["edge", "microsoft edge"],
+            "Safari": ["safari"],
+            "Firefox": ["firefox", "mozilla"]
+        }
+        for browser, keywords in browser_map.items():
+            if any(k in text_lower for k in keywords):
+                entities["browser"] = browser
+                break
+
+        app_map = {
+            "Teams": ["teams", "microsoft teams"],
+            "Outlook": ["outlook"],
+            "Word": ["word", "word document"],
+            "Excel": ["excel", "spreadsheet"],
+            "PowerPoint": ["powerpoint", "ppt", "presentasjon"],
+            "OneDrive": ["onedrive"]
+        }
+        for app, keywords in app_map.items():
+            if any(k in text_lower for k in keywords):
+                entities["application"] = app
+                break
+
+        error_patterns = [
+            r'"([^"]+)"',
+            r'feilmelding[:\s]+([^\n\.]+)',
+            r'får[:\s]+([^\n\.]+)',
+            r'sier[:\s]+([^\n\.]+)'
+        ]
+        for pattern in error_patterns:
+            match = re.search(pattern, text, re.IGNORECASE)
+            if match:
+                entities["error_message"] = match.group(1).strip()
+                break
+
+        action_keywords = ["prøvd", "forsøkt", "restartet", "startet på nytt", "tømt cache",
+                          "logget ut", "reinstallert", "sjekket", "testet"]
+        entities["actions_tried"] = [k for k in action_keywords if k in text_lower]
+
+        return entities
+
+    def _classify_topic(self, text: str, entities: Dict) -> Tuple[str, float]:
+        text_lower = text.lower()
+        scores = {}
+
+        noise_words = ["jeg", "du", "det", "har", "er", "på", "med", "til", "og", "i"]
+        words = [w for w in text_lower.split() if w not in noise_words and len(w) > 2]
+
         for topic, data in self.knowledge_base.items():
-            if any(k in ml for k in data["keywords"]):
-                return f"Jeg ser du spør om {topic}. Prøv: start på nytt, sjekk nett, og beskriv feilmelding."
-        return "Beskriv problemet litt mer (Feide / Wi-Fi / utskrift / passord), så hjelper jeg deg."
+            score = 0
+
+            for keyword in data["keywords"]:
+                if keyword in text_lower:
+                    score += 3
+
+            for phrase in data["natural_phrases"]:
+                if phrase in text_lower:
+                    score += 5
+
+            for keyword in data["keywords"]:
+                if any(keyword in word or word in keyword for word in words):
+                    score += 1
+
+            if topic == "m365" and entities.get("application"):
+                score += 4
+            if topic == "nettleser" and entities.get("browser"):
+                score += 4
+
+            for error_pattern, _ in data.get("error_patterns", []):
+                if re.search(error_pattern, text_lower):
+                    score += 6
+
+            if score > 0:
+                scores[topic] = score
+
+        if not scores:
+            return "unknown", 0.0
+
+        best_topic = max(scores.items(), key=lambda x: x[1])
+        confidence = min(best_topic[1] / 10.0, 1.0)
+
+        return best_topic[0], confidence
+
+    def _find_matching_error(self, error_msg: str, topic: str) -> Optional[str]:
+        if not error_msg or topic not in self.knowledge_base:
+            return None
+
+        topic_data = self.knowledge_base[topic]
+        error_lower = error_msg.lower()
+
+        for pattern, explanation in topic_data.get("error_patterns", []):
+            if re.search(pattern, error_lower):
+                return explanation
+
+        return None
+
+    def _generate_ai_response(
+        self,
+        topic: str,
+        confidence: float,
+        entities: Dict,
+        sentiment: Dict,
+        conversation_state: Dict
+    ) -> str:
+        response_parts = []
+
+        if confidence < 0.3:
+            return self._generate_clarification_request(entities, sentiment)
+
+        topic_data = self.knowledge_base.get(topic, {})
+
+        opening = self._generate_opening(topic, sentiment, entities)
+        response_parts.append(opening)
+        response_parts.append("")
+
+        if entities.get("error_message"):
+            error_explanation = self._find_matching_error(entities["error_message"], topic)
+            if error_explanation:
+                response_parts.append("🎯 **Jeg forstår problemet:**")
+                response_parts.append(f"Feilmeldingen '{entities['error_message']}' betyr: {error_explanation}")
+                response_parts.append("")
+
+        if entities.get("actions_tried"):
+            response_parts.append(f"✅ Jeg ser du allerede har prøvd: {', '.join(entities['actions_tried'])}")
+            response_parts.append("La meg gi deg neste steg basert på det.")
+            response_parts.append("")
+
+        context_parts = []
+        if entities.get("os"):
+            context_parts.append(f"💻 {entities['os']}")
+        if entities.get("browser"):
+            context_parts.append(f"🌐 {entities['browser']}")
+        if entities.get("application"):
+            context_parts.append(f"📱 {entities['application']}")
+
+        if context_parts:
+            response_parts.append(f"**System:** {' | '.join(context_parts)}")
+            response_parts.append("")
+
+        message_count = conversation_state.get("message_count", 1)
+
+        if message_count == 1 or not conversation_state.get("solutions_given"):
+            response_parts.append("**🔧 Her er hva jeg anbefaler å prøve:**")
+            response_parts.append("")
+            for i, solution in enumerate(topic_data["solutions"]["basic"], 1):
+                response_parts.append(f"{i}. {solution}")
+            conversation_state["solutions_given"] = "basic"
+
+        elif conversation_state.get("solutions_given") == "basic":
+            response_parts.append("**🔧 La oss prøve mer avanserte løsninger:**")
+            response_parts.append("")
+            for i, solution in enumerate(topic_data["solutions"]["intermediate"], 1):
+                response_parts.append(f"{i}. {solution}")
+            conversation_state["solutions_given"] = "intermediate"
+
+        else:
+            response_parts.append("**⚙️ Dette er mer avanserte løsninger:**")
+            response_parts.append("")
+            for i, solution in enumerate(topic_data["solutions"]["advanced"], 1):
+                response_parts.append(f"{i}. {solution}")
+            conversation_state["solutions_given"] = "advanced"
+
+        response_parts.append("")
+
+        if message_count == 1:
+            response_parts.append("**❓ For å hjelpe deg bedre:**")
+            questions = topic_data.get("questions", [])[:2]
+            for q in questions:
+                response_parts.append(f"• {q}")
+            response_parts.append("")
+
+        if message_count >= 3:
+            response_parts.append("**💡 Hvis dette fortsatt ikke løser problemet:**")
+            response_parts.append("Jeg anbefaler at du oppretter en support-sak så kan vårt team hjelpe deg direkte.")
+            response_parts.append("De har tilgang til flere verktøy og kan feilsøke mer detaljert.")
+        else:
+            response_parts.append("**💬 Fungerte det?**")
+            response_parts.append("• Hvis ja: Fantastisk! Glad jeg kunne hjelpe! 😊")
+            response_parts.append("• Hvis nei: Fortell meg hva som skjedde, så går vi videre.")
+
+        return "\n".join(response_parts)
+
+    def _generate_opening(self, topic: str, sentiment: Dict, entities: Dict) -> str:
+        if sentiment["urgency"] == "high":
+            urgency_openers = [
+                "⚡ **Jeg ser dette haster!** La meg hjelpe deg raskt.",
+                "🚨 **Forstår at dette er viktig.** La oss løse det nå.",
+                "⏰ **OK, dette må fikses fort.** Jeg skal hjelpe deg umiddelbart."
+            ]
+            import random
+            return random.choice(urgency_openers)
+
+        if sentiment["emotion"] == "frustrated":
+            if sentiment["frustration_level"] > 1:
+                return "😔 **Jeg forstår at dette er frustrerende.** La meg hjelpe deg å løse dette en gang for alle."
+            return "💙 **Jeg forstår at dette er irriterende.** La oss finne en løsning sammen."
+
+        if sentiment["emotion"] == "confused":
+            return "🤝 **Jeg skal forklare dette enkelt.** Ikke bekymre deg, vi tar det steg for steg."
+
+        topic_openings = {
+            "feide": "👋 **Feide-innlogging kan være tricky!** Jeg hjelper deg å komme inn.",
+            "wifi": "📡 **Nettverksproblemer er kjedelige!** La meg hjelpe deg å få nettet til å virke.",
+            "utskrift": "🖨️ **Skriverproblemer er ofte enkle å fikse!** La meg guide deg.",
+            "passord": "🔑 **Passordproblemer? Helt normalt!** Jeg hjelper deg tilbake på rett spor.",
+            "m365": "📧 **Microsoft 365 kan ha sine utfordringer.** La meg hjelpe deg.",
+            "nettleser": "🌐 **Nettleserproblemer? Jeg har løsningen!**"
+        }
+        return topic_openings.get(topic, "👋 **Hei! Jeg er her for å hjelpe deg.**")
+
+    def _generate_clarification_request(self, entities: Dict, sentiment: Dict) -> str:
+        parts = []
+
+        if sentiment["emotion"] == "frustrated":
+            parts.append("💙 **Jeg merker at dette er frustrerende for deg.**")
+            parts.append("La meg hjelpe - jeg trenger bare litt mer info for å gi deg best mulig hjelp.")
+            parts.append("")
+        else:
+            parts.append("🤔 **Jeg vil gjerne hjelpe deg, men trenger litt mer informasjon.**")
+            parts.append("")
+
+        understood = []
+        if entities.get("os"):
+            understood.append(f"✅ System: {entities['os']}")
+        if entities.get("browser"):
+            understood.append(f"✅ Nettleser: {entities['browser']}")
+        if entities.get("application"):
+            understood.append(f"✅ Program: {entities['application']}")
+
+        if understood:
+            parts.append("**Dette har jeg forstått:**")
+            parts.extend(understood)
+            parts.append("")
+
+        parts.append("**Jeg kan hjelpe med:**")
+        parts.append("• 🔐 **Feide/Innlogging** - 'Kan ikke logge inn på Feide'")
+        parts.append("• 📡 **Wi-Fi/Nettverk** - 'Får ikke internett på PC-en'")
+        parts.append("• 🖨️ **Utskrift** - 'Skriveren vil ikke printe'")
+        parts.append("• 🔑 **Passord** - 'Har glemt passordet mitt'")
+        parts.append("• 📧 **Microsoft 365** - 'Teams krasjer hele tiden'")
+        parts.append("• 🌐 **Nettleser** - 'Chrome laster ikke nettsider'")
+        parts.append("")
+        parts.append("**💡 Tips for best hjelp:**")
+        parts.append("• Beskriv problemet: 'Jeg kan ikke logge inn på Feide på PC-en min'")
+        parts.append("• Inkluder feilmelding: 'Får feilmelding \"timeout\"'")
+        parts.append("• Fortell hva du har prøvd: 'Har startet på nytt, men hjelper ikke'")
+        parts.append("")
+        parts.append("**Prøv å beskrive problemet ditt med noen flere ord, så hjelper jeg deg! 😊**")
+
+        return "\n".join(parts)
+
+    def _should_escalate(self, conversation_state: Dict) -> bool:
+        message_count = conversation_state.get("message_count", 0)
+        solutions_level = conversation_state.get("solutions_given", "")
+        return (
+            message_count >= 4
+            or solutions_level == "advanced"
+            or conversation_state.get("user_requested_human", False)
+        )
+
+    def process_message(self, user_msg: str, conversation_state: Dict = None) -> Tuple[str, Dict]:
+        if conversation_state is None:
+            conversation_state = {
+                "message_count": 0,
+                "last_topic": None,
+                "solutions_given": None,
+                "context_entities": {},
+                "user_requested_human": False
+            }
+
+        conversation_state["message_count"] += 1
+
+        human_request_phrases = ["snakke med", "menneske", "ekte person", "support", "menneskelig"]
+        if any(phrase in user_msg.lower() for phrase in human_request_phrases):
+            conversation_state["user_requested_human"] = True
+            return self._generate_human_escalation_message(), conversation_state
+
+        positive_phrases = ["takk", "fungerte", "virket", "løst", "fikset", "bra", "perfekt"]
+        if any(phrase in user_msg.lower() for phrase in positive_phrases) and conversation_state["message_count"] > 1:
+            return self._generate_success_message(), conversation_state
+
+        sentiment = self._analyze_sentiment(user_msg)
+        entities = self._extract_entities(user_msg)
+
+        previous_entities = conversation_state.get("context_entities", {})
+        for key, value in entities.items():
+            if value:
+                previous_entities[key] = value
+        conversation_state["context_entities"] = previous_entities
+
+        topic, confidence = self._classify_topic(user_msg, previous_entities)
+
+        follow_up_phrases = ["nei", "fungerer ikke", "virker ikke", "fortsatt", "samme problem", "hjelper ikke"]
+        if (topic == "unknown" or confidence < 0.3) and conversation_state.get("last_topic"):
+            if any(phrase in user_msg.lower() for phrase in follow_up_phrases):
+                topic = conversation_state["last_topic"]
+                confidence = 0.8
+
+        if topic != "unknown":
+            conversation_state["last_topic"] = topic
+
+        if self._should_escalate(conversation_state):
+            return self._generate_escalation_message(topic, previous_entities), conversation_state
+
+        response = self._generate_ai_response(
+            topic,
+            confidence,
+            previous_entities,
+            sentiment,
+            conversation_state
+        )
+
+        return response, conversation_state
+
+    def _generate_success_message(self) -> str:
+        import random
+        messages = [
+            "🎉 **Fantastisk!** Jeg er så glad jeg kunne hjelpe deg!\n\nHvis du får andre problemer, er jeg her. Ha en fin dag! 😊",
+            "✨ **Perfekt!** Det var akkurat det jeg håpet på!\n\nHusk at jeg alltid er her hvis du trenger hjelp igjen. Lykke til! 🚀",
+            "🌟 **Supert!** Kjempe bra at det virket!\n\nFøl deg fri til å spørre meg igjen hvis du trenger noe. God dag videre! 💪"
+        ]
+        return random.choice(messages)
+
+    def _generate_escalation_message(self, topic: str, entities: Dict) -> str:
+        parts = []
+        parts.append("🤝 **Jeg tror det er best at vårt support-team tar over herfra.**")
+        parts.append("")
+        parts.append("De har tilgang til flere verktøy og kan:")
+        parts.append("• Se direkte på systemet ditt")
+        parts.append("• Sjekke logger og feilmeldinger")
+        parts.append("• Gjøre mer avanserte endringer")
+        parts.append("• Gi deg personlig oppfølging")
+        parts.append("")
+        parts.append("**📝 Når du oppretter en support-sak, inkluder:**")
+
+        if entities.get("error_message"):
+            parts.append(f"• Feilmelding: '{entities['error_message']}'")
+        if entities.get("os"):
+            parts.append(f"• System: {entities['os']}")
+        if entities.get("browser"):
+            parts.append(f"• Nettleser: {entities['browser']}")
+        if entities.get("application"):
+            parts.append(f"• Program: {entities['application']}")
+        if entities.get("actions_tried"):
+            parts.append(f"• Hva du har prøvd: {', '.join(entities['actions_tried'])}")
+
+        parts.append("")
+        parts.append("Du kan opprette en sak ved å klikke på 'Saker' i menyen. 👆")
+        parts.append("")
+        parts.append("Vårt team svarer vanligvis innen 1-2 timer! 💙")
+        return "\n".join(parts)
+
+    def _generate_human_escalation_message(self) -> str:
+        return (
+            "🤝 **Selvfølgelig! La meg sette deg i kontakt med vårt support-team.**\n\n"
+            "De er ekte mennesker som har mer erfaring og tilgang til flere verktøy enn meg.\n\n"
+            "**📝 Opprett en support-sak her:**\n"
+            "Klikk på 'Saker' i menyen, og teamet vårt tar kontakt med deg så fort som mulig!\n\n"
+            "Gjennomsnittlig responstid: 1-2 timer ⏰\n\n"
+            "Jeg håper de kan hjelpe deg bedre enn jeg kunne! 💙"
+        )
 
 
+# Global bot instance
 _bot_instance = None
 
 
-def get_bot() -> HelpdeskBot:
+def get_bot() -> IntelligentHelpdeskAI:
+    """Get or create AI bot instance"""
     global _bot_instance
     if _bot_instance is None:
-        _bot_instance = HelpdeskBot()
+        _bot_instance = IntelligentHelpdeskAI()
     return _bot_instance
 
 
 @bp.route("/chat", methods=["POST"])
 def chat():
+    """AI-powered chat endpoint"""
     if not current_user():
         return jsonify({"reply": "Du må være innlogget for å bruke chat."}), 401
 
@@ -567,20 +1269,57 @@ def chat():
         user_msg = (data.get("message") or "").strip()
 
         if not user_msg:
-            return jsonify({"reply": "Skriv hva du trenger hjelp med."})
+            return jsonify({"reply": "Skriv hva du trenger hjelp med, så hjelper jeg deg! 😊"})
+
+        if "ai_chat_state" not in session:
+            session["ai_chat_state"] = {}
+
+        conversation_state = session["ai_chat_state"]
 
         bot = get_bot()
-        reply = bot.process_message(user_msg)
+        reply, updated_state = bot.process_message(user_msg, conversation_state)
 
-        return jsonify({"reply": reply})
+        session["ai_chat_state"] = updated_state
+        session.modified = True
+
+        try:
+            log_activity(
+                current_user(),
+                f"Chat: {user_msg[:50]}... -> Topic: {updated_state.get('last_topic', 'unknown')}"
+            )
+        except Exception:
+            pass
+
+        return jsonify({
+            "reply": reply,
+            "topic": updated_state.get("last_topic"),
+            "message_count": updated_state.get("message_count", 1),
+            "confidence": "high" if updated_state.get("last_topic") != "unknown" else "low"
+        })
+
     except Exception as e:
-        logger.error(f"Chat error: {e}")
-        return jsonify({"reply": "En feil oppstod. Prøv igjen senere."}), 500
+        logger.error(f"Chat AI error: {e}")
+        return jsonify({
+            "reply": "😅 Oops! Noe gikk galt i mitt AI-hode. Prøv igjen, eller opprett en support-sak hvis problemet fortsetter."
+        }), 500
 
 
 @bp.route("/chat/reset", methods=["POST"])
 def reset_chat():
+    """Reset AI conversation state"""
     if not current_user():
         return jsonify({"status": "error"}), 401
+
+    session.pop("ai_chat_state", None)
     session.pop("chat_history", None)
-    return jsonify({"status": "ok", "message": "Samtalen er tilbakestilt."})
+    session.modified = True
+
+    try:
+        log_activity(current_user(), "Reset chat-samtale")
+    except Exception:
+        pass
+
+    return jsonify({
+        "status": "ok",
+        "message": "Samtalen er tilbakestilt. Jeg husker ikke vår tidligere dialog nå! 🔄"
+    })
