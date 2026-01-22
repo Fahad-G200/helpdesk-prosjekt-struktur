@@ -235,3 +235,43 @@ Alle vesentlige endringer i prosjektet dokumenteres i denne filen.
 - Kun sakseier eller support har tilgang til vedlegg
 
 ---
+
+## 2026-01-22
+
+### Added
+- Implementert avansert AI-basert helpdesk-chat
+- Chatboten analyserer fritekst og identifiserer problemområde automatisk
+- Støtte for flere temaer:
+  - Feide / innlogging
+  - Wi-Fi / nettverk
+  - Utskrift / skrivere
+  - Passord og kontotilgang
+  - Microsoft 365 (Teams, Outlook, OneDrive m.fl.)
+  - Nettleserproblemer
+- Chatten gir trinnvis feilsøking (grunnleggende → avansert)
+- Automatisk eskalering til support etter flere mislykkede forsøk
+- Mulighet for bruker å be om menneskelig support direkte i chat
+- Endepunkt for reset av chat-samtale (`/chat/reset`)
+
+### Changed
+- Forbedret saksopprettelse med støtte for flere filvedlegg samtidig
+- Tickets inkluderer nå vedlegg i visning for både bruker og support
+- Varslinger sendes til support ved ny sak og ved vurdering
+- Forbedret aktivitetslogging for:
+  - Chat-bruk
+  - Saksopprettelse
+  - Lukking av saker
+  - Vurderinger
+
+### Added
+- Støtte for sikre filvedlegg på saker:
+  - Skjermbilder, PDF-er og dokumenter
+  - Unike filnavn for å unngå overskriving
+  - Ny database-tabell for vedlegg
+- Nedlasting av vedlegg med tilgangskontroll
+  - Kun sakseier eller support har tilgang
+
+### Security
+- Validering av filtyper ved opplasting
+- Sikret filnavn med `secure_filename`
+- Forhindrer uautorisert tilgang til vedlegg

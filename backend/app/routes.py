@@ -524,6 +524,31 @@ def upload_attachment(ticket_id: int):
     return redirect(url_for("main.tickets"))
 
 
+@bp.route("/dashboard")
+def dashboard():
+    if not current_user():
+        return redirect(url_for("main.login"))
+
+    # Hent saker fra DB (for support: alle, for user: egne)
+    role = current_role()
+    user = current_user()
+    visible = get_tickets() if role == "support" else get_tickets(owner=user)
+
+    # Enkle “stats” (demo). Kan forbedres senere.
+    total_active = sum(1 for t in visible if (t.get("status") or "").lower() != "lukket")
+    critical = sum(1 for t in visible if (t.get("priority") or "").lower() in ["kritisk", "critical", "høy", "high"])
+    closed_today = 0
+    avg_time = "2.4t"
+
+    stats = {
+        "total_active": total_active,
+        "critical": critical,
+        "closed_today": closed_today,
+        "avg_time": avg_time,
+    }
+
+    return render_template("dashboard.html", tickets=visible, stats=stats)
+
 # -----------------------------
 # Chat (NY: AI-bot)
 # -----------------------------
@@ -1323,3 +1348,4 @@ def reset_chat():
         "status": "ok",
         "message": "Samtalen er tilbakestilt. Jeg husker ikke vår tidligere dialog nå! 🔄"
     })
+
