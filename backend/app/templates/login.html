@@ -1,28 +1,41 @@
-{% extends "base.html" %}
-{% block content %}
+{% extends "auth_base.html" %}
+{% block title %}Helpdesk – Logg inn{% endblock %}
 
-<div class="card">
-  <h1>Logg inn</h1>
-  <p class="muted">Logg inn for å bruke kunnskapsbase og sende inn saker.</p>
+{% block auth_tabs %}
+<div class="tabs">
+  <a class="tab active" href="{{ url_for('main.login') }}">Login</a>
+  <a class="tab" href="{{ url_for('main.register') }}">Sign Up</a>
+</div>
+{% endblock %}
+
+{% block content %}
+  <h2 style="margin:0 0 6px; font-size:22px; font-weight:900;">Logg inn</h2>
+  <p style="margin:0 0 14px; color:#94a3b8;">Logg inn for å bruke systemet.</p>
 
   {% if error %}
-    <div class="card error">{{ error }}</div>
+    <div class="error">{{ error }}</div>
   {% endif %}
 
   <form method="post">
-    <label>Brukernavn</label>
-    <input type="text" name="username" required>
+    <label for="username">Username</label>
+    <input id="username" type="text" name="username" placeholder="Enter your username" required />
 
-    <label>Passord</label>
-    <input type="password" name="password" required>
+    <label for="password">Password</label>
+    <input id="password" type="password" name="password" placeholder="Enter your password" required />
 
-    <button type="submit">Logg inn</button>
+    <div class="row">
+      <label style="display:flex; align-items:center; gap:8px; margin:0; font-weight:800; color:#cbd5e1;">
+        <input type="checkbox" name="remember" style="width:16px; height:16px; margin:0;" />
+        Remember me
+      </label>
+
+      <a href="#" onclick="return false;">Forgot Password?</a>
+    </div>
+
+    <button class="btn" type="submit">Sign In</button>
   </form>
 
-  <p class="muted" style="margin-top:14px;">
-    Har du ikke bruker?
-    <a href="{{ url_for('main.register') }}">Registrer deg</a>
-  </p>
-</div>
-
+  <div style="margin-top:14px; text-align:center; color:#94a3b8; font-size:13px;">
+    Har du ikke bruker? <a href="{{ url_for('main.register') }}" style="color:#60a5fa; font-weight:900; text-decoration:none;">Registrer deg</a>
+  </div>
 {% endblock %}

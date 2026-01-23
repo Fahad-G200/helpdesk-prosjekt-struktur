@@ -1,31 +1,35 @@
-{% extends "base.html" %}
-{% block content %}
+{% extends "auth_base.html" %}
+{% block title %}Helpdesk – Registrer{% endblock %}
 
-<div class="card">
-  <h1>Registrer bruker</h1>
-  <p class="muted">Opprett konto for å kunne sende inn og følge opp supportsaker.</p>
+{% block auth_tabs %}
+<div class="tabs">
+  <a class="tab" href="{{ url_for('main.login') }}">Login</a>
+  <a class="tab active" href="{{ url_for('main.register') }}">Sign Up</a>
+</div>
+{% endblock %}
+
+{% block content %}
+  <h2 style="margin:0 0 6px; font-size:22px; font-weight:900;">Registrer deg</h2>
+  <p style="margin:0 0 14px; color:#94a3b8;">Opprett konto for å sende inn saker.</p>
 
   {% if error %}
-    <p class="error">{{ error }}</p>
+    <div class="error">{{ error }}</div>
   {% endif %}
 
   <form method="post">
-    <label>Brukernavn</label>
-    <input type="text" name="username" placeholder="minbruker" required>
+    <label for="username">Username</label>
+    <input id="username" type="text" name="username" placeholder="Choose a username" required />
 
-    <label>Passord</label>
-    <input type="password" name="password" placeholder="Minst 8 tegn" required>
+    <label for="password">Password</label>
+    <input id="password" type="password" name="password" placeholder="Create a password" required />
 
-    <label>Gjenta passord</label>
-    <input type="password" name="password2" placeholder="Gjenta passord" required>
+    <label for="password2">Confirm Password</label>
+    <input id="password2" type="password" name="password2" placeholder="Confirm your password" required />
 
-    <button type="submit">Registrer</button>
+    <button class="btn" type="submit">Create Account</button>
   </form>
 
-  <p class="muted" style="margin-top:14px;">
-    Har du allerede bruker?
-    <a href="{{ url_for('main.login') }}">Logg inn</a>
-  </p>
-</div>
-
+  <div style="margin-top:14px; text-align:center; color:#94a3b8; font-size:13px;">
+    Har du allerede bruker? <a href="{{ url_for('main.login') }}" style="color:#60a5fa; font-weight:900; text-decoration:none;">Logg inn</a>
+  </div>
 {% endblock %}
