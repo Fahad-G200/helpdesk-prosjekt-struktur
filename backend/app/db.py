@@ -529,3 +529,88 @@ def get_attachment(attachment_id: int) -> Optional[Dict[str, Any]]:
     row = cur.fetchone()
     conn.close()
     return dict(row) if row else None
+
+# -----------------------------
+# ADMIN: Users & Tickets helpers
+# -----------------------------
+
+def get_all_users() -> List[Dict[str, Any]]:
+    """Get all users for admin management"""
+    conn = _conn()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT username, role, email, created_at, last_login
+        FROM users
+        ORDER BY created_at DESC
+    """)
+    rows = cur.fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def change_user_role(username: str, new_role: str) -> None:
+    """Change user's role (admin only)"""
+    conn = _conn()
+    cur = conn.cursor()
+    cur.execute("UPDATE users SET role = ? WHERE username = ?", (new_role, username))
+    conn.commit()
+    conn.close()
+
+
+def delete_user_db(username: str) -> None:
+    """Delete user permanently (admin only)"""
+    conn = _conn()
+    cur = conn.cursor()
+    # Delete user's tickets, notifications, etc.
+    cur.execute("DELETE FROM tickets WHERE owner = ?", (username,))
+    cur.execute("DELETE FROM notifications WHERE user = ?", (username,))
+    cur.execute("DELETE FROM ratings WHERE user = ?", (username,))
+    cur.execute("DELETE FROM activity WHERE user = ?", (username,))
+    cur.execute("DELETE FROM users WHERE username = ?", (username,))
+    conn.commit()
+    conn.close()
+
+
+def assign_ticket(ticket_id: int, assigned_to: str) -> None:
+    """Assign ticket to support user"""
+    conn = _conn()
+    cur = conn.cursor()
+
+    # Add column if it doesn't exist
+    try:
+        cur.execute("ALTER TABLE tickets ADD COLUMN assigned_to TEXT")
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass
+
+    cur.execute("""
+        UPDATE tickets
+        SET assigned_to = ?, updated_at = datetime('now')
+        WHERE id = ?
+    """, (assigned_to, ticket_id))
+    conn.commit()
+    conn.close()
+
+
+def update_ticket_priority(ticket_id: int, priority: str) -> None:
+    """Update ticket priority"""
+    conn = _conn()
+    cur = conn.cursor()
+    cur.execute("""
+        UPDATE tickets
+        SET priority = ?, updated_at = datetime('now')
+        WHERE id = ?
+    """, (priority, ticket_id))
+    conn.commit()
+    conn.close()
+
+
+def delete_ticket_db(ticket_id: int) -> None:
+    """Delete ticket permanently"""
+    conn = _conn()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM attachments WHERE ticket_id = ?", (ticket_id,))
+    cur.execute("DELETE FROM ratings WHERE ticket_id = ?", (ticket_id,))
+    cur.execute("DELETE FROM tickets WHERE id = ?", (ticket_id,))
+    conn.commit()
+    conn.close()

@@ -549,6 +549,360 @@ def dashboard():
 
     return render_template("dashboard.html", tickets=visible, stats=stats)
 
+
+
+# ============================================================================
+# LEGG TIL DISSE RUTENE I routes.py (etter dashboard-ruten)
+# ============================================================================
+
+# -----------------------------
+# ADMIN: User Management
+# -----------------------------
+@bp.route("/admin/users")
+def admin_users():
+    user = current_user()
+    if not user or current_role() != "support":
+        abort(403)
+
+    from .db import get_all_users
+    try:
+        users = get_all_users()
+    except Exception as e:
+        logger.error(f"Error fetching users: {e}")
+        users = []
+
+    return render_template("admin_users.html", users=users)
+
+
+@bp.route("/admin/users/<username>/promote", methods=["POST"])
+def promote_user(username: str):
+    user = current_user()
+    if not user or current_role() != "support":
+        abort(403)
+
+    if username == "admin":
+        flash("Kan ikke endre admin-bruker.")
+        return redirect(url_for("main.admin_users"))
+
+    from .db import change_user_role
+    try:
+        change_user_role(username, "support")
+        log_activity(user, f"Promoterte {username} til support")
+        flash(f"{username} er nå support.")
+    except Exception as e:
+        logger.error(f"Error promoting user: {e}")
+        flash("Kunne ikke endre rolle.")
+
+    return redirect(url_for("main.admin_users"))
+
+
+@bp.route("/admin/users/<username>/demote", methods=["POST"])
+def demote_user(username: str):
+    user = current_user()
+    if not user or current_role() != "support":
+        abort(403)
+
+    if username == "admin":
+        flash("Kan ikke endre admin-bruker.")
+        return redirect(url_for("main.admin_users"))
+
+    from .db import change_user_role
+    try:
+        change_user_role(username, "user")
+        log_activity(user, f"Degraderte {username} til user")
+        flash(f"{username} er nå vanlig bruker.")
+    except Exception as e:
+        logger.error(f"Error demoting user: {e}")
+        flash("Kunne ikke endre rolle.")
+
+    return redirect(url_for("main.admin_users"))
+
+
+@bp.route("/admin/users/<username>/delete", methods=["POST"])
+def delete_user(username: str):
+    user = current_user()
+    if not user or current_role() != "support":
+        abort(403)
+
+    if username == "admin" or username == user:
+        flash("Kan ikke slette denne brukeren.")
+        return redirect(url_for("main.admin_users"))
+
+    from .db import delete_user_db
+    try:
+        delete_user_db(username)
+        log_activity(user, f"Slettet bruker {username}")
+        flash(f"Bruker {username} slettet.")
+    except Exception as e:
+        logger.error(f"Error deleting user: {e}")
+        flash("Kunne ikke slette bruker.")
+
+    return redirect(url_for("main.admin_users"))
+
+
+# -----------------------------
+# ADMIN: Ticket Management
+# -----------------------------
+@bp.route("/admin/tickets")
+def admin_tickets():
+    user = current_user()
+    if not user or current_role() != "support":
+        abort(403)
+
+    try:
+        all_tickets = get_tickets()
+    except Exception as e:
+        logger.error(f"Error fetching tickets: {e}")
+        all_tickets = []
+
+    return render_template("admin_tickets.html", tickets=all_tickets)
+
+
+@bp.route("/tickets/<int:ticket_id>/assign", methods=["POST"])
+def assign_ticket_to_support(ticket_id: int):
+    user = current_user()
+    if not user or current_role() != "support":
+        abort(403)
+
+    assigned_to = request.form.get("assigned_to", user).strip()
+
+    from .db import assign_ticket
+    try:
+        assign_ticket(ticket_id, assigned_to)
+        log_activity(user, f"Tildelte sak #{ticket_id} til {assigned_to}")
+
+        t = get_ticket(ticket_id)
+        if t:
+            add_notification(
+                t["owner"],
+                f"Sak #{ticket_id} er tildelt {assigned_to}",
+                url_for("main.tickets")
+            )
+
+        flash(f"Sak #{ticket_id} tildelt {assigned_to}.")
+    except Exception as e:
+        logger.error(f"Error assigning ticket: {e}")
+        flash("Kunne ikke tildele sak.")
+
+    return redirect(url_for("main.admin_tickets"))
+
+
+@bp.route("/tickets/<int:ticket_id>/priority", methods=["POST"])
+def change_ticket_priority(ticket_id: int):
+    user = current_user()
+    if not user or current_role() != "support":
+        abort(403)
+
+    new_priority = request.form.get("priority", "Middels")
+
+    from .db import update_ticket_priority
+    try:
+        update_ticket_priority(ticket_id, new_priority)
+        log_activity(user, f"Endret prioritet på sak #{ticket_id} til {new_priority}")
+        flash(f"Prioritet endret til {new_priority}.")
+    except Exception as e:
+        logger.error(f"Error changing priority: {e}")
+        flash("Kunne ikke endre prioritet.")
+
+    return redirect(url_for("main.admin_tickets"))
+
+
+@bp.route("/tickets/<int:ticket_id>/delete", methods=["POST"])
+def delete_ticket_permanently(ticket_id: int):
+    user = current_user()
+    if not user or current_role() != "support":
+        abort(403)
+
+    from .db import delete_ticket_db
+    try:
+        delete_ticket_db(ticket_id)
+        log_activity(user, f"Slettet sak #{ticket_id} permanent")
+        flash(f"Sak #{ticket_id} slettet permanent.")
+    except Exception as e:
+        logger.error(f"Error deleting ticket: {e}")
+        flash("Kunne ikke slette sak.")
+
+    return redirect(url_for("main.admin_tickets"))
+
+
+# -----------------------------
+# ADMIN: Knowledge Base Management
+# -----------------------------
+@bp.route("/admin/kb")
+def admin_kb():
+    user = current_user()
+    if not user or current_role() != "support":
+        abort(403)
+
+    try:
+        articles = get_articles()
+    except Exception:
+        articles = []
+
+    return render_template("admin_kb.html", articles=articles)
+
+
+@bp.route("/admin/kb/new", methods=["GET", "POST"])
+def create_article_view():
+    user = current_user()
+    if not user or current_role() != "support":
+        abort(403)
+
+    if request.method == "POST":
+        title = request.form.get("title", "").strip()
+        content = request.form.get("content", "").strip()
+
+        if not title or not content:
+            flash("Tittel og innhold er påkrevd.")
+        else:
+            try:
+                article_id = create_article(title, content, user)
+                log_activity(user, f"Opprettet KB-artikkel #{article_id}: {title}")
+                flash("Artikkel opprettet.")
+                return redirect(url_for("main.view_article", article_id=article_id))
+            except Exception as e:
+                logger.error(f"Error creating article: {e}")
+                flash("Kunne ikke opprette artikkel.")
+
+    return render_template("create_article.html")
+
+
+@bp.route("/kb/<int:article_id>")
+def view_article(article_id: int):
+    if not current_user():
+        return redirect(url_for("main.login"))
+
+    try:
+        article = get_article(article_id)
+        if not article:
+            flash("Artikkelen finnes ikke.")
+            return redirect(url_for("main.kb"))
+    except Exception as e:
+        logger.error(f"Error viewing article: {e}")
+        flash("Kunne ikke hente artikkel.")
+        return redirect(url_for("main.kb"))
+
+    return render_template("view_article.html", article=article, role=current_role())
+
+
+@bp.route("/kb/<int:article_id>/edit", methods=["GET", "POST"])
+def edit_article_view(article_id: int):
+    user = current_user()
+    if not user or current_role() != "support":
+        abort(403)
+
+    try:
+        article = get_article(article_id)
+        if not article:
+            flash("Artikkelen finnes ikke.")
+            return redirect(url_for("main.admin_kb"))
+    except Exception as e:
+        logger.error(f"Error fetching article: {e}")
+        flash("Kunne ikke hente artikkel.")
+        return redirect(url_for("main.admin_kb"))
+
+    if request.method == "POST":
+        title = request.form.get("title", "").strip()
+        content = request.form.get("content", "").strip()
+
+        if not title or not content:
+            flash("Tittel og innhold er påkrevd.")
+        else:
+            try:
+                update_article(article_id, title, content)
+                log_activity(user, f"Redigerte KB-artikkel #{article_id}")
+                flash("Artikkel oppdatert.")
+                return redirect(url_for("main.view_article", article_id=article_id))
+            except Exception as e:
+                logger.error(f"Error updating article: {e}")
+                flash("Kunne ikke oppdatere artikkel.")
+
+    return render_template("edit_article.html", article=article)
+
+
+@bp.route("/kb/<int:article_id>/delete", methods=["POST"])
+def delete_article(article_id: int):
+    user = current_user()
+    if not user or current_role() != "support":
+        abort(403)
+
+    try:
+        delete_article_db(article_id)
+        log_activity(user, f"Slettet KB-artikkel #{article_id}")
+        flash("Artikkel slettet.")
+    except Exception as e:
+        logger.error(f"Error deleting article: {e}")
+        flash("Kunne ikke slette artikkel.")
+
+    return redirect(url_for("main.admin_kb"))
+
+
+# -----------------------------
+# ADMIN: System Settings
+# -----------------------------
+@bp.route("/admin/settings", methods=["GET", "POST"])
+def admin_settings():
+    user = current_user()
+    if not user or current_role() != "support":
+        abort(403)
+
+    if request.method == "POST":
+        # Dette kan utvides med faktiske systeminnstillinger senere
+        flash("Innstillinger lagret.")
+        log_activity(user, "Endret systeminnstillinger")
+
+    return render_template("admin_settings.html")
+
+
+# -----------------------------
+# ADMIN: Bulk Actions
+# -----------------------------
+@bp.route("/admin/tickets/bulk-close", methods=["POST"])
+def bulk_close_tickets():
+    user = current_user()
+    if not user or current_role() != "support":
+        abort(403)
+
+    ticket_ids = request.form.getlist("ticket_ids[]")
+
+    closed_count = 0
+    for tid in ticket_ids:
+        try:
+            close_ticket(int(tid))
+            closed_count += 1
+        except Exception:
+            pass
+
+    log_activity(user, f"Lukket {closed_count} saker samtidig (bulk)")
+    flash(f"{closed_count} saker lukket.")
+
+    return redirect(url_for("main.admin_tickets"))
+
+
+@bp.route("/admin/tickets/bulk-delete", methods=["POST"])
+def bulk_delete_tickets():
+    user = current_user()
+    if not user or current_role() != "support":
+        abort(403)
+
+    ticket_ids = request.form.getlist("ticket_ids[]")
+
+    from .db import delete_ticket_db
+    deleted_count = 0
+    for tid in ticket_ids:
+        try:
+            delete_ticket_db(int(tid))
+            deleted_count += 1
+        except Exception:
+            pass
+
+    log_activity(user, f"Slettet {deleted_count} saker permanent (bulk)")
+    flash(f"{deleted_count} saker slettet.")
+
+    return redirect(url_for("main.admin_tickets"))
+
+
+
 # -----------------------------
 # Chat (NY: AI-bot)
 # -----------------------------
