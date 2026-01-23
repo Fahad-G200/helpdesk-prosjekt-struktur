@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="card">
+  <h1>🎫 Sakshåndtering</h1>
+  <p class="muted">Administrer alle support-saker</p>
+</div>
+
+<div class="card">
+  <form method="post" action="{{ url_for('main.bulk_close_tickets') }}" id="bulkForm">
+
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:14px; flex-wrap:wrap;">
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button type="submit" style="background:#10b981;">✓ Lukk valgte</button>
+
+        <button
+          type="submit"
+          formaction="{{ url_for('main.bulk_delete_tickets') }}"
+          style="background:#ef4444;"
+          onclick="return confirm('Slette valgte saker permanent?');"
+        >
+          🗑️ Slett valgte
+        </button>
+      </div>
+
+      <div class="muted">Totalt: {{ tickets|length }} saker</div>
+    </div>
+
+    <table style="width:100%; border-collapse:collapse;">
+      <thead>
+        <tr style="background:rgba(148,163,184,.06); border-bottom:1px solid rgba(148,163,184,.14);">
+          <th style="padding:12px; width:40px;"><input type="checkbox" id="selectAll"></th>
+          <th style="padding:12px; text-align:left;">ID</th>
+          <th style="padding:12px; text-align:left;">Tittel</th>
+          <th style="padding:12px; text-align:left;">Eier</th>
+          <th style="padding:12px; text-align:left;">Prioritet</th>
+          <th style="padding:12px; text-align:left;">Status</th>
+          <th style="padding:12px; text-align:left;">Tildelt</th>
+          <th style="padding:12px; text-align:right;">Handlinger</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for t in tickets %}
+        <tr style="border-bottom:1px solid rgba(148,163,184,.10);">
+          <td style="padding:12px;">
+            <input type="checkbox" name="ticket_ids[]" value="{{ t.id }}" class="ticketCheckbox">
+          </td>
+
+          <td style="padding:12px;">
+            <strong>#{{ t.id }}</strong>
+          </td>
+
+          <td style="padding:12px;">
+            <a href="{{ url_for('main.ticket_detail', ticket_id=t.id) }}" style="color:#60a5fa; font-weight:900; text-decoration:none;">
+              {{ t.title }}
+            </a>
+          </td>
+
+          <td style="padding:12px; color:#94a3b8;">{{ t.owner }}</td>
+
+          <td style="padding:12px;">
+            {% set p = (t.priority or '') %}
+            {% if p in ['Kritisk','Høy','critical','high'] %}
+              <span style="background:rgba(239,68,68,.14); border:1px solid rgba(239,68,68,.28); color:#fecaca; padding:4px 10px; border-radius:999px; font-size:12px; font-weight:900;">
+                {{ p }}
+              </span>
+            {% elif p in ['Middels','medium'] %}
+              <span style="background:rgba(234,179,8,.14); border:1px solid rgba(234,179,8,.28); color:#fde68a; padding:4px 10px; border-radius:999px; font-size:12px; font-weight:900;">
+                {{ p }}
+              </span>
+            {% else %}
+              <span style="background:rgba(16,185,129,.14); border:1px solid rgba(16,185,129,.28); color:#bbf7d0; padding:4px 10px; border-radius:999px; font-size:12px; font-weight:900;">
+                {{ p or 'Lav' }}
+              </span>
+            {% endif %}
+          </td>
+
+          <td style="padding:12px; color:#94a3b8;">{{ t.status }}</td>
+
+          <td style="padding:12px; color:#94a3b8;">
+            {{ t.assigned_to or '—' }}
+          </td>
+
+          <td style="padding:12px; text-align:right;">
+            <div style="display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap;">
+              {% if (t.status or '') != 'Lukket' %}
+              <form method="post" action="{{ url_for('main.assign_ticket_to_support', ticket_id=t.id) }}" style="display:inline;">
+                <input type="hidden" name="assigned_to" value="{{ session.get('user') }}">
+                <button type="submit" style="background:#3b82f6; padding:6px 10px; font-size:12px;">📌 Meg</button>
+              </form>
+
+              <form method="post" action="{{ url_for('main.change_ticket_priority', ticket_id=t.id) }}" style="display:inline;">
+                <select name="priority" style="padding:6px 10px; font-size:12px; margin:0; width:auto;">
+                  <option {% if (t.priority or '') == 'Lav' %}selected{% endif %}>Lav</option>
+                  <option {% if (t.priority or '') == 'Middels' %}selected{% endif %}>Middels</option>
+                  <option {% if (t.priority or '') == 'Høy' %}selected{% endif %}>Høy</option>
+                  <option {% if (t.priority or '') == 'Kritisk' %}selected{% endif %}>Kritisk</option>
+                </select>
+                <button type="submit" style="background:#f59e0b; padding:6px 10px; font-size:12px;">⚠️</button>
+              </form>
+
+              <form method="post" action="{{ url_for('main.close_ticket_view', ticket_id=t.id) }}" style="display:inline;">
+                <button type="submit" style="background:#10b981; padding:6px 10px; font-size:12px;">✓ Lukk</button>
+              </form>
+              {% endif %}
+
+              <form method="post" action="{{ url_for('main.delete_ticket_permanently', ticket_id=t.id) }}" style="display:inline;" onsubmit="return confirm('Slette sak #{{ t.id }} permanent?');">
+                <button type="submit" style="background:#ef4444; padding:6px 10px; font-size:12px;">🗑️</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+
+        {% if tickets|length == 0 %}
+        <tr>
+          <td colspan="8" style="padding:14px; color:#94a3b8;">Ingen saker å vise.</td>
+        </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </form>
+</div>
+
+<script>
+  document.getElementById('selectAll').addEventListener('change', function() {
+    document.querySelectorAll('.ticketCheckbox').forEach(cb => cb.checked = this.checked);
+  });
+</script>
+
+{% endblock %}

@@ -614,3 +614,384 @@ def delete_ticket_db(ticket_id: int) -> None:
     cur.execute("DELETE FROM tickets WHERE id = ?", (ticket_id,))
     conn.commit()
     conn.close()
+
+
+
+import os
+import sqlite3
+import logging
+import random
+from pathlib import Path
+from typing import Dict, List, Optional, Any, Tuple
+
+from werkzeug.security import generate_password_hash
+from .config import Config
+
+logger = logging.getLogger(__name__)
+
+DB_PATH = Path(Config.DATABASE_PATH)
+
+
+def _conn() -> sqlite3.Connection:
+    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+def init_db() -> None:
+    conn = _conn()
+    cur = conn.cursor()
+
+    # USERS
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT NOT NULL UNIQUE,
+            pw_hash TEXT NOT NULL,
+            role TEXT NOT NULL DEFAULT 'user',
+            email TEXT,
+            phone TEXT,
+            created_at TEXT NOT NULL DEFAULT (datetime('now')),
+            last_login TEXT,
+            notify_email INTEGER NOT NULL DEFAULT 1,
+            notify_inapp INTEGER NOT NULL DEFAULT 1,
+            notify_sms INTEGER NOT NULL DEFAULT 0
+        )
+    """)
+
+    # Trygge ALTERs (hvis DB allerede finnes)
+    for stmt in [
+        "ALTER TABLE users ADD COLUMN email TEXT",
+        "ALTER TABLE users ADD COLUMN phone TEXT",
+        "ALTER TABLE users ADD COLUMN last_login TEXT",
+        "ALTER TABLE users ADD COLUMN notify_email INTEGER NOT NULL DEFAULT 1",
+        "ALTER TABLE users ADD COLUMN notify_inapp INTEGER NOT NULL DEFAULT 1",
+        "ALTER TABLE users ADD COLUMN notify_sms INTEGER NOT NULL DEFAULT 0",
+    ]:
+        try:
+            cur.execute(stmt)
+        except sqlite3.OperationalError:
+            pass
+
+    # TICKETS
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS tickets (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            desc TEXT NOT NULL,
+            owner TEXT NOT NULL,
+            category TEXT NOT NULL DEFAULT 'Annet',
+            priority TEXT NOT NULL DEFAULT 'Middels',
+            device TEXT NOT NULL DEFAULT '',
+            status TEXT NOT NULL DEFAULT 'Åpen',
+            created_at TEXT NOT NULL DEFAULT (datetime('now')),
+            updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+            closed_at TEXT
+        )
+    """)
+
+    # ATTACHMENTS
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS attachments (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            ticket_id INTEGER NOT NULL,
+            stored_filename TEXT NOT NULL,
+            original_filename TEXT NOT NULL,
+            uploaded_by TEXT NOT NULL,
+            uploaded_at TEXT NOT NULL DEFAULT (datetime('now')),
+            FOREIGN KEY(ticket_id) REFERENCES tickets(id)
+        )
+    """)
+
+    # NOTIFICATIONS
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS notifications (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user TEXT NOT NULL,
+            message TEXT NOT NULL,
+            link TEXT,
+            read INTEGER NOT NULL DEFAULT 0,
+            created_at TEXT NOT NULL DEFAULT (datetime('now'))
+        )
+    """)
+
+    # RATINGS
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS ratings (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            ticket_id INTEGER NOT NULL UNIQUE,
+            user TEXT NOT NULL,
+            stars INTEGER NOT NULL,
+            feedback TEXT NOT NULL DEFAULT '',
+            created_at TEXT NOT NULL DEFAULT (datetime('now')),
+            FOREIGN KEY(ticket_id) REFERENCES tickets(id)
+        )
+    """)
+
+    # ARTICLES
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS articles (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            content TEXT NOT NULL,
+            author TEXT NOT NULL,
+            created_at TEXT NOT NULL DEFAULT (datetime('now')),
+            updated_at TEXT
+        )
+    """)
+
+    # ACTIVITY
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS activity (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user TEXT NOT NULL,
+            details TEXT NOT NULL,
+            created_at TEXT NOT NULL DEFAULT (datetime('now'))
+        )
+    """)
+
+    # PASSWORD RESETS (NY)
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS password_resets (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT NOT NULL,
+            code TEXT NOT NULL,
+            channel TEXT NOT NULL, -- 'email' eller 'sms'
+            sent_to TEXT NOT NULL,
+            created_at TEXT NOT NULL DEFAULT (datetime('now')),
+            expires_at TEXT NOT NULL,
+            used INTEGER NOT NULL DEFAULT 0
+        )
+    """)
+
+    # Opprett admin/support uten hardkodet passord
+    cur.execute("SELECT 1 FROM users WHERE username = 'admin'")
+    if not cur.fetchone():
+        admin_pw = os.environ.get("ADMIN_PASSWORD")
+        if not admin_pw:
+            logger.warning("ADMIN_PASSWORD ikke satt. Admin-bruker ble ikke opprettet.")
+        else:
+            cur.execute(
+                "INSERT INTO users (username, pw_hash, role) VALUES (?, ?, ?)",
+                ("admin", generate_password_hash(admin_pw, method="pbkdf2:sha256"), "support"),
+            )
+            logger.info("Admin/support bruker opprettet (admin).")
+
+    conn.commit()
+    conn.close()
+
+
+# -----------------------------
+# USERS
+# -----------------------------
+def user_exists(username: str) -> bool:
+    conn = _conn()
+    cur = conn.cursor()
+    cur.execute("SELECT 1 FROM users WHERE username = ?", (username,))
+    ok = cur.fetchone() is not None
+    conn.close()
+    return ok
+
+
+def create_user(username: str, pw_hash: str, role: str = "user", email: Optional[str] = None, phone: Optional[str] = None) -> None:
+    conn = _conn()
+    cur = conn.cursor()
+    cur.execute(
+        "INSERT INTO users (username, pw_hash, role, email, phone) VALUES (?, ?, ?, ?, ?)",
+        (username, pw_hash, role, email, phone),
+    )
+    conn.commit()
+    conn.close()
+
+
+def get_user(username: str) -> Optional[Dict[str, Any]]:
+    conn = _conn()
+    cur = conn.cursor()
+    try:
+        cur.execute(
+            "SELECT username, pw_hash, role, email, phone, last_login, notify_email, notify_inapp, notify_sms "
+            "FROM users WHERE username = ?",
+            (username,),
+        )
+        row = cur.fetchone()
+        conn.close()
+        return dict(row) if row else None
+    except sqlite3.OperationalError:
+        cur.execute("SELECT username, pw_hash, role FROM users WHERE username = ?", (username,))
+        row = cur.fetchone()
+        conn.close()
+        return dict(row) if row else None
+
+
+def update_last_login(username: str) -> None:
+    conn = _conn()
+    cur = conn.cursor()
+    cur.execute("UPDATE users SET last_login = datetime('now') WHERE username = ?", (username,))
+    conn.commit()
+    conn.close()
+
+
+def set_password_hash(username: str, new_hash: str) -> None:
+    conn = _conn()
+    cur = conn.cursor()
+    cur.execute("UPDATE users SET pw_hash = ? WHERE username = ?", (new_hash, username))
+    conn.commit()
+    conn.close()
+
+
+# -----------------------------
+# PASSWORD RESET (NY)
+# -----------------------------
+def create_reset_code(username: str, channel: str, sent_to: str, ttl_minutes: int = 15) -> str:
+    """
+    Lager 6-sifret kode, lagrer i DB, returnerer koden.
+    """
+    code = f"{random.randint(0, 999999):06d}"
+
+    conn = _conn()
+    cur = conn.cursor()
+
+    # ugyldiggjør gamle aktive koder
+    cur.execute("UPDATE password_resets SET used = 1 WHERE username = ? AND used = 0", (username,))
+
+    cur.execute(
+        """
+        INSERT INTO password_resets (username, code, channel, sent_to, expires_at, used)
+        VALUES (?, ?, ?, ?, datetime('now', ?), 0)
+        """,
+        (username, code, channel, sent_to, f"+{ttl_minutes} minutes"),
+    )
+
+    conn.commit()
+    conn.close()
+    return code
+
+
+def verify_reset_code(username: str, code: str) -> bool:
+    conn = _conn()
+    cur = conn.cursor()
+    cur.execute(
+        """
+        SELECT 1
+        FROM password_resets
+        WHERE username = ?
+          AND code = ?
+          AND used = 0
+          AND datetime('now') <= datetime(expires_at)
+        ORDER BY id DESC
+        LIMIT 1
+        """,
+        (username, code),
+    )
+    ok = cur.fetchone() is not None
+    conn.close()
+    return ok
+
+
+def consume_reset_code(username: str, code: str) -> None:
+    conn = _conn()
+    cur = conn.cursor()
+    cur.execute(
+        """
+        UPDATE password_resets
+        SET used = 1
+        WHERE username = ? AND code = ? AND used = 0
+        """,
+        (username, code),
+    )
+    conn.commit()
+    conn.close()
+
+
+# -----------------------------
+# (rest of your existing DB functions...)
+# -----------------------------
+# Du har flere funksjoner i din db.py (tickets, attachments, etc).
+# La dem stå slik de er i din nåværende fil.
+# Hvis du allerede har dem, skal du beholde dem under.
+
+
+# -----------------------------
+# ADMIN / SUPPORT HELPERS
+# -----------------------------
+
+def get_all_users() -> list[dict]:
+    conn = _conn()
+    cur = conn.cursor()
+    cur.execute(
+        """
+        SELECT
+            username,
+            role,
+            email,
+            created_at,
+            last_login
+        FROM users
+        ORDER BY username ASC
+        """
+    )
+    rows = cur.fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def change_user_role(username: str, role: str) -> None:
+    conn = _conn()
+    cur = conn.cursor()
+    cur.execute("UPDATE users SET role = ? WHERE username = ?", (role, username))
+    conn.commit()
+    conn.close()
+
+
+def delete_user_db(username: str) -> None:
+    conn = _conn()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM users WHERE username = ?", (username,))
+    conn.commit()
+    conn.close()
+
+
+def assign_ticket(ticket_id: int, assigned_to: str) -> None:
+    conn = _conn()
+    cur = conn.cursor()
+    cur.execute(
+        """
+        UPDATE tickets
+        SET assigned_to = ?,
+            updated_at = datetime('now')
+        WHERE id = ?
+        """,
+        (assigned_to.strip(), ticket_id),
+    )
+    conn.commit()
+    conn.close()
+
+
+def update_ticket_priority(ticket_id: int, priority: str) -> None:
+    conn = _conn()
+    cur = conn.cursor()
+    cur.execute(
+        """
+        UPDATE tickets
+        SET priority = ?,
+            updated_at = datetime('now')
+        WHERE id = ?
+        """,
+        (priority.strip(), ticket_id),
+    )
+    conn.commit()
+    conn.close()
+
+
+def delete_ticket_db(ticket_id: int) -> None:
+    conn = _conn()
+    cur = conn.cursor()
+    # Fjern vedlegg først (hvis tabellen finnes)
+    try:
+        cur.execute("DELETE FROM attachments WHERE ticket_id = ?", (ticket_id,))
+    except Exception:
+        pass
+    cur.execute("DELETE FROM tickets WHERE id = ?", (ticket_id,))
+    conn.commit()
+    conn.close()

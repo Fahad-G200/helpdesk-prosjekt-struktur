@@ -1,94 +1,186 @@
-from flask_mail import Message, Mail
-import logging
+from __future__ import annotations
 
-from .config import Config
+import os
+import logging
+from typing import Any, Dict, Optional, List
 
 logger = logging.getLogger(__name__)
-mail = Mail()
 
-def init_mail(app):
-    """Initialize Flask-Mail"""
-    mail.init_app(app)
+# Flask-Mail er valgfritt. Appen skal ikke krasje om det mangler.
+try:
+    from flask_mail import Mail, Message  # type: ignore
+except Exception:  # pragma: no cover
+    Mail = None  # type: ignore
+    Message = None  # type: ignore
 
-def send_email(subject: str, recipients: list, text_body: str, html_body: str):
-    """Send email with error handling"""
+mail = Mail() if Mail is not None else None
+
+
+def init_mail(app) -> None:
+    """
+    Initialiserer Flask-Mail hvis det er installert.
+    Hvis flask_mail ikke finnes, gjør vi ingenting (app krasjer ikke).
+    """
+    global mail
+    if Mail is None:
+        logger.warning("flask_mail er ikke installert. E-post blir deaktivert.")
+        return
+
+    if mail is None:
+        mail = Mail()  # type: ignore
+
     try:
-        msg = Message(
-            subject=subject,
-            recipients=recipients,
-            body=text_body,
-            html=html_body
-        )
-        mail.send(msg)
-        logger.info(f"E-post sendt til {recipients}: {subject}")
-        return True
+        mail.init_app(app)  # type: ignore[union-attr]
     except Exception as e:
-        logger.error(f"Kunne ikke sende e-post til {recipients}: {e}")
+        logger.error(f"Kunne ikke initialisere Flask-Mail: {e}")
+
+
+def _support_recipients(app=None) -> List[str]:
+    """
+    Henter liste over support-mottakere fra config eller env.
+    Forventet format: "a@x.no,b@y.no"
+    """
+    raw = None
+    if app is not None:
+        try:
+            raw = app.config.get("MAIL_SUPPORT_RECIPIENTS")
+        except Exception:
+            raw = None
+
+    if not raw:
+        raw = os.environ.get("MAIL_SUPPORT_RECIPIENTS")
+
+    if not raw:
+        return []
+
+    return [r.strip() for r in str(raw).split(",") if r.strip()]
+
+
+def _mail_configured(app=None) -> bool:
+    """
+    Best-effort sjekk på om MAIL_* er satt opp.
+    """
+    if app is not None:
+        try:
+            return bool(app.config.get("MAIL_SERVER") and app.config.get("MAIL_DEFAULT_SENDER"))
+        except Exception:
+            return False
+
+    return bool(os.environ.get("MAIL_SERVER") and os.environ.get("MAIL_DEFAULT_SENDER"))
+
+
+def _send_message(app, subject: str, recipients: List[str], body: str) -> bool:
+    """
+    Sender e-post. Returnerer True hvis sendt, ellers False.
+    """
+    if Mail is None or Message is None or mail is None:
+        logger.warning("E-post kan ikke sendes (flask_mail mangler eller er ikke init).")
         return False
 
-def send_ticket_created_email(ticket: dict, user_email: str):
-    subject = f"[{Config.SITE_NAME}] Sak #{ticket['id']} opprettet: {ticket['title']}"
+    if not recipients:
+        return False
 
-    text_body = f"""
-Hei,
+    try:
+        with app.app_context():
+            msg = Message(subject=subject, recipients=recipients, body=body)
+            mail.send(msg)  # type: ignore[union-attr]
+        return True
+    except Exception as e:
+        logger.error(f"Kunne ikke sende e-post: {e}")
+        return False
 
-Din support-sak har blitt opprettet.
 
-Saksnummer: #{ticket['id']}
-Tittel: {ticket['title']}
-Kategori: {ticket.get('category','')}
-Prioritet: {ticket.get('priority','')}
+def send_ticket_created_email(ticket: Dict[str, Any], user_email: Optional[str] = None, app=None) -> bool:
+    """
+    Sender bekreftelse til bruker hvis user_email finnes.
+    Hvis ikke konfigurert -> gjør ingenting og returnerer False.
+    """
+    if not user_email:
+        return False
 
-Følg saken din her: {Config.BASE_URL}/tickets/{ticket['id']}
+    if app is None:
+        try:
+            from flask import current_app
+            app = current_app
+        except Exception:
+            app = None
 
-Med vennlig hilsen,
-{Config.SITE_NAME}
-""".strip()
+    if app is None or not _mail_configured(app):
+        logger.warning("E-post er ikke konfigurert. Ticket-epost sendes ikke.")
+        return False
 
-    html_body = f"""
-<html><body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-<div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px;">
-  <h2 style="color: #2563eb;">Support-sak opprettet</h2>
-  <p>Hei,</p>
-  <p>Din support-sak har blitt opprettet.</p>
-  <div style="background:#f3f4f6; padding:15px; border-radius:5px; margin:20px 0;">
-    <p><strong>Saksnummer:</strong> #{ticket['id']}</p>
-    <p><strong>Tittel:</strong> {ticket['title']}</p>
-    <p><strong>Kategori:</strong> {ticket.get('category','')}</p>
-    <p><strong>Prioritet:</strong> {ticket.get('priority','')}</p>
-  </div>
-  <p><a href="{Config.BASE_URL}/tickets/{ticket['id']}" style="display:inline-block; padding:10px 20px; background:#2563eb; color:white; text-decoration:none; border-radius:5px;">Se sak</a></p>
-  <p style="margin-top: 30px; font-size: 12px; color: #666;">Med vennlig hilsen,<br>{Config.SITE_NAME}</p>
-</div>
-</body></html>
-""".strip()
+    subject = f"Helpdesk: Sak #{ticket.get('id')} opprettet"
+    body = (
+        "Hei!\n\n"
+        "Saken din er opprettet.\n\n"
+        f"ID: {ticket.get('id')}\n"
+        f"Tittel: {ticket.get('title')}\n"
+        f"Kategori: {ticket.get('category')}\n"
+        f"Prioritet: {ticket.get('priority')}\n\n"
+        "Beskrivelse:\n"
+        f"{ticket.get('description') or ticket.get('desc') or ''}\n\n"
+        "Hilsen\nHelpdesk\n"
+    )
 
-    if user_email:
-        send_email(subject, [user_email], text_body, html_body)
+    return _send_message(app, subject, [user_email], body)
 
-def notify_support_new_ticket(ticket: dict):
-    subject = f"[{Config.SITE_NAME}] Ny support-sak #{ticket['id']}"
 
-    text_body = f"""
-Ny support-sak opprettet:
+def notify_support_new_ticket(ticket: Dict[str, Any], app=None) -> bool:
+    """
+    Sender e-post til support når ny sak opprettes.
+    Krever MAIL_SUPPORT_RECIPIENTS (comma-separated) i config eller env.
+    """
+    if app is None:
+        try:
+            from flask import current_app
+            app = current_app
+        except Exception:
+            app = None
 
-Saksnummer: #{ticket['id']}
-Fra: {ticket.get('owner','')}
-Tittel: {ticket.get('title','')}
+    if app is None or not _mail_configured(app):
+        logger.warning("E-post er ikke konfigurert. Support-varsling sendes ikke.")
+        return False
 
-Behandle saken: {Config.BASE_URL}/tickets/{ticket['id']}
-""".strip()
+    recipients = _support_recipients(app)
+    if not recipients:
+        logger.warning("MAIL_SUPPORT_RECIPIENTS mangler. Support-varsling sendes ikke.")
+        return False
 
-    html_body = f"""
-<html><body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-<div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px;">
-  <h2 style="color:#dc2626;">Ny support-sak</h2>
-  <p><strong>Saksnummer:</strong> #{ticket['id']}</p>
-  <p><strong>Fra:</strong> {ticket.get('owner','')}</p>
-  <p><strong>Tittel:</strong> {ticket.get('title','')}</p>
-  <p><a href="{Config.BASE_URL}/tickets/{ticket['id']}" style="display:inline-block; padding:10px 20px; background:#2563eb; color:white; text-decoration:none; border-radius:5px;">Behandle sak</a></p>
-</div>
-</body></html>
-""".strip()
+    subject = f"Helpdesk: Ny sak #{ticket.get('id')}"
+    body = (
+        "Ny sak opprettet.\n\n"
+        f"ID: {ticket.get('id')}\n"
+        f"Tittel: {ticket.get('title')}\n"
+        f"Eier: {ticket.get('owner')}\n"
+        f"Kategori: {ticket.get('category')}\n"
+        f"Prioritet: {ticket.get('priority')}\n\n"
+        "Beskrivelse:\n"
+        f"{ticket.get('description') or ticket.get('desc') or ''}\n"
+    )
 
-    send_email(subject, [Config.ADMIN_EMAIL], text_body, html_body)
+    return _send_message(app, subject, recipients, body)
+
+def send_email(subject: str, body: str, to_email: str, app=None) -> bool:
+    """
+    Backwards-compatible helper for older code paths.
+
+    Some parts of the project import `send_email` directly.
+    This function sends a plain-text email to a single recipient.
+
+    Returns True if sent, otherwise False.
+    """
+    if not to_email:
+        return False
+
+    if app is None:
+        try:
+            from flask import current_app
+            app = current_app
+        except Exception:
+            app = None
+
+    if app is None or not _mail_configured(app):
+        logger.warning("E-post er ikke konfigurert. send_email() sendes ikke.")
+        return False
+
+    return _send_message(app, subject, [to_email], body)

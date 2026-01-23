@@ -13,6 +13,9 @@ import re
 import uuid
 from datetime import datetime
 from typing import Dict, Tuple, Optional
+from .email_service import send_email
+from .sms_service import send_sms
+from .db import create_reset_code, verify_reset_code, consume_reset_code, set_password_hash
 
 from .config import Config
 from .db import (
@@ -638,6 +641,55 @@ def delete_user(username: str):
         flash("Kunne ikke slette bruker.")
 
     return redirect(url_for("main.admin_users"))
+
+# -------------------------
+# ADMIN-VERKTØY (placeholder-ruter)
+# -------------------------
+# Disse finnes for at admin-menyen ikke skal gi 500 (BuildError) når base.html
+# bruker url_for(...) til admin-sider som ikke er implementert ennå.
+# Ingen UI-endringer – vi bare sørger for at lenkene fungerer.
+
+
+@bp.route("/admin/system")
+def admin_system():
+    user = current_user()
+    if not user:
+        return redirect(url_for("main.login"))
+    if current_role() != "support":
+        abort(403)
+
+    return render_template("admin_settings.html")
+
+
+# Alias-navn (i tilfelle base.html bruker andre url_for-navn/URL-er)
+@bp.route("/admin/system-settings")
+def admin_system_settings():
+    return admin_system()
+
+
+@bp.route("/admin/kb-admin")
+def kb_admin():
+    return admin_kb()
+
+
+@bp.route("/admin/users-admin")
+def users_admin():
+    return admin_users()
+
+
+@bp.route("/admin/saker")
+def admin_saker():
+    return admin_tickets()
+
+
+@bp.route("/admin/systeminnstillinger")
+def systeminnstillinger():
+    return admin_system()
+
+
+
+
+
 
 
 # -----------------------------
@@ -1725,3 +1777,75 @@ def reset_chat():
         "message": "Samtalen er tilbakestilt. Jeg husker ikke vår tidligere dialog nå! 🔄"
     })
 
+@bp.route("/forgot-password", methods=["GET", "POST"])
+def forgot_password():
+    # Ingen design-endring: bare ny side.
+    if request.method == "POST":
+        username = (request.form.get("username") or "").strip()
+        u = get_user(username) if username else None
+
+        # Sikkerhet: ikke avslør om bruker finnes
+        if not u:
+            flash("Hvis brukeren finnes, har vi sendt en kode for passordbytte.")
+            return redirect(url_for("main.login"))
+
+        # Velg kanal automatisk: e-post hvis finnes, ellers sms hvis finnes
+        email = (u.get("email") or "").strip()
+        phone = (u.get("phone") or "").strip()
+
+        if email:
+            code = create_reset_code(username, "email", email)
+            body = (
+                f"Hei!\n\n"
+                f"Her er koden din for å bytte passord: {code}\n"
+                f"Koden er gyldig i 15 minutter.\n\n"
+                f"Gå til: {request.url_root.rstrip('/')}{url_for('main.reset_password')} \n"
+            )
+            send_email(email, "Passordbytte – IT Helpdesk", body)
+            flash("Hvis brukeren finnes, har vi sendt en kode for passordbytte.")
+            return redirect(url_for("main.login"))
+
+        if phone:
+            code = create_reset_code(username, "sms", phone)
+            send_sms(phone, f"IT Helpdesk: Kode for passordbytte: {code} (gyldig i 15 min)")
+            flash("Hvis brukeren finnes, har vi sendt en kode for passordbytte.")
+            return redirect(url_for("main.login"))
+
+        flash("Kunne ikke sende kode: brukeren mangler e-post og telefonnummer.")
+        return redirect(url_for("main.login"))
+
+    return render_template("forgot_password.html")
+
+
+@bp.route("/reset-password", methods=["GET", "POST"])
+def reset_password():
+    if request.method == "POST":
+        username = (request.form.get("username") or "").strip()
+        code = (request.form.get("code") or "").strip()
+        password = request.form.get("password") or ""
+        password2 = request.form.get("password2") or ""
+
+        if not username or not code or not password or not password2:
+            flash("Alle feltene må fylles ut.")
+            return redirect(url_for("main.reset_password"))
+
+        if len(password) < 8:
+            flash("Passord må være minst 8 tegn.")
+            return redirect(url_for("main.reset_password"))
+
+        if password != password2:
+            flash("Passordene er ikke like.")
+            return redirect(url_for("main.reset_password"))
+
+        if not verify_reset_code(username, code):
+            flash("Ugyldig eller utløpt kode.")
+            return redirect(url_for("main.reset_password"))
+
+        new_hash = generate_password_hash(password, method="pbkdf2:sha256")
+        set_password_hash(username, new_hash)
+        consume_reset_code(username, code)
+
+        flash("Passordet er oppdatert. Du kan logge inn nå.")
+        return redirect(url_for("main.login"))
+
+    return render_template("reset_password.html")
