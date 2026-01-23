@@ -314,3 +314,34 @@ Alle vesentlige endringer i prosjektet dokumenteres i denne filen.
 - Ingen endringer er gjort i `base.html`.
 - Ingen CSS-, JavaScript- eller backend-funksjonalitet er endret.
 - Endringen er bevisst isolert til én template for å unngå regresjoner.
+
+
+# Changelog
+
+## 2026-01-23
+
+### Added
+- Egen autentiserings-layout (`auth_base.html`) for innlogging og registrering
+- Visuelt adskilt innlogging/registrering fra resten av applikasjonen
+- Hero-seksjon på autentiseringssider med:
+  - Bakgrunnsbilde
+  - Mørk gradient-overlay
+  - Funksjonspills (24/7 Support, Secure Access, Expert Team)
+- Fanebasert navigasjon mellom **Login** og **Sign Up**
+- Felles design og struktur for alle auth-sider
+
+### Changed
+- Flyttet innlogging og registrering ut av hovedlayout (`base.html`)
+- Sørget for at dashboard, tickets, varsler og innstillinger kun vises etter innlogging
+- Autentiseringssider arver ikke sidebar eller topbar
+- Forbedret visuell konsistens og profesjonelt førstetrykk
+
+### Fixed
+- Fjernet uønsket visning av dashboard-/app-elementer på innloggingssiden
+- Forhindret at navigasjon og sidebar vises før bruker er autentisert
+- Ryddet opp i layout-arv som tidligere gjorde at alt ble vist på samme side
+
+### Notes
+- Ingen endringer er gjort i `base.html` for applikasjonssidene
+- Endringen er isolert til autentisering (`auth_base.html`, login- og register-templates)
+- Backend-logikk for innlogging, sesjon og sikkerhet er ikke endret
