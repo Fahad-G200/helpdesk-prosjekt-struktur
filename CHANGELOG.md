@@ -345,3 +345,23 @@ Alle vesentlige endringer i prosjektet dokumenteres i denne filen.
 - Ingen endringer er gjort i `base.html` for applikasjonssidene
 - Endringen er isolert til autentisering (`auth_base.html`, login- og register-templates)
 - Backend-logikk for innlogging, sesjon og sikkerhet er ikke endret
+
+
+## [2026-01-23]
+
+### Added
+- Fullt fungerende admin-sider for:
+  - Brukeradministrasjon
+  - Sakshåndtering (inkl. bulk handlinger)
+  - Kunnskapsbase-administrasjon
+  - Systeminnstillinger
+- Manglende templates for admin-funksjoner ble lagt til
+
+### Fixed
+- Fikset Internal Server Error ved klikk på admin-menyvalg
+- Rettet feil med manglende eller feil-koblede Flask-ruter
+- Fjernet dupliserte view-funksjoner som førte til endpoint-kollisjoner
+
+### Improved
+- Admin-menyen fungerer nå konsekvent uten å endre eksisterende UI eller design
+- Backend og templates er nå korrekt synkronisert
