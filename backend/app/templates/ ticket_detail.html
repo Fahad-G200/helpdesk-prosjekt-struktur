@@ -1,0 +1,27 @@
+<h3>Vedlegg:</h3>
+
+{% if attachments and attachments|length > 0 %}
+  <ul>
+    {% for att in attachments %}
+      <li style="margin-bottom:12px;">
+        {% set fn = (att.original_filename or '')|lower %}
+
+        {% if fn.endswith('.jpg') or fn.endswith('.jpeg') or fn.endswith('.png') or fn.endswith('.gif') or fn.endswith('.webp') %}
+          <a href="{{ url_for('main.download_attachment', attachment_id=att.id) }}" target="_blank" rel="noopener">
+            <img
+              src="{{ url_for('main.download_attachment', attachment_id=att.id) }}"
+              alt="{{ att.original_filename }}"
+              style="max-width:220px; height:auto; display:block; margin:6px 0;"
+            >
+          </a>
+        {% endif %}
+
+        <a href="{{ url_for('main.download_attachment', attachment_id=att.id) }}" target="_blank" rel="noopener">
+          {{ att.original_filename }}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>Ingen vedlegg.</p>
+{% endif %}

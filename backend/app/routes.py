@@ -725,6 +725,28 @@ def delete_ticket_permanently(ticket_id: int):
     return redirect(url_for("main.admin_tickets"))
 
 
+@bp.route("/tickets/<int:ticket_id>")
+def ticket_detail(ticket_id: int):
+    user = current_user()
+    if not user:
+        return redirect(url_for("main.login"))
+
+    t = get_ticket(ticket_id)
+    if not t:
+        abort(404)
+
+    role = current_role()
+    if role != "support" and t["owner"] != user:
+        abort(403)
+
+    attachments = get_attachments(ticket_id)
+
+    return render_template(
+        "ticket_detail.html",
+        ticket=t,
+        attachments=attachments
+    )
+
 # -----------------------------
 # ADMIN: Knowledge Base Management
 # -----------------------------
