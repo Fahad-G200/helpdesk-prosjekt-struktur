@@ -122,10 +122,6 @@
   </form>
 </div>
 
-<script>
-  document.getElementById('selectAll').addEventListener('change', function() {
-    document.querySelectorAll('.ticketCheckbox').forEach(cb => cb.checked = this.checked);
-  });
-</script>
+<script src="{{ url_for('static', filename='js/admin.js') }}" defer></script>
 
 {% endblock %}
