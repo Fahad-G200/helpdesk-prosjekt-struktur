@@ -274,6 +274,15 @@ def activity_log():
     return render_template("logs.html", log_entries=entries)
 
 
+# Chatbot page (dedicated chat interface)
+@bp.route("/chatbot")
+def chatbot_page():
+    if not current_user():
+        return redirect(url_for("main.login"))
+    
+    return render_template("chatbot.html")
+
+
 # -----------------------------
 # Tickets
 # -----------------------------
@@ -920,17 +929,28 @@ def admin_settings():
         support_email = (request.form.get("support_email") or "").strip() or "support@helpdesk.no"
         max_file_size = (request.form.get("max_file_size") or "").strip() or "16"
 
-        set_system_settings(system_name, support_email, max_file_size)
-
-        flash("Innstillinger lagret.")
         try:
-            log_activity(user, "Endret systeminnstillinger")
-        except Exception:
-            pass
+            set_system_settings(system_name, support_email, max_file_size)
+            flash("Innstillinger lagret.")
+            try:
+                log_activity(user, "Endret systeminnstillinger")
+            except Exception:
+                pass
+            return redirect(url_for("main.admin_settings"))
+        except Exception as e:
+            logger.error(f"Error saving system settings: {e}")
+            flash("Kunne ikke lagre innstillinger.")
 
-        return redirect(url_for("main.admin_settings"))
-
-    settings = get_system_settings()
+    try:
+        settings = get_system_settings()
+    except Exception as e:
+        logger.error(f"Error loading system settings: {e}")
+        settings = {
+            "system_name": "IT Helpdesk",
+            "support_email": "support@helpdesk.no",
+            "max_file_size": "16",
+        }
+    
     return render_template("admin_settings.html", settings=settings) 
 
 
@@ -1739,6 +1759,21 @@ def get_bot() -> IntelligentHelpdeskAI:
     return _bot_instance
 
 
+def sanitize_chat_reply(text: str) -> str:
+    """Remove markdown formatting from chat reply"""
+    # Remove bold: ** text ** → text
+    text = re.sub(r'\*\*([^*]+)\*\*', r'\1', text)
+    # Remove italic: _ text _ or * text * → text
+    text = re.sub(r'__([^_]+)__', r'\1', text)
+    text = re.sub(r'\*([^*]+)\*', r'\1', text)
+    text = re.sub(r'_([^_]+)_', r'\1', text)
+    # Remove backticks/code: `text` → text
+    text = re.sub(r'`([^`]+)`', r'\1', text)
+    # Remove heading markers (###, ##, #) at start of line
+    text = re.sub(r'^#+\s+', '', text, flags=re.MULTILINE)
+    return text
+
+
 @bp.route("/chat", methods=["POST"])
 def chat():
     """AI-powered chat endpoint"""
@@ -1750,7 +1785,7 @@ def chat():
         user_msg = (data.get("message") or "").strip()
 
         if not user_msg:
-            return jsonify({"reply": "Skriv hva du trenger hjelp med, så hjelper jeg deg! 😊"})
+            return jsonify({"reply": "Skriv hva du trenger hjelp med, så hjelper jeg deg!"})
 
         if "ai_chat_state" not in session:
             session["ai_chat_state"] = {
@@ -1765,6 +1800,9 @@ def chat():
 
         bot = get_bot()
         reply, updated_state = bot.process_message(user_msg, conversation_state)
+
+        # Remove markdown from reply
+        reply = sanitize_chat_reply(reply)
 
         session["ai_chat_state"] = updated_state
         session.modified = True
@@ -1787,8 +1825,9 @@ def chat():
     except Exception as e:
         logger.error(f"Chat AI error: {e}")
         return jsonify({
-            "reply": "😅 Oops! Noe gikk galt i mitt AI-hode. Prøv igjen, eller opprett en support-sak hvis problemet fortsetter."
+            "reply": "Oops! Noe gikk galt i mitt AI-hode. Prøv igjen, eller opprett en support-sak hvis problemet fortsetter."
         }), 500
+
 
 
 @bp.route("/chat/reset", methods=["POST"])
