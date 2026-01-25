@@ -408,3 +408,82 @@ Alle vesentlige endringer i prosjektet dokumenteres i denne filen.
 ### Notes
 - Ingen endringer i design/layout.
 - Ingen endringer i database, routes eller forretningslogikk – kun tekst/kommunikasjon.
+
+
+# Changelog
+
+## [Unreleased]
+
+###  Features
+
+#### Passordreset - Admin-styrt system
+- Oppdatert all UI-tekst for å reflektere at admin nå styrer passordreset manuelt
+- Sjonert brukeren til å kontakte IT-support istedenfor automatisk SMS/e-post
+- Fjernet alle henvisninger til automatisk kodegenerering fra glemt-passord siden
+- Klarere flash-meldinger når admin genererer nytt passord for bruker
+
+#### Kunnskapsbase - Visuell redesign
+- Omdesignet KB-liste som responsiv grid av article cards
+- Legget til støtte for cover-bilder på artikler (`cover_url` i database)
+- Implementert safe database-migrering for eksisterende systemer
+- Ny artikkelside med:
+  - Stor cover-image banner øverst (eller gradient-ikon som fallback)
+  - Auto-generert innholdsfortegnelse basert på H2/H3-overskrifter
+  - Maksimum artikkelbredde (900px) for bedre lesbarhet
+  - Forbedret typografi: større linjeavstand, stiliserte kodeblokker, sitater
+  - "Tilbake til kunnskapsbase"-knapp
+- Admin kan oppgi cover-bilde URL når de oppretter/redigerer artikler
+- Responsive grid med fallback-ikon for artikler uten cover-bilde
+
+#### Vedlegg på saker - Full implementering
+- Ny route `/attachments/<int:attachment_id>/view` for inline visning av bilder
+- Vedlegg lagres nå i database automatisk ved opprettelse og opplasting
+- Brukere kan laste opp flere vedlegg samtidig
+- Thumbnails for bilder (JPG, PNG, GIF, WebP) som åpnes i ny fane ved klikk
+- Andre filtyper (PDF, DOCX) vises som nedlastbare lenker
+- Access control: kun sakseier eller support kan se vedlegg
+- Opplastingshistorikk logges for audit trail
+- Støtt for filtyper: JPG, JPEG, PNG, GIF, WebP, PDF, DOC, DOCX, TXT (maks 16 MB)
+
+### Technical Changes
+
+#### Database
+- `articles`: Lagt til `cover_url TEXT` kolonne med safe migration
+- `articles`: `get_articles()` nå returnerer `cover_url` og `content` for utdrag
+- Vedlegg lagres konsekvent i database via `add_attachment()`
+
+#### Routes
+- Ny `view_attachment()` route for inline bildevisning
+- Oppdatert `upload_attachment()` til å lagre i DB
+- Oppdatert `tickets()` POST handler for å håndtere multiple vedlegg
+- Oppdatert `create_article_view()` og `edit_article_view()` for `cover_url`
+
+#### Templates
+- Redesignet `kb.html` - Grid layout med cards
+- Redesignet `view_article.html` - Bedre lesbarhet, cover-image, TOC
+- Oppdatert `create_article.html` og `edit_article.html` - Cover URL input
+- Oppdatert `_tickets.html` - Vedleggsseksjon med thumbnails
+- Oppdatert `forgot_password.html` - Klarere instruksjoner
+- Oppdatert `reset_password.html` - Advarsel om kodekrav
+
+#### Config
+- Lagt til `'webp'` til `ALLOWED_EXTENSIONS`
+
+### UI/UX Improvements
+
+- KB-artikler nå visuelt mer engasjerende med farger, ikoner, bilder
+- Vedlegg på saker vises som thumbnails-grid i stedet for bare lenker
+- Bedre kontrast og lesbarhet på artikler (linjeavstand, skriftstørrelse)
+- Konsekvent mørk UI-stil, ingen breaking design-changes
+- Responsive design for alle nye komponenter (mobile-friendly)
+
+### Security & Access Control
+
+- `view_attachment()` sjekker tilgang (sakseier eller support)
+- Vedleggupload sjekker filtyper via whitelist
+- Opplastingshistorikk logges for audit
+- Admin kan ikke se andre brukeres private vedlegg
+
+###  All Changes Syntax Verified
+- Python-syntaks validert: `routes.py`, `db.py`, `init_db.py`, `config.py`
+- No breaking changes to existing functionality
