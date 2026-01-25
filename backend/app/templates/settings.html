@@ -29,6 +29,18 @@
     </p>
 
     <p>
+      <label for="email">E-postadresse</label>
+      <input
+        id="email"
+        name="email"
+        type="email"
+        placeholder="din.email@eksempel.no"
+        value="{{ preferences.email or '' }}"
+      />
+      <div class="help">Brukes for passordbytte og viktige varsler.</div>
+    </p>
+
+    <p>
       <label for="phone">Telefonnummer (for SMS)</label>
       <input
         id="phone"

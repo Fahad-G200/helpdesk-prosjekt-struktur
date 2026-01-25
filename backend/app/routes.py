@@ -237,6 +237,7 @@ def settings():
         notify_inapp = 1 if request.form.get("notify_inapp") else 0
         notify_sms = 1 if request.form.get("notify_sms") else 0
         phone = request.form.get("phone", "").strip() or None
+        email = request.form.get("email", "").strip() or None
 
         try:
             update_preferences(
@@ -246,6 +247,18 @@ def settings():
                 notify_sms,
                 phone
             )
+            # Update email separately if provided
+            if email:
+                try:
+                    from .db import _conn
+                    conn = _conn()
+                    cur = conn.cursor()
+                    cur.execute("UPDATE users SET email = ? WHERE username = ?", (email, user))
+                    conn.commit()
+                    conn.close()
+                except Exception as e:
+                    logger.error(f"Email update error: {e}")
+            
             log_activity(user, "Endret varselinnstillinger")
             flash("Innstillinger oppdatert.")
         except Exception as e:
@@ -1852,7 +1865,6 @@ def reset_chat():
 
 @bp.route("/forgot-password", methods=["GET", "POST"])
 def forgot_password():
-    # Ingen design-endring: bare ny side.
     if request.method == "POST":
         username = (request.form.get("username") or "").strip()
         u = get_user(username) if username else None
@@ -1866,21 +1878,29 @@ def forgot_password():
         email = (u.get("email") or "").strip()
         phone = (u.get("phone") or "").strip()
 
-        if email:
-            code = create_reset_code(username, "email", email)
-            body = (
-                f"Hei!\n\n"
-                f"Her er koden din for å bytte passord: {code}\n"
-                f"Koden er gyldig i 15 minutter.\n\n"
-                f"Gå til: {request.url_root.rstrip('/')}{url_for('main.reset_password')} \n"
-            )
-            send_email(email, "Passordbytte – IT Helpdesk", body)
-            flash("Hvis brukeren finnes, har vi sendt en kode for passordbytte.")
-            return redirect(url_for("main.login"))
+        try:
+            if email:
+                code = create_reset_code(username, "email", email)
+                body = (
+                    f"Hei!\n\n"
+                    f"Her er koden din for å bytte passord: {code}\n"
+                    f"Koden er gyldig i 15 minutter.\n\n"
+                    f"Gå til: {request.url_root.rstrip('/')}{url_for('main.reset_password')} \n"
+                )
+                # Fixed parameter order: subject, body, to_email
+                send_email("Passordbytte – IT Helpdesk", body, email)
+                flash("Hvis brukeren finnes, har vi sendt en kode for passordbytte.")
+                return redirect(url_for("main.login"))
 
-        if phone:
-            code = create_reset_code(username, "sms", phone)
-            send_sms(phone, f"IT Helpdesk: Kode for passordbytte: {code} (gyldig i 15 min)")
+            if phone:
+                code = create_reset_code(username, "sms", phone)
+                send_sms(phone, f"IT Helpdesk: Kode for passordbytte: {code} (gyldig i 15 min)")
+                flash("Hvis brukeren finnes, har vi sendt en kode for passordbytte.")
+                return redirect(url_for("main.login"))
+        
+        except Exception as e:
+            logger.error(f"Forgot password error: {e}")
+            # Still show safe message even if sending fails
             flash("Hvis brukeren finnes, har vi sendt en kode for passordbytte.")
             return redirect(url_for("main.login"))
 
@@ -1910,15 +1930,21 @@ def reset_password():
             flash("Passordene er ikke like.")
             return redirect(url_for("main.reset_password"))
 
-        if not verify_reset_code(username, code):
-            flash("Ugyldig eller utløpt kode.")
+        try:
+            if not verify_reset_code(username, code):
+                flash("Ugyldig eller utløpt kode.")
+                return redirect(url_for("main.reset_password"))
+
+            new_hash = generate_password_hash(password, method="pbkdf2:sha256")
+            set_password_hash(username, new_hash)
+            consume_reset_code(username, code)
+
+            flash("Passordet er oppdatert. Du kan logge inn nå.")
+            return redirect(url_for("main.login"))
+        
+        except Exception as e:
+            logger.error(f"Reset password error: {e}")
+            flash("Noe gikk galt ved passordbytte. Prøv igjen eller kontakt support.")
             return redirect(url_for("main.reset_password"))
-
-        new_hash = generate_password_hash(password, method="pbkdf2:sha256")
-        set_password_hash(username, new_hash)
-        consume_reset_code(username, code)
-
-        flash("Passordet er oppdatert. Du kan logge inn nå.")
-        return redirect(url_for("main.login"))
 
     return render_template("reset_password.html")
