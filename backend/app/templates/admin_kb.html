@@ -1,70 +1,43 @@
 {% extends "base.html" %}
 {% block content %}
-
-<div class="card">
-  <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
-    <div>
-      <h1>📚 KB Admin</h1>
-      <p class="muted">Administrer kunnskapsbaseartikler</p>
-    </div>
-
-    <a href="{{ url_for('main.create_article_view') }}"
-       style="background:#10b981; color:#fff; padding:10px 16px; border-radius:12px; text-decoration:none; font-weight:900;">
-      + Ny artikkel
-    </a>
+<div class="card" style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+  <div>
+    <h1>📚 KB Admin</h1>
+    <p class="muted">Administrer kunnskapsbaseartikler</p>
   </div>
+  <a class="btn" href="{{ url_for('main.create_article_view') }}" style="padding:10px 14px; border-radius:12px;">+ Ny artikkel</a>
 </div>
 
 <div class="card">
   <table style="width:100%; border-collapse:collapse;">
     <thead>
-      <tr style="background:rgba(148,163,184,.06); border-bottom:1px solid rgba(148,163,184,.14);">
+      <tr style="border-bottom:1px solid rgba(148,163,184,.18);">
         <th style="padding:12px; text-align:left;">ID</th>
         <th style="padding:12px; text-align:left;">Tittel</th>
         <th style="padding:12px; text-align:left;">Forfatter</th>
         <th style="padding:12px; text-align:left;">Opprettet</th>
-        <th style="padding:12px; text-align:right;">Handlinger</th>
+        <th style="padding:12px; text-align:right;">Handling</th>
       </tr>
     </thead>
     <tbody>
       {% for a in articles %}
       <tr style="border-bottom:1px solid rgba(148,163,184,.10);">
         <td style="padding:12px;"><strong>#{{ a.id }}</strong></td>
-        <td style="padding:12px;">
-          <a href="{{ url_for('main.view_article', article_id=a.id) }}" style="color:#60a5fa; font-weight:900; text-decoration:none;">
-            {{ a.title }}
-          </a>
-        </td>
+        <td style="padding:12px;">{{ a.title }}</td>
         <td style="padding:12px; color:#94a3b8;">{{ a.author }}</td>
         <td style="padding:12px; color:#94a3b8;">{{ a.created_at }}</td>
         <td style="padding:12px; text-align:right;">
-          <div style="display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap;">
-            <a href="{{ url_for('main.view_article', article_id=a.id) }}"
-               style="background:#3b82f6; color:#fff; padding:6px 12px; border-radius:10px; text-decoration:none; font-size:12px; font-weight:900;">
-              👁️ Vis
-            </a>
-
-            <a href="{{ url_for('main.edit_article_view', article_id=a.id) }}"
-               style="background:#f59e0b; color:#fff; padding:6px 12px; border-radius:10px; text-decoration:none; font-size:12px; font-weight:900;">
-              ✏️ Rediger
-            </a>
-
-            <form method="post" action="{{ url_for('main.delete_article', article_id=a.id) }}" style="display:inline;"
-                  onsubmit="return confirm('Slette artikkel #{{ a.id }}?');">
-              <button type="submit" style="background:#ef4444; padding:6px 12px; font-size:12px;">🗑️ Slett</button>
-            </form>
-          </div>
+          <a class="btn" href="{{ url_for('main.view_article', article_id=a.id) }}" style="padding:8px 12px; border-radius:12px;">Åpne</a>
+          <a class="btn" href="{{ url_for('main.edit_article_view', article_id=a.id) }}" style="padding:8px 12px; border-radius:12px; margin-left:8px;">Rediger</a>
         </td>
       </tr>
       {% endfor %}
-
       {% if articles|length == 0 %}
       <tr>
-        <td colspan="5" style="padding:14px; color:#94a3b8;">Ingen artikler å vise.</td>
+        <td colspan="5" style="padding:12px; color:#94a3b8;">Ingen artikler å vise.</td>
       </tr>
       {% endif %}
     </tbody>
   </table>
 </div>
-
 {% endblock %}

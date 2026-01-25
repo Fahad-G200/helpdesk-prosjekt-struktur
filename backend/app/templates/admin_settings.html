@@ -1,24 +1,22 @@
 {% extends "base.html" %}
 {% block content %}
-
 <div class="card">
   <h1>🛠️ Systeminnstillinger</h1>
-  <p class="muted">Systemside for admin (support). Du kan utvide senere.</p>
+  <p class="muted">Disse lagres i databasen.</p>
 </div>
 
 <div class="card">
-  <form method="post" action="{{ url_for('main.admin_settings') }}">
+  <form method="post">
     <label>Systemnavn</label>
-    <input type="text" name="system_name" value="IT Helpdesk">
+    <input type="text" name="system_name" value="{{ settings.get('system_name', 'IT Helpdesk') }}" placeholder="IT Helpdesk">
 
     <label>Support e-post</label>
-    <input type="email" name="support_email" value="support@helpdesk.no">
+    <input type="email" name="support_email" value="{{ settings.get('support_email', 'support@helpdesk.no') }}" placeholder="support@helpdesk.no">
 
     <label>Maks filstørrelse (MB)</label>
-    <input type="number" name="max_file_size" value="16">
+    <input type="number" name="max_file_size" value="{{ settings.get('max_file_size', '16') }}" placeholder="16">
 
-    <button type="submit" style="background:#10b981;">💾 Lagre</button>
+    <button type="submit">Lagre</button>
   </form>
 </div>
-
 {% endblock %}

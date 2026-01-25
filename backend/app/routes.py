@@ -658,7 +658,7 @@ def admin_system():
     if current_role() != "support":
         abort(403)
 
-    return render_template("admin_settings.html")
+    return redirect(url_for("main.admin_settings"))
 
 
 # Alias-navn (i tilfelle base.html bruker andre url_for-navn/URL-er)
@@ -685,13 +685,6 @@ def admin_saker():
 @bp.route("/admin/systeminnstillinger")
 def systeminnstillinger():
     return admin_system()
-
-
-
-
-
-
-
 # -----------------------------
 # ADMIN: Ticket Management
 # -----------------------------
@@ -824,7 +817,7 @@ def create_article_view():
 
     if request.method == "POST":
         title = request.form.get("title", "").strip()
-        content = request.form.get("content", "").strip()
+        content = (request.form.get("content") or request.form.get("body") or "").strip()
 
         if not title or not content:
             flash("Tittel og innhold er påkrevd.")
@@ -920,12 +913,25 @@ def admin_settings():
     if not user or current_role() != "support":
         abort(403)
 
-    if request.method == "POST":
-        # Dette kan utvides med faktiske systeminnstillinger senere
-        flash("Innstillinger lagret.")
-        log_activity(user, "Endret systeminnstillinger")
+    from .db import get_system_settings, set_system_settings
 
-    return render_template("admin_settings.html")
+    if request.method == "POST":
+        system_name = (request.form.get("system_name") or "").strip() or "IT Helpdesk"
+        support_email = (request.form.get("support_email") or "").strip() or "support@helpdesk.no"
+        max_file_size = (request.form.get("max_file_size") or "").strip() or "16"
+
+        set_system_settings(system_name, support_email, max_file_size)
+
+        flash("Innstillinger lagret.")
+        try:
+            log_activity(user, "Endret systeminnstillinger")
+        except Exception:
+            pass
+
+        return redirect(url_for("main.admin_settings"))
+
+    settings = get_system_settings()
+    return render_template("admin_settings.html", settings=settings) 
 
 
 # -----------------------------
@@ -975,6 +981,28 @@ def bulk_delete_tickets():
 
     return redirect(url_for("main.admin_tickets"))
 
+
+# -----------------------------
+# Alias-ruter (norske sidebar-lenker)
+# -----------------------------
+@bp.route("/admin/systeminnstillinger")
+def admin_systeminnstillinger_alias():
+    return redirect(url_for("main.admin_settings"))
+
+
+@bp.route("/admin/saker")
+def admin_saker_alias():
+    return redirect(url_for("main.admin_tickets"))
+
+
+@bp.route("/admin/kb-admin")
+def admin_kb_alias():
+    return redirect(url_for("main.admin_kb"))
+
+
+@bp.route("/admin/users-admin")
+def admin_users_alias():
+    return redirect(url_for("main.admin_users"))
 
 
 # -----------------------------

@@ -133,6 +133,14 @@ def init_db() -> None:
         )
     """)
 
+    # SYSTEM SETTINGS
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS system_settings (
+            key TEXT PRIMARY KEY,
+            value TEXT NOT NULL
+        )
+    """)
+
     # Opprett admin/support uten hardkodet passord
     cur.execute("SELECT 1 FROM users WHERE username = 'admin'")
     if not cur.fetchone():
@@ -993,5 +1001,157 @@ def delete_ticket_db(ticket_id: int) -> None:
     except Exception:
         pass
     cur.execute("DELETE FROM tickets WHERE id = ?", (ticket_id,))
+    conn.commit()
+    conn.close()
+
+    import secrets
+from datetime import datetime, timedelta
+
+def get_system_setting(key: str, default: str = "") -> str:
+    conn = _conn()
+    cur = conn.cursor()
+    cur.execute("SELECT value FROM system_settings WHERE key=?", (key,))
+    row = cur.fetchone()
+    return (row["value"] if row else default) or default
+
+def set_system_setting(key: str, value: str) -> None:
+    conn = _conn()
+    cur = conn.cursor()
+    cur.execute(
+        "INSERT INTO system_settings(key,value) VALUES(?,?) "
+        "ON CONFLICT(key) DO UPDATE SET value=excluded.value",
+        (key, value)
+    )
+    conn.commit()
+    conn.close()
+
+def get_system_settings_defaults() -> dict:
+    return {
+        "system_name": get_system_setting("system_name", "IT Helpdesk"),
+        "support_email": get_system_setting("support_email", "support@helpdesk.no"),
+        "max_file_size": get_system_setting("max_file_size", "16"),
+    }
+
+def set_password_hash(username: str, pw_hash: str) -> None:
+    conn = _conn()
+    cur = conn.cursor()
+    cur.execute("UPDATE users SET pw_hash=? WHERE username=?", (pw_hash, username))
+    conn.commit()
+    conn.close()
+
+def create_reset_code(username: str, channel: str, destination: str, minutes_valid: int = 15) -> str:
+    code = f"{secrets.randbelow(1000000):06d}"  # 6 siffer
+    expires = (datetime.utcnow() + timedelta(minutes=minutes_valid)).strftime("%Y-%m-%d %H:%M:%S")
+    conn = _conn()
+    cur = conn.cursor()
+    cur.execute(
+        "INSERT INTO password_resets(username, code, channel, destination, expires_at, consumed) "
+        "VALUES(?,?,?,?,?,0)",
+        (username, code, channel, destination, expires)
+    )
+    conn.commit()
+    conn.close()
+    return code
+
+def verify_reset_code(username: str, code: str) -> bool:
+    conn = _conn()
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT * FROM password_resets WHERE username=? AND code=? AND consumed=0 "
+        "ORDER BY id DESC LIMIT 1",
+        (username, code)
+    )
+    row = cur.fetchone()
+    conn.close()
+    if not row:
+        return False
+    try:
+        exp = datetime.strptime(row["expires_at"], "%Y-%m-%d %H:%M:%S")
+    except Exception:
+        return False
+    return datetime.utcnow() <= exp
+
+def consume_reset_code(username: str, code: str) -> None:
+    conn = _conn()
+    cur = conn.cursor()
+    cur.execute(
+        "UPDATE password_resets SET consumed=1 WHERE username=? AND code=?",
+        (username, code)
+    )
+    conn.commit()
+    conn.close()
+
+
+def get_all_users():
+    conn = _conn()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT username, role, email, created_at, last_login
+        FROM users
+        ORDER BY username ASC
+    """)
+    rows = cur.fetchall()
+    conn.close()
+    return rows
+
+
+def change_user_role(username: str, role: str):
+    conn = _conn()
+    cur = conn.cursor()
+    cur.execute("UPDATE users SET role=? WHERE username=?", (role, username))
+    conn.commit()
+    conn.close()
+
+
+def delete_user_db(username: str):
+    conn = _conn()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM users WHERE username=?", (username,))
+    conn.commit()
+    conn.close()
+
+
+# -------------------------
+# SYSTEM SETTINGS
+# -------------------------
+def get_system_settings() -> Dict[str, str]:
+    """Hent alle systeminnstillinger med defaults"""
+    conn = _conn()
+    cur = conn.cursor()
+    cur.execute("SELECT key, value FROM system_settings")
+    rows = cur.fetchall()
+    conn.close()
+    
+    defaults = {
+        "system_name": "IT Helpdesk",
+        "support_email": "support@helpdesk.no",
+        "max_file_size": "16",
+    }
+    
+    result = dict(defaults)
+    for key, value in rows:
+        if key in result:
+            result[key] = value
+    
+    return result
+
+
+def set_system_settings(system_name: str, support_email: str, max_file_size: str) -> None:
+    """Lagre systeminnstillinger (upsert)"""
+    conn = _conn()
+    cur = conn.cursor()
+    
+    settings = {
+        "system_name": system_name or "IT Helpdesk",
+        "support_email": support_email or "support@helpdesk.no",
+        "max_file_size": max_file_size or "16",
+    }
+    
+    for key, value in settings.items():
+        cur.execute(
+            "INSERT OR REPLACE INTO system_settings (key, value) VALUES (?, ?)",
+            (key, str(value))
+        )
+    
     conn.commit()
     conn.close()

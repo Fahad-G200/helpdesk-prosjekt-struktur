@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h1>📝 Ny artikkel</h1>
+  <p class="muted">Opprett en ny kunnskapsbaseartikkel</p>
+</div>
+
+<div class="card">
+  <form method="post">
+    <label>Tittel</label>
+    <input type="text" name="title" required placeholder="F.eks. Feide-innlogging fungerer ikke">
+
+    <label>Innhold</label>
+    <textarea name="content" rows="14" required placeholder="Skriv artikkelen her..."></textarea>
+
+    <button type="submit">Lagre</button>
+    <a class="btn" href="{{ url_for('main.admin_kb') }}" style="margin-left:10px; padding:10px 14px; border-radius:12px; text-decoration:none;">Avbryt</a>
+  </form>
+</div>
+{% endblock %}
