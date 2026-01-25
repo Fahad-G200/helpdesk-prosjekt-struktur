@@ -1,12 +1,18 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="card">
-  <h2>Rediger artikkel</h2>
+  <h2>✏️ Rediger artikkel</h2>
   <form method="post">
     <label>Tittel</label>
     <input name="title" value="{{ article.title }}" required>
+
+    <label>Cover image URL (valgfri)</label>
+    <input type="url" name="cover_url" value="{{ article.cover_url or '' }}" placeholder="https://example.com/image.jpg">
+    <p class="muted" style="font-size:12px; margin-top:-4px;">Hvis du ikke oppgir cover-bilde, vises en standard ikon.</p>
+
     <label>Innhold</label>
     <textarea name="content" rows="10" required>{{ article.content }}</textarea>
+
     <button type="submit">Lagre</button>
     <a class="btn btn-secondary" href="{{ url_for('main.view_article', article_id=article.id) }}">Avbryt</a>
   </form>

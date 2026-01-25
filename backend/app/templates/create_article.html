@@ -10,8 +10,12 @@
     <label>Tittel</label>
     <input type="text" name="title" required placeholder="F.eks. Feide-innlogging fungerer ikke">
 
+    <label>Cover image URL (valgfri)</label>
+    <input type="url" name="cover_url" placeholder="https://example.com/image.jpg">
+    <p class="muted" style="font-size:12px; margin-top:-4px;">Hvis du ikke oppgir cover-bilde, vises en standard ikon.</p>
+
     <label>Innhold</label>
-    <textarea name="content" rows="14" required placeholder="Skriv artikkelen her..."></textarea>
+    <textarea name="content" rows="14" required placeholder="Skriv artikkelen her. Du kan bruke Markdown-formatering (overskrifter, lister, osv)."></textarea>
 
     <button type="submit">Lagre</button>
     <a class="btn" href="{{ url_for('main.admin_kb') }}" style="margin-left:10px; padding:10px 14px; border-radius:12px; text-decoration:none;">Avbryt</a>

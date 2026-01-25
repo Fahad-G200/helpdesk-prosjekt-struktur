@@ -1,61 +1,214 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class="card">
-  <h1>Velkommen til Helpdesk</h1>
-  <p class="muted">
-    Start med nivå 1 (selvhjelp). Hvis det ikke løser problemet, gå videre til nivå 2.
-    Nivå 3 brukes når du må sende inn sak til support.
-  </p>
-  <div style="margin-top:12px;">
-    <a class="btn" href="#niva1">Start med nivå 1</a>
-    <a class="btn" href="{{ url_for('main.tickets') }}" style="margin-left:8px;">Gå til Mine saker</a>
+<style>
+  .kb-header {
+    margin-bottom: 28px;
+  }
+
+  .kb-header h1 {
+    font-size: 28px;
+    font-weight: 900;
+    margin: 0 0 8px;
+  }
+
+  .kb-header p {
+    color: #94a3b8;
+    margin: 0;
+  }
+
+  .kb-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .kb-card {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .kb-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    border-color: #475569;
+  }
+
+  .kb-card-cover {
+    width: 100%;
+    height: 160px;
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    overflow: hidden;
+  }
+
+  .kb-card-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .kb-card-cover.default {
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    color: white;
+  }
+
+  .kb-card-body {
+    padding: 16px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .kb-card-title {
+    font-weight: 700;
+    font-size: 15px;
+    color: #f1f5f9;
+    margin: 0 0 8px;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .kb-card-excerpt {
+    font-size: 13px;
+    color: #cbd5e1;
+    margin: 0 0 12px;
+    flex: 1;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .kb-card-meta {
+    font-size: 12px;
+    color: #94a3b8;
+    margin: 0;
+  }
+
+  .kb-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .kb-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px 20px;
+    color: #94a3b8;
+  }
+
+  .kb-levels {
+    margin-top: 32px;
+  }
+
+  .kb-level-card {
+    margin-bottom: 16px;
+    padding: 20px;
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+  }
+
+  .kb-level-card h2 {
+    margin: 0 0 12px;
+    font-size: 18px;
+  }
+
+  .kb-level-card p {
+    margin: 0 0 12px;
+    color: #cbd5e1;
+  }
+
+  .kb-level-card ul {
+    margin: 0;
+    padding-left: 20px;
+  }
+
+  .kb-level-card li {
+    color: #cbd5e1;
+    margin-bottom: 6px;
+  }
+</style>
+
+<div class="kb-header">
+  <h1>📚 Kunnskapsbase</h1>
+  <p>Finn svar og løsninger på vanlige problemer</p>
+</div>
+
+{% if articles %}
+<div class="kb-grid">
+  {% for article in articles %}
+  <a href="{{ url_for('main.view_article', article_id=article.id) }}" class="kb-card-link">
+    <div class="kb-card">
+      <div class="kb-card-cover {% if not article.cover_url %}default{% endif %}">
+        {% if article.cover_url %}
+          <img src="{{ article.cover_url }}" alt="{{ article.title }}">
+        {% else %}
+          📄
+        {% endif %}
+      </div>
+      <div class="kb-card-body">
+        <h3 class="kb-card-title">{{ article.title }}</h3>
+        <p class="kb-card-excerpt">{{ article.content[:140] }}{% if article.content|length > 140 %}...{% endif %}</p>
+        <p class="kb-card-meta">
+          <strong>{{ article.author }}</strong> · {{ article.created_at.split()[0] }}
+        </p>
+      </div>
+    </div>
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<div class="kb-grid">
+  <div class="kb-empty">Ingen artikler ennå.</div>
+</div>
+{% endif %}
+
+<div class="kb-levels">
+  <div class="kb-level-card" style="background: linear-gradient(to bottom, rgba(34, 197, 94, 0.1), transparent); border-color: #22c55e;">
+    <h2>🟢 Nivå 1 – Selvbetjening</h2>
+    <p>Dette er ting du kan prøve før du kontakter support.</p>
+    <ul>
+      <li><strong>Feide:</strong> Sjekk brukernavn/passord, velg riktig organisasjon, prøv inkognito-modus</li>
+      <li><strong>Wi-Fi/Nett:</strong> Slå av/på Wi-Fi, koble til riktig nettverk, restart enheten</li>
+      <li><strong>Utskrift:</strong> Velg riktig skriver, sjekk papir/toner, restart skriver og PC</li>
+    </ul>
   </div>
-</div>
 
-<div id="niva1" class="card level1">
-  <h2>🟢 Nivå 1 – Selvbetjening</h2>
-  <p>Dette er ting du kan prøve før du kontakter support.</p>
+  <div class="kb-level-card" style="background: linear-gradient(to bottom, rgba(202, 138, 4, 0.1), transparent); border-color: #ca8a04;">
+    <h2>🟡 Nivå 2 – Videre feilsøking</h2>
+    <p>Samle denne informasjonen før du går videre:</p>
+    <ul>
+      <li>Tidspunkt for feilen</li>
+      <li>Nøyaktig feilmelding eller skjermbilde</li>
+      <li>Hva du har prøvd (nivå 1)</li>
+      <li>Enhet/OS + nettleser</li>
+    </ul>
+  </div>
 
-  <h3>Feide</h3>
-  <ul>
-    <li>Sjekk brukernavn/passord (Caps Lock)</li>
-    <li>Velg riktig skole/organisasjon</li>
-    <li>Prøv inkognito/privat vindu</li>
-    <li>Tøm cache/cookies og prøv igjen</li>
-  </ul>
-
-  <h3>Wi-Fi / Nett</h3>
-  <ul>
-    <li>Slå Wi-Fi av/på</li>
-    <li>Koble til riktig nettverk</li>
-    <li>Restart enheten</li>
-  </ul>
-
-  <h3>Utskrift</h3>
-  <ul>
-    <li>Velg riktig skriver</li>
-    <li>Sjekk papir/toner</li>
-    <li>Restart skriver og PC</li>
-  </ul>
-</div>
-
-<div class="card level2">
-  <h2>🟡 Nivå 2 – Videre feilsøking</h2>
-  <p>Samle denne informasjonen før du går videre:</p>
-  <ul>
-    <li>Tidspunkt for feilen</li>
-    <li>Nøyaktig feilmelding</li>
-    <li>Skjermbilde av feilen</li>
-    <li>Hva du har prøvd (nivå 1)</li>
-    <li>Enhet/OS + nettleser</li>
-  </ul>
-</div>
-
-<div class="card level3">
-  <h2>🔴 Nivå 3 – Send inn sak</h2>
-  <p>Hvis nivå 1 og 2 ikke løser problemet, opprett en supportsak med god beskrivelse.</p>
-  <a class="btn" href="{{ url_for('main.tickets') }}">Opprett / se saker</a>
+  <div class="kb-level-card" style="background: linear-gradient(to bottom, rgba(239, 68, 68, 0.1), transparent); border-color: #ef4444;">
+    <h2>🔴 Nivå 3 – Send inn sak</h2>
+    <p>Hvis nivå 1 og 2 ikke løser problemet, opprett en supportsak med god beskrivelse.</p>
+    <a class="btn" href="{{ url_for('main.tickets') }}" style="display: inline-block;">Opprett / se saker</a>
+  </div>
 </div>
 
 {% endblock %}

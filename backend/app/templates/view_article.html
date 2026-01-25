@@ -1,15 +1,259 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="card">
-  <h2>{{ article.title }}</h2>
-  <p class="muted">Forfatter: {{ article.author }} | {{ article.created_at }}</p>
-  <div style="white-space: pre-wrap;">{{ article.content }}</div>
 
-  {% if role == "support" %}
-    <p style="margin-top:12px;">
-      <a href="{{ url_for('main.edit_article_view', article_id=article.id) }}">Rediger</a> |
-      <a href="{{ url_for('main.delete_article', article_id=article.id) }}" onclick="return confirm('Slette artikkel?');">Slett</a>
-    </p>
+<style>
+  .article-container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .article-header {
+    margin-bottom: 24px;
+  }
+
+  .article-back {
+    display: inline-block;
+    font-size: 13px;
+    color: #60a5fa;
+    text-decoration: none;
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+
+  .article-back:hover {
+    text-decoration: underline;
+  }
+
+  .article-cover {
+    width: 100%;
+    height: 300px;
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 72px;
+  }
+
+  .article-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .article-title {
+    font-size: 32px;
+    font-weight: 900;
+    margin: 0 0 12px;
+    color: #f1f5f9;
+    line-height: 1.2;
+  }
+
+  .article-meta {
+    display: flex;
+    gap: 16px;
+    font-size: 13px;
+    color: #94a3b8;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #334155;
+  }
+
+  .article-meta strong {
+    color: #cbd5e1;
+  }
+
+  .article-toc {
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 24px;
+  }
+
+  .article-toc-title {
+    font-weight: 700;
+    font-size: 13px;
+    color: #cbd5e1;
+    margin: 0 0 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .article-toc ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .article-toc li {
+    margin-bottom: 6px;
+  }
+
+  .article-toc a {
+    font-size: 13px;
+    color: #60a5fa;
+    text-decoration: none;
+  }
+
+  .article-toc a:hover {
+    text-decoration: underline;
+  }
+
+  .article-body {
+    font-size: 15px;
+    line-height: 1.8;
+    color: #cbd5e1;
+  }
+
+  .article-body h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #f1f5f9;
+    margin: 28px 0 12px;
+    padding-top: 12px;
+  }
+
+  .article-body h2:first-child {
+    margin-top: 0;
+  }
+
+  .article-body h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #f1f5f9;
+    margin: 20px 0 12px;
+  }
+
+  .article-body ul, .article-body ol {
+    margin: 12px 0;
+    padding-left: 24px;
+  }
+
+  .article-body li {
+    margin-bottom: 8px;
+  }
+
+  .article-body code {
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-family: 'Monaco', 'Courier New', monospace;
+    font-size: 13px;
+    color: #a1e8ff;
+  }
+
+  .article-body pre {
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 12px;
+    overflow-x: auto;
+    margin: 12px 0;
+  }
+
+  .article-body pre code {
+    background: none;
+    border: none;
+    padding: 0;
+  }
+
+  .article-body blockquote {
+    border-left: 4px solid #3b82f6;
+    padding-left: 12px;
+    margin: 12px 0;
+    color: #a1a1a1;
+  }
+
+  .article-footer {
+    margin-top: 32px;
+    padding-top: 20px;
+    border-top: 1px solid #334155;
+  }
+
+  .article-actions {
+    display: flex;
+    gap: 12px;
+  }
+
+  .article-actions a {
+    font-size: 13px;
+    padding: 8px 12px;
+    text-decoration: none;
+  }
+</style>
+
+<div class="article-container">
+  <a href="{{ url_for('main.kb') }}" class="article-back">← Tilbake til kunnskapsbase</a>
+
+  <div class="article-header">
+    {% if article.cover_url %}
+    <div class="article-cover">
+      <img src="{{ article.cover_url }}" alt="{{ article.title }}">
+    </div>
+    {% else %}
+    <div class="article-cover">📄</div>
+    {% endif %}
+
+    <h1 class="article-title">{{ article.title }}</h1>
+
+    <div class="article-meta">
+      <span><strong>Forfatter:</strong> {{ article.author }}</span>
+      <span><strong>Publisert:</strong> {{ article.created_at.split()[0] }}</span>
+      {% if article.updated_at %}
+      <span><strong>Oppdatert:</strong> {{ article.updated_at.split()[0] }}</span>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Innholdsfortegnelse (genereres fra H2-overskrifter) -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const bodyDiv = document.querySelector('.article-body');
+      const headings = bodyDiv ? bodyDiv.querySelectorAll('h2, h3') : [];
+      
+      if (headings.length > 0) {
+        const toc = document.getElementById('toc');
+        if (toc) {
+          const tocList = toc.querySelector('ul');
+          headings.forEach((h, idx) => {
+            const id = 'heading-' + idx;
+            h.id = id;
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.textContent = h.textContent;
+            li.style.paddingLeft = h.tagName === 'H3' ? '20px' : '0';
+            li.appendChild(a);
+            tocList.appendChild(li);
+          });
+        }
+      }
+    });
+  </script>
+
+  {% if article.content.count('## ') > 0 or article.content.count('### ') > 0 %}
+  <div class="article-toc" id="toc">
+    <div class="article-toc-title">📖 Innholdsfortegnelse</div>
+    <ul></ul>
+  </div>
   {% endif %}
+
+  <div class="article-body">
+    {{ article.content | safe }}
+  </div>
+
+  <div class="article-footer">
+    {% if role == "support" %}
+    <div class="article-actions">
+      <a href="{{ url_for('main.edit_article_view', article_id=article.id) }}" class="btn">✏️ Rediger</a>
+      <a href="{{ url_for('main.delete_article', article_id=article.id) }}" class="btn" onclick="return confirm('Slette denne artikkelen?');">🗑️ Slett</a>
+    </div>
+    {% endif %}
+  </div>
 </div>
+
 {% endblock %}

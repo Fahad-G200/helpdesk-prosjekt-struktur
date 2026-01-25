@@ -881,12 +881,13 @@ def create_article_view():
     if request.method == "POST":
         title = request.form.get("title", "").strip()
         content = (request.form.get("content") or request.form.get("body") or "").strip()
+        cover_url = request.form.get("cover_url", "").strip()
 
         if not title or not content:
             flash("Tittel og innhold er påkrevd.")
         else:
             try:
-                article_id = create_article(title, content, user)
+                article_id = create_article(title, content, user, cover_url or None)
                 log_activity(user, f"Opprettet KB-artikkel #{article_id}: {title}")
                 flash("Artikkel opprettet.")
                 return redirect(url_for("main.view_article", article_id=article_id))
@@ -934,12 +935,13 @@ def edit_article_view(article_id: int):
     if request.method == "POST":
         title = request.form.get("title", "").strip()
         content = request.form.get("content", "").strip()
+        cover_url = request.form.get("cover_url", "").strip()
 
         if not title or not content:
             flash("Tittel og innhold er påkrevd.")
         else:
             try:
-                update_article(article_id, title, content)
+                update_article(article_id, title, content, cover_url or None)
                 log_activity(user, f"Redigerte KB-artikkel #{article_id}")
                 flash("Artikkel oppdatert.")
                 return redirect(url_for("main.view_article", article_id=article_id))

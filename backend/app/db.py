@@ -414,12 +414,12 @@ def count_notifications(user: str) -> int:
 # -----------------------------
 # KNOWLEDGE BASE
 # -----------------------------
-def create_article(title: str, content: str, author: str) -> int:
+def create_article(title: str, content: str, author: str, cover_url: str = None) -> int:
     conn = _conn()
     cur = conn.cursor()
     cur.execute(
-        "INSERT INTO articles (title, content, author) VALUES (?, ?, ?)",
-        (title.strip(), content.strip(), author),
+        "INSERT INTO articles (title, content, author, cover_url) VALUES (?, ?, ?, ?)",
+        (title.strip(), content.strip(), author, (cover_url or "").strip() or None),
     )
     conn.commit()
     article_id = int(cur.lastrowid)
@@ -430,7 +430,7 @@ def create_article(title: str, content: str, author: str) -> int:
 def get_articles() -> List[Dict[str, Any]]:
     conn = _conn()
     cur = conn.cursor()
-    cur.execute("SELECT id, title, author, created_at FROM articles ORDER BY id DESC")
+    cur.execute("SELECT id, title, content, author, cover_url, created_at FROM articles ORDER BY id DESC")
     rows = cur.fetchall()
     conn.close()
     return [dict(r) for r in rows]
@@ -445,12 +445,12 @@ def get_article(article_id: int) -> Optional[Dict[str, Any]]:
     return dict(row) if row else None
 
 
-def update_article(article_id: int, title: str, content: str) -> None:
+def update_article(article_id: int, title: str, content: str, cover_url: str = None) -> None:
     conn = _conn()
     cur = conn.cursor()
     cur.execute(
-        "UPDATE articles SET title = ?, content = ?, updated_at = datetime('now') WHERE id = ?",
-        (title.strip(), content.strip(), article_id),
+        "UPDATE articles SET title = ?, content = ?, cover_url = ?, updated_at = datetime('now') WHERE id = ?",
+        (title.strip(), content.strip(), (cover_url or "").strip() or None, article_id),
     )
     conn.commit()
     conn.close()

@@ -53,10 +53,17 @@ def init_db() -> None:
             title TEXT NOT NULL,
             content TEXT NOT NULL,
             author TEXT NOT NULL,
+            cover_url TEXT,
             created_at TEXT NOT NULL DEFAULT (datetime('now')),
             updated_at TEXT
         )
     """)
+
+    # Migration: Legg til cover_url hvis kolonne mangler
+    try:
+        cur.execute("ALTER TABLE articles ADD COLUMN cover_url TEXT")
+    except sqlite3.OperationalError:
+        pass
 
     # --- NYTT: aktivitetslogg ---
     cur.execute("""
