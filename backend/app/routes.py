@@ -1753,7 +1753,13 @@ def chat():
             return jsonify({"reply": "Skriv hva du trenger hjelp med, så hjelper jeg deg! 😊"})
 
         if "ai_chat_state" not in session:
-            session["ai_chat_state"] = {}
+            session["ai_chat_state"] = {
+                "message_count": 0,
+                "last_topic": None,
+                "solutions_given": None,
+                "context_entities": {},
+                "user_requested_human": False
+            }
 
         conversation_state = session["ai_chat_state"]
 
