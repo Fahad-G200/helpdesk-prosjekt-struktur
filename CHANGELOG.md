@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-01-25
+### Refactoring
+- Flytt CSS fra templates til `static/css/app.css` og `static/css/auth.css`
+- Flytt JavaScript fra templates til `static/js/chatbot.js` og `static/js/admin.js`
+- Ryddigere kodestruktur, bedre vedlikehold
+- Ingen funksjons- eller visuelle endringer
+
 ## 2026-01-05
 - Opprettet prosjektstruktur med docs, backend og infra
 - Publiserte prosjektet til GitHub
