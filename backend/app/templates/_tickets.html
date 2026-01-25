@@ -1,6 +1,69 @@
 {% extends "base.html" %}
 {% block content %}
 
+<style>
+  .attachments-section {
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid #334155;
+  }
+
+  .attachments-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  .attachment-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .attachment-thumb {
+    max-width: 100px;
+    max-height: 100px;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+
+  .attachment-thumb:hover {
+    transform: scale(1.05);
+  }
+
+  .attachment-file {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 8px;
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #cbd5e1;
+  }
+
+  .attachment-file a {
+    color: #60a5fa;
+    text-decoration: none;
+  }
+
+  .attachment-file a:hover {
+    text-decoration: underline;
+  }
+
+  .attachment-label {
+    font-size: 11px;
+    color: #94a3b8;
+    text-align: center;
+    word-break: break-word;
+  }
+</style>
+
 <div class="card">
   <h1>Mine saker</h1>
   <p class="muted">
@@ -33,8 +96,9 @@
     <label>Enhet/Programvare</label>
     <input type="text" name="device" placeholder="F.eks. Mac + Safari / Windows + Chrome" required>
 
-    <label>Beskrivelse</label>
-    <textarea name="desc" rows="5" placeholder="Hva skjer? Når? Hva har du prøvd på nivå 1 og 2?" required></textarea>
+    <label>Vedlegg (valgfritt)</label>
+    <input type="file" name="files" multiple accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx,.txt">
+    <p class="muted" style="font-size:12px; margin-top:-4px;">JPG, PNG, GIF, WebP, PDF, DOC, DOCX, TXT (maks 16 MB)</p>
 
     <button type="submit">Send inn sak</button>
   </form>
@@ -70,6 +134,36 @@
             </p>
 
             <p style="margin-top:10px;">{{ t.desc }}</p>
+
+            <!-- Vedlegg -->
+            {% if t.attachments and t.attachments|length > 0 %}
+            <div class="attachments-section">
+              <strong style="font-size: 13px;">📎 Vedlegg:</strong>
+              <div class="attachments-grid">
+                {% for att in t.attachments %}
+                  {% set filename_lower = att.original_filename.lower() %}
+                  {% if filename_lower.endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp')) %}
+                    <!-- Bilde - vis som thumbnail -->
+                    <div class="attachment-item">
+                      <a href="{{ url_for('main.view_attachment', attachment_id=att.id) }}" target="_blank">
+                        <img src="{{ url_for('main.view_attachment', attachment_id=att.id) }}" class="attachment-thumb" alt="{{ att.original_filename }}">
+                      </a>
+                      <div class="attachment-label">{{ att.original_filename[:15] }}{% if att.original_filename|length > 15 %}...{% endif %}</div>
+                      <a href="{{ url_for('main.download_attachment', attachment_id=att.id) }}" style="font-size: 11px; color: #60a5fa;">Last ned</a>
+                    </div>
+                  {% else %}
+                    <!-- Annen filtype - vis som lenke -->
+                    <div class="attachment-item">
+                      <div class="attachment-file">
+                        <span>📄</span>
+                        <a href="{{ url_for('main.download_attachment', attachment_id=att.id) }}">{{ att.original_filename[:20] }}{% if att.original_filename|length > 20 %}...{% endif %}</a>
+                      </div>
+                    </div>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            </div>
+            {% endif %}
 
             <p class="muted" style="margin-top:10px;">
               Opprettet: <strong>{{ t.created_at }}</strong>

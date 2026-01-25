@@ -513,13 +513,63 @@ def download_attachment(attachment_id: int):
     )
 
 
+# Vis vedlegg inline (for bilder)
+@bp.route("/attachments/<int:attachment_id>/view")
+def view_attachment(attachment_id: int):
+    user = current_user()
+    role = current_role()
+    if not user:
+        return redirect(url_for("main.login"))
+
+    att = get_attachment(attachment_id)
+    if not att:
+        abort(404)
+
+    t = get_ticket(att["ticket_id"])
+    if not t:
+        abort(404)
+
+    # tilgangskontroll: eier eller support
+    if role != "support" and t["owner"] != user:
+        abort(403)
+
+    # Bestem mimetype basert på filendelse
+    filename = att["original_filename"].lower()
+    if filename.endswith(('.jpg', '.jpeg')):
+        mimetype = 'image/jpeg'
+    elif filename.endswith('.png'):
+        mimetype = 'image/png'
+    elif filename.endswith('.gif'):
+        mimetype = 'image/gif'
+    elif filename.endswith('.webp'):
+        mimetype = 'image/webp'
+    else:
+        # Ikke et bilde - redirect til download
+        return redirect(url_for("main.download_attachment", attachment_id=attachment_id))
+
+    return send_from_directory(
+        Config.UPLOAD_FOLDER,
+        att["stored_filename"],
+        mimetype=mimetype,
+        as_attachment=False,
+    )
+
+
 # -----------------------------
 # (Beholder din gamle upload-route urørt)
 # -----------------------------
 @bp.route("/tickets/<int:ticket_id>/upload", methods=["POST"])
 def upload_attachment(ticket_id: int):
-    if not current_user():
+    user = current_user()
+    if not user:
         return redirect(url_for("main.login"))
+
+    # Sjekk at brukeren har tilgang til saken
+    t = get_ticket(ticket_id)
+    if not t:
+        abort(404)
+    if current_role() != "support" and t["owner"] != user:
+        abort(403)
 
     if "file" not in request.files:
         flash("Ingen fil valgt")
@@ -531,21 +581,19 @@ def upload_attachment(ticket_id: int):
         flash("Ingen fil valgt")
         return redirect(url_for("main.tickets"))
 
-    # Denne bruker Config nå for konsistens
     if not allowed_file(file.filename):
         flash("Ugyldig filtype")
         return redirect(url_for("main.tickets"))
 
-    original = secure_filename(file.filename)
-    unique_name = f"{uuid.uuid4()}_{original}"
+    try:
+        stored_name, original_name = save_upload(file, ticket_id)
+        add_attachment(ticket_id, stored_name, original_name, user)
+        log_activity(user, f"Lastet opp vedlegg til sak #{ticket_id}")
+        flash("Vedlegg lastet opp")
+    except Exception as e:
+        logger.error(f"Upload error for ticket #{ticket_id}: {e}")
+        flash("Kunne ikke laste opp vedlegg. Prøv igjen.")
 
-    os.makedirs(Config.UPLOAD_FOLDER, exist_ok=True)
-    save_path = os.path.join(Config.UPLOAD_FOLDER, unique_name)
-    file.save(save_path)
-
-    flash("Vedlegg lastet opp")
-
-    # Merk: denne gamle ruta lagrer fortsatt ikke i DB (som før)
     return redirect(url_for("main.tickets"))
 
 
