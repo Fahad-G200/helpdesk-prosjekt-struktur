@@ -676,7 +676,7 @@ def admin_reset_password(username: str):
         log_activity(user, f"Resatte passord for bruker {username}")
         
         # Flash passordet KUN denne gangen (ikke i log, ikke i response)
-        flash(f"Nytt passord for {username} er: {new_password} – Kopier dette nå, det vises ikke igjen!", category="success")
+        flash(f"Nytt passord for {username} er: {new_password} – Gi dette direkte til brukeren.", category="success")
     except Exception as e:
         logger.error(f"Error resetting password for {username}: {e}")
         flash("Kunne ikke resette passord.")
@@ -1912,40 +1912,17 @@ def forgot_password():
 
         # Sikkerhet: ikke avslør om bruker finnes
         if not u:
-            flash("Hvis brukeren finnes, har vi sendt en kode for passordbytte.")
+            flash("Hvis brukeren finnes, vil IT-support hjelpe deg med nytt passord.")
             return redirect(url_for("main.login"))
 
-        # Velg kanal automatisk: e-post hvis finnes, ellers sms hvis finnes
-        email = (u.get("email") or "").strip()
-        phone = (u.get("phone") or "").strip()
-
+        # Admin styrer nå passordreset - ingen automatisk SMS/e-post
         try:
-            if email:
-                code = create_reset_code(username, "email", email)
-                body = (
-                    f"Hei!\n\n"
-                    f"Her er koden din for å bytte passord: {code}\n"
-                    f"Koden er gyldig i 15 minutter.\n\n"
-                    f"Gå til: {request.url_root.rstrip('/')}{url_for('main.reset_password')} \n"
-                )
-                # Fixed parameter order: subject, body, to_email
-                send_email("Passordbytte – IT Helpdesk", body, email)
-                flash("Hvis brukeren finnes, har vi sendt en kode for passordbytte.")
-                return redirect(url_for("main.login"))
-
-            if phone:
-                code = create_reset_code(username, "sms", phone)
-                send_sms(phone, f"IT Helpdesk: Kode for passordbytte: {code} (gyldig i 15 min)")
-                flash("Hvis brukeren finnes, har vi sendt en kode for passordbytte.")
-                return redirect(url_for("main.login"))
+            # Logg at bruker forsøkte å bruke glemt-passord siden
+            log_activity(username, "Forsøkte å endre passord via glemt passord-siden")
+        except:
+            pass
         
-        except Exception as e:
-            logger.error(f"Forgot password error: {e}")
-            # Still show safe message even if sending fails
-            flash("Hvis brukeren finnes, har vi sendt en kode for passordbytte.")
-            return redirect(url_for("main.login"))
-
-        flash("Kunne ikke sende kode: brukeren mangler e-post og telefonnummer.")
+        flash("Hvis brukeren finnes, vil IT-support hjelpe deg med nytt passord.")
         return redirect(url_for("main.login"))
 
     return render_template("forgot_password.html")
