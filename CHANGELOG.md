@@ -391,3 +391,20 @@ Alle vesentlige endringer i prosjektet dokumenteres i denne filen.
 ### Notes
 - Ingen eksisterende UI eller design er endret.
 - Endringer er kun gjort der det var nødvendig for funksjonalitet.
+# Changelog
+
+## 2026-01-25
+
+### Changed
+- Oppdatert tekster og brukerbeskjeder for “Glemt passord” slik at de samsvarer med ny flyt (admin/support resetter passord).
+- Fjernet/erstattet formuleringer som antyder at brukeren får SMS eller e-post automatisk ved passordgjenoppretting.
+- Justert flash-meldinger i passordflyten til nøytrale og riktige meldinger (ikke avsløre om bruker finnes, og ikke love SMS/epost).
+- Oppdatert hjelpetekst på reset-siden slik at det er tydelig når den faktisk skal brukes (kode/passord fra support).
+
+### Fixed
+- Rettet misvisende tekst som sa at SMS ble sendt til brukeren, selv om reset nå håndteres av admin.
+- Forhindret forvirring i UI ved å gjøre språk og flyt konsistent på tvers av templates og backend-flash.
+
+### Notes
+- Ingen endringer i design/layout.
+- Ingen endringer i database, routes eller forretningslogikk – kun tekst/kommunikasjon.
