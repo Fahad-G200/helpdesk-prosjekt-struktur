@@ -326,7 +326,7 @@ def tickets():
                     priority=priority,
                     device=device
                 )
-                logger.info(f"Ticket created: #{ticket_id} by {user}")
+                logger.info(f"Ticket created: #{ticket_id} by {user} (owner field should be: {user})")
                 try:
                     log_activity(user, f"Opprettet sak #{ticket_id} – '{title}'")
                 except Exception:
@@ -381,9 +381,14 @@ def tickets():
         return redirect(url_for("main.tickets"))
 
     try:
-        visible = get_tickets() if role == "support" else get_tickets(owner=user)
+        if role == "support":
+            visible = get_tickets()
+            logger.info(f"Support user {user} fetched all tickets: {len(visible)} total")
+        else:
+            visible = get_tickets(owner=user)
+            logger.info(f"User {user} fetched their own tickets: {len(visible)} visible")
     except Exception as e:
-        logger.error(f"Error fetching tickets: {e}")
+        logger.error(f"Error fetching tickets for {user} (role={role}): {e}")
         visible = []
         flash("Kunne ikke hente saker. Prøv igjen senere.")
 
@@ -393,6 +398,11 @@ def tickets():
             t["attachments"] = get_attachments(t["id"])
         except Exception:
             t["attachments"] = []
+    
+    # DEBUG: log owner field på første sak hvis det finnes
+    if visible and len(visible) > 0:
+        first_ticket = visible[0]
+        logger.debug(f"First ticket keys: {list(first_ticket.keys())} | owner={first_ticket.get('owner', 'MISSING')}")
 
     return render_template("_tickets.html", tickets=visible, role=role)
 
