@@ -365,3 +365,29 @@ Alle vesentlige endringer i prosjektet dokumenteres i denne filen.
 ### Improved
 - Admin-menyen fungerer nå konsekvent uten å endre eksisterende UI eller design
 - Backend og templates er nå korrekt synkronisert
+
+
+# Changelog
+
+## [Unreleased] – 25.01.2026
+
+### Added
+- Full støtte for admin-sider: Brukere, Saker, KB Admin og Systeminnstillinger.
+- Mulighet for å opprette, lagre og administrere KB-artikler via admin-panel.
+- Stabil backend-logikk for chatbot-kommunikasjon.
+
+### Changed
+- Forbedret routing og tilgangskontroll for admin-funksjoner.
+- Systeminnstillinger lagres nå korrekt etter endring.
+- Forbedret flyt for glemt passord og passordbytte.
+
+### Fixed
+- Rettet feil som førte til 500/Internal Server Error på admin-sider.
+- Fikset feil der nye KB-artikler ikke ble lagret etter “Lagre”.
+- Fikset feil der systeminnstillinger ble nullstilt etter lagring.
+- Fikset passord-reset som tidligere ikke fungerte i praksis.
+- Forbedret stabilitet i chatbot-funksjonalitet.
+
+### Notes
+- Ingen eksisterende UI eller design er endret.
+- Endringer er kun gjort der det var nødvendig for funksjonalitet.
