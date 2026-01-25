@@ -36,7 +36,11 @@
         <td style="padding:12px; color:#94a3b8;">{{ u.last_login or 'Aldri' }}</td>
         <td style="padding:12px; text-align:right;">
           {% if u.username != 'admin' and u.username != session.get("user") %}
-            <div style="display:flex; gap:8px; justify-content:flex-end;">
+            <div style="display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap;">
+              <form method="post" action="{{ url_for('main.admin_reset_password', username=u.username) }}" style="display:inline;">
+                <button type="submit" style="background:#8b5cf6; padding:6px 12px; font-size:12px;">🔑 Nytt passord</button>
+              </form>
+              
               {% if u.role == 'user' %}
               <form method="post" action="{{ url_for('main.promote_user', username=u.username) }}" style="display:inline;">
                 <button type="submit" style="background:#10b981; padding:6px 12px; font-size:12px;">⬆️ Promote</button>

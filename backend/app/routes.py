@@ -643,6 +643,47 @@ def demote_user(username: str):
     return redirect(url_for("main.admin_users"))
 
 
+@bp.route("/admin/users/<username>/reset-password", methods=["POST"])
+def admin_reset_password(username: str):
+    user = current_user()
+    if not user or current_role() != "support":
+        abort(403)
+
+    # Admin kan ikke resette sitt eget passord
+    if username == user:
+        flash("Du kan ikke resette ditt eget passord.")
+        return redirect(url_for("main.admin_users"))
+
+    # Generer tilfeldig passord (12-16 tegn, bokstaver + tall)
+    import secrets
+    import string
+    
+    alphabet = string.ascii_letters + string.digits  # a-z, A-Z, 0-9
+    new_password = ''.join(secrets.choice(alphabet) for _ in range(14))
+    
+    # Hash og lagre
+    from werkzeug.security import generate_password_hash
+    from .db import _conn
+    
+    try:
+        new_hash = generate_password_hash(new_password, method="pbkdf2:sha256")
+        conn = _conn()
+        cur = conn.cursor()
+        cur.execute("UPDATE users SET pw_hash = ? WHERE username = ?", (new_hash, username))
+        conn.commit()
+        conn.close()
+        
+        log_activity(user, f"Resatte passord for bruker {username}")
+        
+        # Flash passordet KUN denne gangen (ikke i log, ikke i response)
+        flash(f"Nytt passord for {username} er: {new_password} – Kopier dette nå, det vises ikke igjen!", category="success")
+    except Exception as e:
+        logger.error(f"Error resetting password for {username}: {e}")
+        flash("Kunne ikke resette passord.")
+
+    return redirect(url_for("main.admin_users"))
+
+
 @bp.route("/admin/users/<username>/delete", methods=["POST"])
 def delete_user(username: str):
     user = current_user()
