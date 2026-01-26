@@ -1,4 +1,6 @@
-#!/var/www/helpdesk-prosjekt-struktur/backend/venv/bin/python3
+#!/bin/sh
+'''exec' "/Users/97ashfah/Library/CloudStorage/OneDrive-AkademietNorgeAS/2 VGS/helpdesk-prosjekt-struktur/backend/venv/bin/python" "$0" "$@"
+' '''
 # -*- coding: utf-8 -*-
 import re
 import sys
