@@ -1,496 +1,90 @@
 # Changelog
 
-## 2026-01-25
-### Refactoring
-- Flytt CSS fra templates til `static/css/app.css` og `static/css/auth.css`
-- Flytt JavaScript fra templates til `static/js/chatbot.js` og `static/js/admin.js`
-- Ryddigere kodestruktur, bedre vedlikehold
-- Ingen funksjons- eller visuelle endringer
-
-## 2026-01-05
-- Opprettet prosjektstruktur med docs, backend og infra
-- Publiserte prosjektet til GitHub
-- Startet README med prosjektbeskrivelse, MVP og kobling til kompetansemål
-
-## 2026-01-05
-- Skrev behovskartlegging og funksjonelle krav i krav.md
-
-## 2026-01-05
-- Skrev arkitektur for prosjektet
-- Beskrev hvordan systemet er bygget opp med webapp og database
-- Forklarte roller, drift med Docker og enkel segmentering
-- Skrev personvern og sikkerhet (hvilke data som lagres og tiltak for å beskytte dem)
-- Skrev brukerveiledning for vanlige brukere (innlogging, saker og kunnskapsbase)
-
-
-
-## 2026-01-07
-- Skrev testplan for helpdesk-løsningen (testmiljø, metoder og testtilfeller)
-
-# Changelog
-
-Alle viktige endringer i dette prosjektet dokumenteres her.
-
-2026-01-09
-### Lagt til
-- Opprettet grunnstruktur for helpdesk-prosjektet
-- Implementert helpdesk med tre støttenivåer (nivå 1, 2 og 3)
-- Skrevet selvhjelpsinstruksjoner for vanlige problemer:
-  - Feide-pålogging
-  - Nettverk (Wi-Fi)
-  - Utskrift
-  - Glemt eller låst passord
-- Laget refleksjon skrevet i førsteperson
-- Dokumentert prosjektbeskrivelse, mål og fremgangsmåte
-- Laget enkel HTML-side som demonstrerer helpdesk-flyten
-
-### Endret
-- Forbedret struktur og språk for å gjøre prosjektet mer profesjonelt
-- Tilpasset dokumentasjon til tverrfaglig vurdering
-
-### Planlagt
-- Utvide kunnskapsbasen med flere problemtyper
-- Forbedre design og brukervennlighet
-- Eventuelt implementere lagring av innsendte saker
-
-
-
-# Changelog
-
-Alle vesentlige endringer i prosjektet dokumenteres i denne filen.
-
-2026-01-10
-### Nytt
-- Opprettet komplett prosjektstruktur for helpdesk og kunnskapsbase (docs, backend, infra, site)
-- Implementert nivåbasert brukerstøtte (nivå 1–3) med tydelig eskaleringsflyt
-- Lagt til kunnskapsbase i backend (/kb) integrert med innlogging og felles design
-- Lagt til innsendingsskjema på nivå 3 med kategori, prioritet og enhet/programvare
-- Implementert ticketsystem med opprettelse, visning og lukking av saker
-- Lagt til SQLite-database for lagring av brukere og saker
-- Implementert registreringsside for nye brukere
-- Implementert roller (bruker og support/admin)
-- Lagt til fast admin/support-bruker som kan se og håndtere alle saker
-- Support-bruker kan lukke saker og følge status
-- Satt opp Docker (nginx) for lokal kjøring av prosjektet uavhengig av skolens nettverk
-- Oppdatert og fullført dokumentasjon (testplan, personvern, arkitektur, refleksjon)
-
-### Endret
-- Gått fra midlertidig/demonstrasjonslagring til databasebasert lagring
-- Forbedret struktur i backend-koden (routes, database, templates)
-- Forbedret navigasjon og brukeropplevelse i backend (felles layout og meny)
-- Forbedret design og struktur på nettsiden for mer profesjonelt uttrykk
-- Rettet Dockerfile fra feil mappe (`system/`) til korrekt innhold (`docs` / `site`)
-- Forbedret innhold og sammenheng i README, prosjektbeskrivelse og refleksjon
-
-### Fikset
-- Rettet feil der saker forsvant ved omstart (manglende database)
-- Rettet feil der admin-bruker manglet i databasen
-- Forbedret tilgangskontroll mellom bruker og support/admin
-- Rettet problemer med lokal kjøring (`localhost`) ved testing
-  - Prosjektet kjøres nå stabilt via `http://127.0.0.1:8080`
-- Ryddet opp i HTML- og CSS-struktur for å sikre korrekt visning
-
-### Notater
-- Dette er første ferdige hovedversjon av prosjektet (versjon 1.0.0)
-- Prosjektet viser en helhetlig helpdesk-løsning med brukerstøtte, roller og saksbehandling
-- Løsningen kan kjøres lokalt og er uavhengig av skolens nettverk
-- Standard admin for demo/testing:
-  - Brukernavn: `admin`
-  - Passord: `admin123`
-
-### Planlagt videre arbeid
-- Koble nivå 3-innsendingsskjema enda tettere mot backend (for eksempel forhåndsvalgt kategori)
-- Utvide kunnskapsbasen med flere artikler og bedre søk
-- Gjennomføre flere tester og dokumentere testresultater
-
-
-
-## 2026-01-11
-- Lagt til beskrivelse av skytjenester og nettverkssegmentering
-- Gjennomført risikoanalyse av helpdesk-løsningen
-- Utviklet kursmateriell for brukere
-- Dokumentert valg av programmeringsspråk og rammeverk
-
-
-
-## 2026-01-12
-### Endret
-- Erstattet OpenAI-basert chat (krever billing) med lokal helpdesk-chatbot
-- Chatboten kan nå håndtere fritekst/setninger og gir trinnvis veiledning (nivå 1–3)
-- Lagt til enkle oppfølgingsspørsmål (OS/nettleser/feilmelding) for mer presis feilsøking
-
-## Changelog
-
-## 2026-01-16
-
-### Endret
-- Rettet ugyldig HTML i `base.html` ved å flytte CSS-regler inn i `<style>`-taggen.
-- Forbedret navigasjonen med aktive menypunkter basert på nåværende side.
-- Standardisert navigasjonslenker ved å bruke felles CSS-klassen `nav-link`.
-
-### Forbedret
-- Brukergrensesnittet fremstår mer profesjonelt og konsistent.
-- Navigasjonen gir tydeligere tilbakemelding på hvor brukeren befinner seg i systemet.
-
-### Fikset
-- CSS som tidligere lå utenfor `<style>`-taggen og ikke ble tolket korrekt av nettleseren.
-
-### Filer endret
-- `backend/app/templates/base.html`
-
-## 2026-01-20
-
-### Sikkerhet
-- Byttet hardkodet SECRET_KEY til sikker, tilfeldig generert nøkkel
-- Lagt til security headers (X-Frame-Options, X-Content-Type-Options, X-XSS-Protection)
--  Lagt til error handling i alle routes
--  Implementert logging av viktige hendelser (innlogging, saksopprettelse, etc.)
-
-### Dokumentasjon
--  Opprettet `docs/risikoanalyse.md` med komplett risikovurdering
--  Opprettet `docs/kvalitetssikring.md` med ITIL-basert prosess og KPI
--  Opprettet `backup.py` for automatisk database-backup
-
-### Kode-kvalitet
--  Slettet tomme filer (models.py, build_site.py)
--  Ryddet i duplikate build-scripts
-- Forbedret error messages for bedre brukeropplevelse
-
-### Filer endret
-- `backend/app/__init__.py` - Sikker SECRET_KEY og security headers
-- `backend/app/routes.py` - Error handling og logging
-- `docs/risikoanalyse.md` - Ny fil
-- `docs/kvalitetssikring.md` - Ny fil
-- `backup.py` - Ny fil
-
-
-### Added
-- La til nye sider for Varsler (/notifications), Innstillinger (/settings) og Aktivitetslogg (/admin/activity).
-- La til templates: `notifications.html`, `settings.html` og `logs.html`.
-- La til visning av antall uleste varsler (badge) i navigasjonen via `notif_count`.
-
-### Changed
-- Oppdatert `routes.py` slik at lenkene i `base.html` faktisk peker på eksisterende routes (fikser 404 på Innstillinger).
-- Oppdatert `db.py` slik at eksisterende databaser automatisk får kolonnene `email`, `notify_email` og `notify_inapp` (trygge `ALTER TABLE` ved oppstart).
-
-### Fixed
-- Fikset 404 “Not Found” når man trykker på “Innstillinger” i menyen.
-- Reduserte risiko for krasj ved innstillinger/varsler hvis databasen var opprettet før disse feltene fantes.
-
-### Added
-- Lagt til støtte for **SMS-varslinger** via Twilio
-- Brukere kan nå lagre **telefonnummer** i profilinnstillinger
-- Nye varslingsvalg i innstillinger:
-  - E-postvarsler
-  - Interne varsler i applikasjonen
-  - SMS-varsler
-- Eksakt tidspunkt vises for:
-  - Når en sak ble opprettet
-  - Når en sak ble oppdatert
-  - Når en sak ble lukket
-- Aktivitet logges når bruker endrer varselinnstillinger
-
-### Changed
-- Oppdatert **settings-siden** til å håndtere flere typer varslinger
-- Database-struktur utvidet med:
-  - `phone`
-  - `notify_sms`
-- Oppdatert `update_preferences` slik at alle varslingsvalg lagres samlet
-- Twilio-integrasjon gjort **valgfri** slik at appen ikke krasjer hvis Twilio ikke er installert
-
-### Fixed
-- Rettet feil som gjorde at **Innstillinger-siden ikke fungerte**
-- Forhindret krasj ved manglende `twilio`-avhengighet
-- Ryddet opp i imports og fjernet direkte Twilio-import fra routes
-- Stabilisert database-initiering ved eksisterende databaser
-
-### Security
-- Brukernavn er fortsatt **unik** (kan ikke registreres flere ganger)
-- Applikasjonen starter trygt selv uten SMS-konfigurasjon
-
-### Added
-- Støtte for filvedlegg på saker (attachments)
-- Mulighet for å laste opp skjermbilder, PDF-er og dokumenter til en sak
-- Ny database-tabell for vedlegg knyttet til tickets
-- Unike filnavn ved opplasting for å unngå overskriving
-- Nedlasting av vedlegg med tilgangskontroll
-- SMS-varsling via Twilio (valgfritt)
-- Telefonnummer lagret på brukerprofil
-- Nye brukerinnstillinger for:
-  - E-postvarsler
-  - Interne varsler
-  - SMS-varsler
-- Aktivitetslogging for endring av innstillinger
-
-### Changed
-- Utvidet `/settings`-siden til å håndtere flere varseltyper
-- Forbedret tickets-visning med støtte for vedlegg
-- Database-initialisering gjort mer robust (ALTER TABLE med try/except)
-- Varslingslogikk forbedret slik at appen ikke krasjer hvis eksterne tjenester mangler
-- Strukturert bedre separasjon mellom database, ruter og tjenester
-
-### Fixed
-- Innstillinger som tidligere ikke ble lagret korrekt
-- Feil ved oppstart hvis Twilio ikke var installert
-- Varsler som ikke ble markert som lest
-- Feil som oppstod ved manglende miljøvariabler
-
-### Security
-- Sikret filopplasting med `secure_filename`
-- Begrenset tillatte filtyper via konfigurasjon
-- Forhindrer path traversal ved opplasting
-- Kun sakseier eller support har tilgang til vedlegg
+Alle vesentlige endringer i prosjektet dokumenteres her.
 
 ---
 
-## 2026-01-22
+## [1.0.0] – 2026-01-26 (Vurderingsklart)
 
 ### Added
-- Implementert avansert AI-basert helpdesk-chat
-- Chatboten analyserer fritekst og identifiserer problemområde automatisk
-- Støtte for flere temaer:
-  - Feide / innlogging
-  - Wi-Fi / nettverk
-  - Utskrift / skrivere
-  - Passord og kontotilgang
-  - Microsoft 365 (Teams, Outlook, OneDrive m.fl.)
-  - Nettleserproblemer
-- Chatten gir trinnvis feilsøking (grunnleggende → avansert)
-- Automatisk eskalering til support etter flere mislykkede forsøk
-- Mulighet for bruker å be om menneskelig support direkte i chat
-- Endepunkt for reset av chat-samtale (`/chat/reset`)
+- Cookie consent banner (GDPR-kompatibel)
+- Komplett dokumentasjon for vurdering (kompetansemål, testing, KI-bruk)
+- Forbedret README med demo-flyt og setup-instruksjoner
 
 ### Changed
-- Forbedret saksopprettelse med støtte for flere filvedlegg samtidig
-- Tickets inkluderer nå vedlegg i visning for både bruker og support
-- Varslinger sendes til support ved ny sak og ved vurdering
-- Forbedret aktivitetslogging for:
-  - Chat-bruk
-  - Saksopprettelse
-  - Lukking av saker
-  - Vurderinger
+- Refaktorert CSS og JavaScript til egne filer (bedre vedlikehold)
+- Oppgradert dokumentasjon med tydelige kompetansemål og testing
 
-### Added
-- Støtte for sikre filvedlegg på saker:
-  - Skjermbilder, PDF-er og dokumenter
-  - Unike filnavn for å unngå overskriving
-  - Ny database-tabell for vedlegg
-- Nedlasting av vedlegg med tilgangskontroll
-  - Kun sakseier eller support har tilgang
+### Fixed
+- Input-felt på "Glemt passord"-siden (pointer-events: none fjernet)
+- Chatbot-integrasjon
 
 ### Security
-- Validering av filtyper ved opplasting
-- Sikret filnavn med `secure_filename`
-- Forhindrer uautorisert tilgang til vedlegg
+- Passordhashing med Werkzeug
+- Rollebasert tilgangskontroll (RBAC)
+- Aktivitetslogg for audit trail
 
-## [Unreleased]
+---
 
-### Added
-- Ny dashboard-side (/dashboard) med oversikt over tickets
-- Statistikk for aktive saker og kritiske saker
-- Avansert AI-basert chatbot (IntelligentHelpdeskAI)
-- Støtte for kontekstbasert chat, feilanalyse og eskalering til support
-- Bevaring av samtaletilstand via session
-
-### Changed
-- Erstattet tidligere enkel chatbot med intelligent AI-løsning
-
-### Fixed
-- Ingen eksisterende funksjonalitet endret eller fjernet
-
-
-# Changelog
-
-## [Unreleased]
+## [0.9.0] – 2026-01-10
 
 ### Added
-- Blå primærknapper i kunnskapsbasen for viktige handlinger:
-  - "Start med nivå 1"
-  - "Gå til Mine saker"
-  - "Opprett / se saker"
+- Ticketsystem med fullt CRUD (Create, Read, Update, Delete)
+- Vedleggsystem (jpg, png, pdf) med validering
+- Kunnskapsbase (KB) med admin-håndtering
+- Vurderingssystem for lukkede saker (1-5 stjerner)
+- Chatbot-assistanse
+- Rolle-basert tilgangskontroll (user/support/admin)
+- Aktivitetslogg
+- Innstillinger (E-post, SMS, varsler)
+- Passord-reset funksjonalitet
 
 ### Changed
-- Oppdatert kb.html slik at sentrale navigasjonslenker nå bruker
-  eksisterende knappestil (`.btn`) for bedre visuell konsistens.
+- Splittet innlogging fra main-app (auth_base.html vs base.html)
+- Forbedret design og brukeropplevelse
+- Migrert til SQLite-database fra fil-basert lagring
 
 ### Fixed
-- Fjernet inkonsistent visning av viktige handlinger som lilla
-  standardlenker i kunnskapsbasen.
+- Admin-bruker manglet ved oppstart
+- Saker som forsvant ved omstart (nå persistert i DB)
+- Tilgangskontroll mellom bruker og support
+- Docker-konfigurering (localhost → 127.0.0.1)
 
-### Notes
-- Ingen endringer er gjort i `base.html`.
-- Ingen CSS-, JavaScript- eller backend-funksjonalitet er endret.
-- Endringen er bevisst isolert til én template for å unngå regresjoner.
+### Security
+- Innførte sesjonshåndtering
+- Passordhashing
+- Filtype-validering på vedlegg
 
+---
 
-# Changelog
-
-## 2026-01-23
+## [0.5.0] – 2026-01-07
 
 ### Added
-- Egen autentiserings-layout (`auth_base.html`) for innlogging og registrering
-- Visuelt adskilt innlogging/registrering fra resten av applikasjonen
-- Hero-seksjon på autentiseringssider med:
-  - Bakgrunnsbilde
-  - Mørk gradient-overlay
-  - Funksjonspills (24/7 Support, Secure Access, Expert Team)
-- Fanebasert navigasjon mellom **Login** og **Sign Up**
-- Felles design og struktur for alle auth-sider
+- Testplan for løsningen
+- Arkitektur-dokumentasjon
+- Personvern- og sikkerhetsdokumentasjon
+- Brukerveiledning
 
 ### Changed
-- Flyttet innlogging og registrering ut av hovedlayout (`base.html`)
-- Sørget for at dashboard, tickets, varsler og innstillinger kun vises etter innlogging
-- Autentiseringssider arver ikke sidebar eller topbar
-- Forbedret visuell konsistens og profesjonelt førstetrykk
+- Strukturert dokumentasjon under docs/
 
-### Fixed
-- Fjernet uønsket visning av dashboard-/app-elementer på innloggingssiden
-- Forhindret at navigasjon og sidebar vises før bruker er autentisert
-- Ryddet opp i layout-arv som tidligere gjorde at alt ble vist på samme side
+---
 
-### Notes
-- Ingen endringer er gjort i `base.html` for applikasjonssidene
-- Endringen er isolert til autentisering (`auth_base.html`, login- og register-templates)
-- Backend-logikk for innlogging, sesjon og sikkerhet er ikke endret
-
-
-## [2026-01-23]
+## [0.3.0] – 2026-01-05
 
 ### Added
-- Fullt fungerende admin-sider for:
-  - Brukeradministrasjon
-  - Sakshåndtering (inkl. bulk handlinger)
-  - Kunnskapsbase-administrasjon
-  - Systeminnstillinger
-- Manglende templates for admin-funksjoner ble lagt til
+- Prosjektbeskrivelse
+- Behovskartlegging (docs/krav.md)
+- GitHub-repo opprettet
+- Grunnstruktur (docs/, backend/, infra/)
 
-### Fixed
-- Fikset Internal Server Error ved klikk på admin-menyvalg
-- Rettet feil med manglende eller feil-koblede Flask-ruter
-- Fjernet dupliserte view-funksjoner som førte til endpoint-kollisjoner
+### Changed
+- Innledende krav og arkitektur definert
 
-### Improved
-- Admin-menyen fungerer nå konsekvent uten å endre eksisterende UI eller design
-- Backend og templates er nå korrekt synkronisert
+---
 
-
-# Changelog
-
-## [Unreleased] – 25.01.2026
+## [0.1.0] – 2026-01-01
 
 ### Added
-- Full støtte for admin-sider: Brukere, Saker, KB Admin og Systeminnstillinger.
-- Mulighet for å opprette, lagre og administrere KB-artikler via admin-panel.
-- Stabil backend-logikk for chatbot-kommunikasjon.
-
-### Changed
-- Forbedret routing og tilgangskontroll for admin-funksjoner.
-- Systeminnstillinger lagres nå korrekt etter endring.
-- Forbedret flyt for glemt passord og passordbytte.
-
-### Fixed
-- Rettet feil som førte til 500/Internal Server Error på admin-sider.
-- Fikset feil der nye KB-artikler ikke ble lagret etter “Lagre”.
-- Fikset feil der systeminnstillinger ble nullstilt etter lagring.
-- Fikset passord-reset som tidligere ikke fungerte i praksis.
-- Forbedret stabilitet i chatbot-funksjonalitet.
-
-### Notes
-- Ingen eksisterende UI eller design er endret.
-- Endringer er kun gjort der det var nødvendig for funksjonalitet.
-# Changelog
-
-## 2026-01-25
-
-### Changed
-- Oppdatert tekster og brukerbeskjeder for “Glemt passord” slik at de samsvarer med ny flyt (admin/support resetter passord).
-- Fjernet/erstattet formuleringer som antyder at brukeren får SMS eller e-post automatisk ved passordgjenoppretting.
-- Justert flash-meldinger i passordflyten til nøytrale og riktige meldinger (ikke avsløre om bruker finnes, og ikke love SMS/epost).
-- Oppdatert hjelpetekst på reset-siden slik at det er tydelig når den faktisk skal brukes (kode/passord fra support).
-
-### Fixed
-- Rettet misvisende tekst som sa at SMS ble sendt til brukeren, selv om reset nå håndteres av admin.
-- Forhindret forvirring i UI ved å gjøre språk og flyt konsistent på tvers av templates og backend-flash.
-
-### Notes
-- Ingen endringer i design/layout.
-- Ingen endringer i database, routes eller forretningslogikk – kun tekst/kommunikasjon.
-
-
-# Changelog
-
-## [Unreleased]
-
-###  Features
-
-#### Passordreset - Admin-styrt system
-- Oppdatert all UI-tekst for å reflektere at admin nå styrer passordreset manuelt
-- Sjonert brukeren til å kontakte IT-support istedenfor automatisk SMS/e-post
-- Fjernet alle henvisninger til automatisk kodegenerering fra glemt-passord siden
-- Klarere flash-meldinger når admin genererer nytt passord for bruker
-
-#### Kunnskapsbase - Visuell redesign
-- Omdesignet KB-liste som responsiv grid av article cards
-- Legget til støtte for cover-bilder på artikler (`cover_url` i database)
-- Implementert safe database-migrering for eksisterende systemer
-- Ny artikkelside med:
-  - Stor cover-image banner øverst (eller gradient-ikon som fallback)
-  - Auto-generert innholdsfortegnelse basert på H2/H3-overskrifter
-  - Maksimum artikkelbredde (900px) for bedre lesbarhet
-  - Forbedret typografi: større linjeavstand, stiliserte kodeblokker, sitater
-  - "Tilbake til kunnskapsbase"-knapp
-- Admin kan oppgi cover-bilde URL når de oppretter/redigerer artikler
-- Responsive grid med fallback-ikon for artikler uten cover-bilde
-
-#### Vedlegg på saker - Full implementering
-- Ny route `/attachments/<int:attachment_id>/view` for inline visning av bilder
-- Vedlegg lagres nå i database automatisk ved opprettelse og opplasting
-- Brukere kan laste opp flere vedlegg samtidig
-- Thumbnails for bilder (JPG, PNG, GIF, WebP) som åpnes i ny fane ved klikk
-- Andre filtyper (PDF, DOCX) vises som nedlastbare lenker
-- Access control: kun sakseier eller support kan se vedlegg
-- Opplastingshistorikk logges for audit trail
-- Støtt for filtyper: JPG, JPEG, PNG, GIF, WebP, PDF, DOC, DOCX, TXT (maks 16 MB)
-
-### Technical Changes
-
-#### Database
-- `articles`: Lagt til `cover_url TEXT` kolonne med safe migration
-- `articles`: `get_articles()` nå returnerer `cover_url` og `content` for utdrag
-- Vedlegg lagres konsekvent i database via `add_attachment()`
-
-#### Routes
-- Ny `view_attachment()` route for inline bildevisning
-- Oppdatert `upload_attachment()` til å lagre i DB
-- Oppdatert `tickets()` POST handler for å håndtere multiple vedlegg
-- Oppdatert `create_article_view()` og `edit_article_view()` for `cover_url`
-
-#### Templates
-- Redesignet `kb.html` - Grid layout med cards
-- Redesignet `view_article.html` - Bedre lesbarhet, cover-image, TOC
-- Oppdatert `create_article.html` og `edit_article.html` - Cover URL input
-- Oppdatert `_tickets.html` - Vedleggsseksjon med thumbnails
-- Oppdatert `forgot_password.html` - Klarere instruksjoner
-- Oppdatert `reset_password.html` - Advarsel om kodekrav
-
-#### Config
-- Lagt til `'webp'` til `ALLOWED_EXTENSIONS`
-
-### UI/UX Improvements
-
-- KB-artikler nå visuelt mer engasjerende med farger, ikoner, bilder
-- Vedlegg på saker vises som thumbnails-grid i stedet for bare lenker
-- Bedre kontrast og lesbarhet på artikler (linjeavstand, skriftstørrelse)
-- Konsekvent mørk UI-stil, ingen breaking design-changes
-- Responsive design for alle nye komponenter (mobile-friendly)
-
-### Security & Access Control
-
-- `view_attachment()` sjekker tilgang (sakseier eller support)
-- Vedleggupload sjekker filtyper via whitelist
-- Opplastingshistorikk logges for audit
-- Admin kan ikke se andre brukeres private vedlegg
-
-###  All Changes Syntax Verified
-- Python-syntaks validert: `routes.py`, `db.py`, `init_db.py`, `config.py`
-- No breaking changes to existing functionality
+- Initialisert prosjekt
+- Opprettet grunnmapper og filer

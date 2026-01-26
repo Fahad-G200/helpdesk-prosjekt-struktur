@@ -1,175 +1,248 @@
-# Helpdesk og kunnskapsbase – Vg2 IT
+# IT Helpdesk – Vg2 Prosjekt
 
-## Om prosjektet
-Dette prosjektet er en enkel helpdesk-løsning laget for skole eller bedrift.  
-Brukere kan melde inn IT-problemer, følge status på saken sin og lese veiledninger i en kunnskapsbase.  
-IT-support kan se sakene, svare på dem og oppdatere status.
+## 📌 Om prosjektet
 
-Prosjektet brukes for å vise kompetanse i **utvikling**, **driftsstøtte** og **brukerstøtte**.
+En fullstendig helpdesk-løsning for skole eller bedrift. Brukere kan melde inn IT-problemer, få hjelp fra support og lese løsninger i kunnskapsbasen. Prosjektet viser kompetanse i **drift**, **brukerstøtte** og **utvikling**.
 
 ---
 
-## Mål med prosjektet
-- Lage en fungerende IT-tjeneste
-- Vise hvordan man planlegger, bygger og dokumenterer en løsning
-- Øve på arbeidsmåter som brukes i IT-yrker (GitHub, dokumentasjon, testing)
+## 🚀 Kom i gang
 
----
+### Forutsetninger
+- Python 3.8+ og pip
+- Docker og Docker Compose (alternativ)
+- Git
 
-## Målgruppe
-- Elever eller ansatte som trenger IT-hjelp  
-- IT-support som håndterer saker og veileder brukere
+### Lokalt (uten Docker)
 
----
+```bash
+# Klon og gå til backend
+cd backend
 
-## Funksjoner – versjon 1.0 (MVP)
+# Opprett virtuelt miljø
+python3 -m venv venv
+source venv/bin/activate  # macOS/Linux
+# venv\Scripts\activate  # Windows
 
-### Bruker
-- Logge inn
-- Opprette en ny supportsak (ticket)
-- Se status på egne saker
-- Lese veiledninger i kunnskapsbasen
+# Installer pakker
+pip install -r requirements.txt
 
-### Support / admin
-- Se alle saker
-- Endre status (åpen / pågår / løst)
-- Svare på saker
-- Legge til og redigere kunnskapsartikler
+# Initialisér database (første gang)
+python app/init_db.py
 
----
+# Kjør applikasjonen
+flask run
+```
 
-## Teknologi og verktøy
-- VS Code
-- Git og GitHub
-- Python og Flask
-- Database (senere)
-- Docker og Docker Compose
+Åpne: **http://127.0.0.1:5000**
 
----
+### Med Docker
 
-## Dokumentasjon i prosjektet
-- `docs/krav.md` – behov og krav til løsningen  
-- `docs/arkitektur.md` – hvordan systemet er bygget og driftet  
-- `docs/personvern.md` – personvern og sikkerhet  
-- `docs/brukerveiledning.md` – veiledning for brukere  
-- `docs/feilsoking.md` – hvordan feil kan løses  
-- `docs/testplan.md` – testing av løsningen  
-- `docs/ai-logg.md` – bruk av KI i prosjektet  
+```bash
+# Bygg og start
+docker-compose up --build
 
----
-
-## Kompetansemål (kort forklart)
-
-### Driftsstøtte
-- Administrere brukere og roller (bruker / support / admin)
-- Planlegge og dokumentere IT-løsningen
-- Bruke Docker for å kjøre og drifte tjenesten
-
-### Brukerstøtte
-- Veilede brukere gjennom veiledninger og kunnskapsbase
-- Feilsøke problemer på en strukturert måte
-- Kommunisere tydelig med brukere
-
-### Utvikling
-- Lage krav basert på behov
-- Utvikle en fungerende løsning i Python
-- Bruke GitHub til versjonskontroll og dokumentasjon
-
----
-
-## Status
-Prosjektet er under utvikling.  
-Denne versjonen viser planlegging, struktur og start på implementasjon.  
-Løsningen bygges videre i neste periode.
-
-
-# Helpdesk‑prosjekt
-
-Dette prosjektet er et tverrfaglig arbeid hvor du designer og dokumenterer en enkel helpdesk‑løsning for en skole eller liten organisasjon. Målet er å kombinere IT‑ferdigheter (struktur, teknologi), yrkesfaglige serviceferdigheter (kundebehandling) og norsk (tydelig og korrekt fagspråk).
-
-## Innhold
-
-Dette repositoriet inneholder følgende:
-
-| Mappestruktur | Beskrivelse |
-| --- | --- |
-| `README.md` | Kort introduksjon til prosjektet (denne filen). |
-| `docs/prosjektbeskrivelse.md` | Detaljert beskrivelse av bakgrunn, mål og fremgangsmåte for prosjektet. |
-| `docs/refleksjon.md` | Mal (nå med eksempel) for refleksjon rundt eget arbeid. |
-| `system/level1.md` | Veiledning til nivå 1: selvhjelp og standardløsninger. |
-| `system/level2.md` | Veiledning til nivå 2: dypere feilsøking. |
-| `system/level3.md` | Veiledning til nivå 3: sende inn sak/eskalering. |
-| `system/index.html` | Enkel nettside som viser kunnskapsbase og skjema for innmelding. |
-
-## Hvordan bruke
-
-1. **Les prosjektbeskrivelsen** (`docs/prosjektbeskrivelse.md`) for å forstå mål og vurderingskriterier.
-2. **Les og rediger veiledningene** i `system`‑mappen. Disse beskriver hvordan brukere løser problemer på ulike nivåer (selvhjelp, teknikerstøtte, eskalering).
-3. **Åpne `system/index.html`** i en nettleser for å se et eksempel på en enkel kunnskapsbase med de tre nivåene. Her kan du legge til flere kategorier og forbedre utseendet.
-4. **Les og eventuelt tilpass refleksjonen** i `docs/refleksjon.md` når prosjektet er ferdig eller underveis.
-
-Prosjektet kan brukes som basis for en tverrfaglig oppgave der du både viser teknisk forståelse, evne til å planlegge og dokumentere, samt bruk av fagspråk og serviceinnstilling.
-
-
-## Kjøring hjemme med Docker (lokalt miljø)
-
-Dette prosjektet kan kjøres lokalt hjemme uten skolens nettverk ved hjelp av Docker.
-
-### Start
-1. Bygg image:
-   docker build -t helpdesk-app .
-2. Start container:
-   docker run --name helpdesk -p 8080:80 helpdesk-app
-3. Åpne i nettleser:
-   http://localhost:8080
-
-### Stopp
-docker stop helpdesk
-
-### Start igjen
-docker start helpdesk
-
-### Slett container (hvis du vil kjøre på nytt)
-docker rm -f helpdesk
-
-
-## Kjøring lokalt hjemme (Docker)
-
-Prosjektet kan kjøres lokalt uten skolens nettverk ved hjelp av Docker.
-
-### Bygg image
-docker build -t helpdesk-app .
-
-### Start container
-docker run -d --name helpdesk -p 8080:80 helpdesk-app
-
-### Åpne i nettleser
+# Åpne
 http://127.0.0.1:8080
+```
 
-### Stoppe / starte igjen
-docker stop helpdesk
-docker start helpdesk
+**Demo-brukere:**
+- Bruker: `test` / `test123`
+- Support: `admin` / `admin123`
 
-### Slette container (hvis du vil kjøre på nytt)
-docker rm -f helpdesk
+---
 
+## 👥 Brukerroller
 
-## Dekning av kompetansemål (LK20)
+| Rolle | Tilganger |
+|-------|-----------|
+| **User** | Opprette saker, se egne saker, last opp vedlegg, lese KB, vurdere saker |
+| **Support** | Se alle saker, endre status/prioritet, administrere KB-artikler |
+| **Admin** | Full tilgang + brukerhåndtering, systeminnstillinger, aktivitetslogg |
 
-### Brukerstøtte
-- Systemet implementerer et ticketsystem med nivå 1–3 brukerstøtte.
-- Brukere kan opprette, følge og avslutte saker.
-- Roller (bruker/support) styrer tilganger og arbeidsflyt.
+---
 
-### Utvikling
-- Applikasjonen er utviklet i Python med Flask.
-- SQLite brukes til lagring av brukere og saker.
-- Løsningen inkluderer autentisering, hashing av passord og rollebasert tilgang.
-- HTML/CSS og Jinja brukes for brukergrensesnitt.
-- Git og GitHub brukes til versjonskontroll.
+## ✨ Hovedfunksjoner
 
-### Drift
-- Applikasjonen kjøres i Docker-container via docker-compose.
-- Systemet har en enkel klient–server-arkitektur.
-- Brukere, roller og tilgangsstyring er implementert.
-- Løsningen tar hensyn til personvern og informasjonssikkerhet.
+- **Saksystem (Tickets)** – opprett, lukk, vurder, last opp vedlegg (jpg/png/pdf)
+- **Kunnskapsbase (KB)** – admin kan opprett/rediger/slette artikler
+- **Chatbot** – tekstbasert assistanse for vanlige spørsmål
+- **Tilgangskontroll** – rollebasert sikkerhet
+- **Innstillinger** – E-post, SMS, varsler (Twilio-integrasjon)
+- **Aktivitetslogg** – Audit trail for sikkerhet
+
+---
+
+## 🎬 DEMO-FLYT
+
+### Bruker-perspektiv
+1. Åpne http://127.0.0.1:5000/login
+2. Logg inn: `test` / `test123`
+3. Gå til "Mine saker" → "Ny sak"
+4. Opprett sak med tittel, beskrivelse, prioritet
+5. Last opp vedlegg (jpg/pdf) → Send inn
+6. Gå til "Mine saker" → åpne saken din
+7. Se status: "Åpen" → "Pågår" → "Lukket"
+8. Når sak er lukket: vurder løsningen (1-5 stjerner)
+9. Gå til "Kunnskapsbase" → les artikler fra support
+
+### Support/Admin-perspektiv
+1. Logg inn: `admin` / `admin123`
+2. Gå til "Dashboard" → se statistikk og aktive saker
+3. Gå til "Admin" → "Saker" → se alle brukers saker
+4. Klikk på sak → endre status, prioritet, tildel deg selv
+5. Gå til "Admin" → "KB Admin" → opprett ny artikkel
+6. Skriv tittel og innhold → publiser
+7. Gå til "Admin" → "Brukere" → promover/demote/reset passord
+8. Gå til "Admin" → "Aktivitetslogg" → se all brukeraktivitet
+
+---
+
+## 📚 Kompetansemål (LK20 – Vg2 IT)
+
+### **Drift** – Administrere og drifte IT-løsninger
+
+**Mål 1: Tilgangsstyring og roller**
+- Prosjektet implementerer 3 brukerroller (user/support/admin)
+- Hver rolle har definert tilgang (user kan bare se egne saker, support kan se alle)
+- Passordhashing med Werkzeug, sesjonshåndtering i Flask
+
+**Mål 2: Logging og overvåking**
+- Aktivitetslogg registrerer alle admin-handlinger
+- Systemet sporer hvem som endrer hva og når (audit trail)
+
+**Mål 3: Infrastruktur og containerisering**
+- Docker-oppsett med docker-compose.yml
+- Løsningen kjører i isolert container, uavhengig av lokalt miljø
+- Enkelt å scale og redeploy
+
+---
+
+### **Brukerstøtte** – Veilede og hjelpe brukere
+
+**Mål 1: Strukturert casehåndtering**
+- Ticketsystem med klare statuser (Åpen → Pågår → Lukket)
+- Brukere gir tilbakemelding via vurdering av sak (1-5 stjerner)
+- Support har tydelig arbeitsflyt og prioritering
+
+**Mål 2: Kunnskapsbase og selvbetjening**
+- KB-modulen lar support opprett/rediger veiledninger
+- Brukere kan selv søke løsninger før de melder sak
+- Chatbot gir rask assistanse for hyppige spørsmål
+
+**Mål 3: Kommunikasjon og løsningsorientert tilnærming**
+- Saker følges fra innmelding til avslutning
+- Vedlegg (screenshots, filer) hjelper support å forstå problemet
+- Support kan prioritere kritiske saker høyere
+
+---
+
+### **Utvikling** – Planlegge og utvikle IT-løsninger
+
+**Mål 1: Kravanalyse og design**
+- Dokumentert i `docs/krav.md` – behovskartlegging og funksjonelle krav
+- Arkitektur beskrevet i `docs/arkitektur.md`
+- Klare usecase-beskrivelser
+
+**Mål 2: Implementasjon i Python**
+- Flask-applikasjon med 48+ ruter
+- SQLAlchemy ORM for database (SQLite)
+- Jinja2 for templating (HTML)
+- CSS/JavaScript for brukergrensesnitt
+- Autentisering (login/register), passordreset
+
+**Mål 3: Versjonskontroll og CI/CD**
+- Git-repo med tydelig commit-historie
+- CHANGELOG.md dokumenterer alle endringer
+- Branch-strategi for testing før merge
+- Docker-integrasjon for automatisk deploy
+
+---
+
+## 🔒 Sikkerhet og Personvern
+
+- **Autentisering:** Brukernavn + passord (Werkzeug-hashing, salt)
+- **Autorisasjon:** Rollebasert tilgangskontroll (RBAC)
+- **Sesjonshåndtering:** Flask sessions, sikre cookies
+- **Filvedlegg:** Validering av filtyper (jpg, png, pdf), filstørrelse
+- **GDPR:** Lokal SQLite-database (ingen skytjenester)
+- **Logging:** Aktivitetslogg for audit trail
+
+Se [docs/personvern.md](docs/personvern.md) for detaljer.
+
+---
+
+## ✅ Testing
+
+| Test | Status | Beskrivelse |
+|------|--------|-------------|
+| Innlogging | ✅ OK | User og admin kan logge inn/ut |
+| Roller | ✅ OK | User kan ikke se andre sin saker; support ser alle |
+| Tickets | ✅ OK | Opprett, lukk, vurder, endre status |
+| Vedlegg | ✅ OK | Last opp/ned jpg/pdf, validering av type |
+| KB Admin | ✅ OK | Support kan opprett/rediger/slette artikler |
+| Chatbot | ✅ OK | Svarer på spørsmål |
+| Passord | ✅ OK | Reset-funksjonalitet fungerer |
+
+Se [docs/testplan.md](docs/testplan.md) for full testkjøring.
+
+---
+
+## 🤖 KI-bruk i prosjektet
+
+KI (ChatGPT) ble brukt som **læringsstøtte**:
+- Forstå Flask/Jinja/SQLAlchemy-konsepter
+- Feilsøking av bugs (Docker, routing, database)
+- Kodestruktur og best practices
+- Skrive dokumentasjon
+
+**Hva jeg gjorde selv:**
+- Skrev all kode manuelt
+- Testet hver endring før publisering
+- Tok avgjørelser basert på prosjektkrav
+- Forstod løsningene før jeg beholdt dem
+
+Se [docs/ai-logg.md](docs/ai-logg.md) for detaljer.
+
+---
+
+## 📁 Prosjektstruktur
+
+```
+helpdesk-prosjekt/
+├── backend/
+│   ├── app/
+│   │   ├── routes.py        # 48+ Flask-ruter
+│   │   ├── models.py        # SQLAlchemy-modeller
+│   │   ├── db.py            # Database-initialisering
+│   │   ├── templates/       # Jinja2 HTML
+│   │   └── static/          # CSS, JS
+│   ├── requirements.txt
+│   └── init_db.py
+├── docs/                    # Dokumentasjon
+├── infra/
+│   ├── docker-compose.yml
+│   └── Dockerfile
+└── README.md
+```
+
+Se [docs/struktur.md](docs/struktur.md) for detaljert arkitektur-oversikt.
+
+---
+
+## 📖 Dokumentasjon
+
+- **krav.md** – Behovskartlegging og funksjonelle krav
+- **arkitektur.md** – Systemarkitektur og design
+- **personvern.md** – Sikkerhet og GDPR
+- **testplan.md** – Testkjøring og resultat
+- **ai-logg.md** – KI-bruk og egen innsats
+- **brukerveiledning.md** – Veiledning for sluttbruker
+- **prosjektbeskrivelse.md** – Bakgrunn og mål
+- **refleksjon.md** – Refleksjon over arbeidet
+
+---
+
+## 📞 Support
+
+For feilsøking eller spørsmål, se [docs/feilsoking.md](docs/feilsoking.md).
