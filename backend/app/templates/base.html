@@ -143,5 +143,50 @@
     </div>
 
     <script src="{{ url_for('static', filename='js/chatbot.js') }}" defer></script>
+
+    <!-- COOKIE CONSENT BANNER -->
+    <div id="cookieBanner" style="display:none; position:fixed; bottom:0; left:0; right:0; background:rgba(15,23,42,.95); border-top:1px solid rgba(148,163,184,.18); padding:16px 20px; z-index:9999; backdrop-filter:blur(10px);">
+      <div style="max-width:1200px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;">
+        <p style="margin:0; color:#e5e7eb; font-size:14px; flex:1; min-width:250px;">
+          Denne nettsiden bruker informasjonskapsler (cookies) for å sikre funksjonalitet og forbedre brukeropplevelsen. Ved å bruke siden godtar du bruk av cookies.
+        </p>
+        <div style="display:flex; gap:8px; flex-shrink:0;">
+          <button id="cookieAccept" type="button" style="background:#0284c7; color:#fff; border:none; padding:10px 16px; border-radius:8px; font-weight:700; cursor:pointer; font-size:14px;">
+            Godta
+          </button>
+          <button id="cookieReject" type="button" style="background:transparent; color:#60a5fa; border:1px solid #60a5fa; padding:10px 16px; border-radius:8px; font-weight:700; cursor:pointer; font-size:14px;">
+            Avslå
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      (function() {
+        const banner = document.getElementById('cookieBanner');
+        const acceptBtn = document.getElementById('cookieAccept');
+        const rejectBtn = document.getElementById('cookieReject');
+        
+        // Sjekk hvis bruker allerede har samtykket
+        const hasConsent = localStorage.getItem('cookie_consent');
+        
+        // Vis banner hvis ikke samtykke finnes
+        if (!hasConsent) {
+          banner.style.display = 'flex';
+        }
+        
+        // Godta cookies
+        acceptBtn.addEventListener('click', function() {
+          localStorage.setItem('cookie_consent', 'accepted');
+          banner.style.display = 'none';
+        });
+        
+        // Avslå cookies
+        rejectBtn.addEventListener('click', function() {
+          localStorage.setItem('cookie_consent', 'rejected');
+          banner.style.display = 'none';
+        });
+      })();
+    </script>
   </body>
 </html>
