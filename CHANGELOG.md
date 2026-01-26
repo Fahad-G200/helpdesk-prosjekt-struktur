@@ -1,90 +1,99 @@
 # Changelog
 
-Alle vesentlige endringer i prosjektet dokumenteres her.
+## 2026-01-25
+### Refactoring
+- Flytt CSS fra templates til `static/css/app.css` og `static/css/auth.css`
+- Flytt JavaScript fra templates til `static/js/chatbot.js` og `static/js/admin.js`
+- Ryddigere kodestruktur, bedre vedlikehold
+- Ingen funksjons- eller visuelle endringer
 
----
+## 2026-01-05
+- Opprettet prosjektstruktur med docs, backend og infra
+- Publiserte prosjektet til GitHub
+- Startet README med prosjektbeskrivelse, MVP og kobling til kompetansemål
 
-## [1.0.0] – 2026-01-26 (Vurderingsklart)
+## 2026-01-05
+- Skrev behovskartlegging og funksjonelle krav i krav.md
 
-### Added
-- Cookie consent banner (GDPR-kompatibel)
-- Komplett dokumentasjon for vurdering (kompetansemål, testing, KI-bruk)
-- Forbedret README med demo-flyt og setup-instruksjoner
+## 2026-01-05
+- Skrev arkitektur for prosjektet
+- Beskrev hvordan systemet er bygget opp med webapp og database
+- Forklarte roller, drift med Docker og enkel segmentering
+- Skrev personvern og sikkerhet (hvilke data som lagres og tiltak for å beskytte dem)
+- Skrev brukerveiledning for vanlige brukere (innlogging, saker og kunnskapsbase)
 
-### Changed
-- Refaktorert CSS og JavaScript til egne filer (bedre vedlikehold)
-- Oppgradert dokumentasjon med tydelige kompetansemål og testing
 
-### Fixed
-- Input-felt på "Glemt passord"-siden (pointer-events: none fjernet)
-- Chatbot-integrasjon
 
-### Security
-- Passordhashing med Werkzeug
-- Rollebasert tilgangskontroll (RBAC)
-- Aktivitetslogg for audit trail
+## 2026-01-07
+- Skrev testplan for helpdesk-løsningen (testmiljø, metoder og testtilfeller)
 
----
+# Changelog
 
-## [0.9.0] – 2026-01-10
+Alle viktige endringer i dette prosjektet dokumenteres her.
 
-### Added
-- Ticketsystem med fullt CRUD (Create, Read, Update, Delete)
-- Vedleggsystem (jpg, png, pdf) med validering
-- Kunnskapsbase (KB) med admin-håndtering
-- Vurderingssystem for lukkede saker (1-5 stjerner)
-- Chatbot-assistanse
-- Rolle-basert tilgangskontroll (user/support/admin)
-- Aktivitetslogg
-- Innstillinger (E-post, SMS, varsler)
-- Passord-reset funksjonalitet
+2026-01-09
+### Lagt til
+- Opprettet grunnstruktur for helpdesk-prosjektet
+- Implementert helpdesk med tre støttenivåer (nivå 1, 2 og 3)
+- Skrevet selvhjelpsinstruksjoner for vanlige problemer:
+  - Feide-pålogging
+  - Nettverk (Wi-Fi)
+  - Utskrift
+  - Glemt eller låst passord
+- Laget refleksjon skrevet i førsteperson
+- Dokumentert prosjektbeskrivelse, mål og fremgangsmåte
+- Laget enkel HTML-side som demonstrerer helpdesk-flyten
 
-### Changed
-- Splittet innlogging fra main-app (auth_base.html vs base.html)
-- Forbedret design og brukeropplevelse
-- Migrert til SQLite-database fra fil-basert lagring
+### Endret
+- Forbedret struktur og språk for å gjøre prosjektet mer profesjonelt
+- Tilpasset dokumentasjon til tverrfaglig vurdering
 
-### Fixed
-- Admin-bruker manglet ved oppstart
-- Saker som forsvant ved omstart (nå persistert i DB)
-- Tilgangskontroll mellom bruker og support
-- Docker-konfigurering (localhost → 127.0.0.1)
+### Planlagt
+- Utvide kunnskapsbasen med flere problemtyper
+- Forbedre design og brukervennlighet
+- Eventuelt implementere lagring av innsendte saker
 
-### Security
-- Innførte sesjonshåndtering
-- Passordhashing
-- Filtype-validering på vedlegg
 
----
 
-## [0.5.0] – 2026-01-07
+# Changelog
 
-### Added
-- Testplan for løsningen
-- Arkitektur-dokumentasjon
-- Personvern- og sikkerhetsdokumentasjon
-- Brukerveiledning
+Alle vesentlige endringer i prosjektet dokumenteres i denne filen.
 
-### Changed
-- Strukturert dokumentasjon under docs/
+2026-01-10
+### Nytt
+- Opprettet komplett prosjektstruktur for helpdesk og kunnskapsbase (docs, backend, infra, site)
+- Implementert nivåbasert brukerstøtte (nivå 1–3) med tydelig eskaleringsflyt
+- Lagt til kunnskapsbase i backend (/kb) integrert med innlogging og felles design
+- Lagt til innsendingsskjema på nivå 3 med kategori, prioritet og enhet/programvare
+- Implementert ticketsystem med opprettelse, visning og lukking av saker
+- Lagt til SQLite-database for lagring av brukere og saker
+- Implementert registreringsside for nye brukere
+- Implementert roller (bruker og support/admin)
+- Lagt til fast admin/support-bruker som kan se og håndtere alle saker
+- Support-bruker kan lukke saker og følge status
+- Satt opp Docker (nginx) for lokal kjøring av prosjektet uavhengig av skolens nettverk
+- Oppdatert og fullført dokumentasjon (testplan, personvern, arkitektur, refleksjon)
 
----
+### Endret
+- Gått fra midlertidig/demonstrasjonslagring til databasebasert lagring
+- Forbedret struktur i backend-koden (routes, database, templates)
+- Forbedret navigasjon og brukeropplevelse i backend (felles layout og meny)
+- Forbedret design og struktur på nettsiden for mer profesjonelt uttrykk
+- Rettet Dockerfile fra feil mappe (`system/`) til korrekt innhold (`docs` / `site`)
+- Forbedret innhold og sammenheng i README, prosjektbeskrivelse og refleksjon
 
-## [0.3.0] – 2026-01-05
+### Fikset
+- Rettet feil der saker forsvant ved omstart (manglende database)
+- Rettet feil der admin-bruker manglet i databasen
+- Forbedret tilgangskontroll mellom bruker og support/admin
+- Rettet problemer med lokal kjøring (`localhost`) ved testing
+  - Prosjektet kjøres nå stabilt via `http://127.0.0.1:8080`
+- Ryddet opp i HTML- og CSS-struktur for å sikre korrekt visning
 
-### Added
-- Prosjektbeskrivelse
-- Behovskartlegging (docs/krav.md)
-- GitHub-repo opprettet
-- Grunnstruktur (docs/, backend/, infra/)
-
-### Changed
-- Innledende krav og arkitektur definert
-
----
-
-## [0.1.0] – 2026-01-01
-
-### Added
-- Initialisert prosjekt
-- Opprettet grunnmapper og filer
+### Notater
+- Dette er første ferdige hovedversjon av prosjektet (versjon 1.0.0)
+- Prosjektet viser en helhetlig helpdesk-løsning med brukerstøtte, roller og saksbehandling
+- Løsningen kan kjøres lokalt og er uavhengig av skolens nettverk
+- Standard admin for demo/testing:
+  - Brukernavn: `admin`
+  - Passord: `admin123`
