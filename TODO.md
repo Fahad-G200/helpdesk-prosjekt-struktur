@@ -1,12 +1,12 @@
 # IT Helpdesk – Prosjekt ferdigstillelse
 
-## ✅ Vurderingsklart (Karakter 6)
+##  Vurderingsklart (Karakter 6)
 
 Prosjektet er **fullstendig ferdigstilt** og klart for vurdering.
 
 ---
 
-## 📋 Ferdigstilte oppgaver
+##  Ferdigstilte oppgaver
 
 ### Dokumentasjon
 - [x] **README.md** – Komplett med kompetansemål, demo-flyt, setup
@@ -43,7 +43,7 @@ Prosjektet er **fullstendig ferdigstilt** og klart for vurdering.
 
 ---
 
-## 🎯 Kompetansemål (Dekket)
+##  Kompetansemål (Dekket)
 
 ### Drift
 - [x] Tilgangsstyring & roller
@@ -62,7 +62,7 @@ Prosjektet er **fullstendig ferdigstilt** og klart for vurdering.
 
 ---
 
-## 🚀 Quick Start
+##  Quick Start
 
 ```bash
 cd backend
@@ -77,16 +77,16 @@ flask run
 
 ---
 
-## 📊 Prosjekt-status
+##  Prosjekt-status
 
 | Område | Status |
 |--------|--------|
-| Kode | ✅ 100% fungerende |
-| Dokumentasjon | ✅ 1200+ linjer |
-| Testing | ✅ 25/25 OK |
-| Sikkerhet | ✅ Implementert |
-| Deployment | ✅ Docker klart |
-| KI-bruk | ✅ Dokumentert |
+| Kode |  100% fungerende |
+| Dokumentasjon |  1200+ linjer |
+| Testing |  25/25 OK |
+| Sikkerhet |  Implementert |
+| Deployment |  Docker klart |
+| KI-bruk |  Dokumentert |
 
 **Versjon:** 1.0.0  
 **Dato:** 26. januar 2026  

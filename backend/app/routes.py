@@ -1616,22 +1616,22 @@ class IntelligentHelpdeskAI:
         if entities.get("error_message"):
             error_explanation = self._find_matching_error(entities["error_message"], topic)
             if error_explanation:
-                response_parts.append("🎯 **Jeg forstår problemet:**")
+                response_parts.append(" **Jeg forstår problemet:**")
                 response_parts.append(f"Feilmeldingen '{entities['error_message']}' betyr: {error_explanation}")
                 response_parts.append("")
 
         if entities.get("actions_tried"):
-            response_parts.append(f"✅ Jeg ser du allerede har prøvd: {', '.join(entities['actions_tried'])}")
+            response_parts.append(f" Jeg ser du allerede har prøvd: {', '.join(entities['actions_tried'])}")
             response_parts.append("La meg gi deg neste steg basert på det.")
             response_parts.append("")
 
         context_parts = []
         if entities.get("os"):
-            context_parts.append(f"💻 {entities['os']}")
+            context_parts.append(f" {entities['os']}")
         if entities.get("browser"):
-            context_parts.append(f"🌐 {entities['browser']}")
+            context_parts.append(f" {entities['browser']}")
         if entities.get("application"):
-            context_parts.append(f"📱 {entities['application']}")
+            context_parts.append(f" {entities['application']}")
 
         if context_parts:
             response_parts.append(f"**System:** {' | '.join(context_parts)}")
@@ -1640,14 +1640,14 @@ class IntelligentHelpdeskAI:
         message_count = conversation_state.get("message_count", 1)
 
         if message_count == 1 or not conversation_state.get("solutions_given"):
-            response_parts.append("**🔧 Her er hva jeg anbefaler å prøve:**")
+            response_parts.append("** Her er hva jeg anbefaler å prøve:**")
             response_parts.append("")
             for i, solution in enumerate(topic_data["solutions"]["basic"], 1):
                 response_parts.append(f"{i}. {solution}")
             conversation_state["solutions_given"] = "basic"
 
         elif conversation_state.get("solutions_given") == "basic":
-            response_parts.append("**🔧 La oss prøve mer avanserte løsninger:**")
+            response_parts.append("** La oss prøve mer avanserte løsninger:**")
             response_parts.append("")
             for i, solution in enumerate(topic_data["solutions"]["intermediate"], 1):
                 response_parts.append(f"{i}. {solution}")
@@ -1670,12 +1670,12 @@ class IntelligentHelpdeskAI:
             response_parts.append("")
 
         if message_count >= 3:
-            response_parts.append("**💡 Hvis dette fortsatt ikke løser problemet:**")
+            response_parts.append("** Hvis dette fortsatt ikke løser problemet:**")
             response_parts.append("Jeg anbefaler at du oppretter en support-sak så kan vårt team hjelpe deg direkte.")
             response_parts.append("De har tilgang til flere verktøy og kan feilsøke mer detaljert.")
         else:
-            response_parts.append("**💬 Fungerte det?**")
-            response_parts.append("• Hvis ja: Fantastisk! Glad jeg kunne hjelpe! 😊")
+            response_parts.append("** Fungerte det?**")
+            response_parts.append("• Hvis ja: Fantastisk! Glad jeg kunne hjelpe! ")
             response_parts.append("• Hvis nei: Fortell meg hva som skjedde, så går vi videre.")
 
         return "\n".join(response_parts)
@@ -1684,7 +1684,7 @@ class IntelligentHelpdeskAI:
         if sentiment["urgency"] == "high":
             urgency_openers = [
                 "⚡ **Jeg ser dette haster!** La meg hjelpe deg raskt.",
-                "🚨 **Forstår at dette er viktig.** La oss løse det nå.",
+                " **Forstår at dette er viktig.** La oss løse det nå.",
                 "⏰ **OK, dette må fikses fort.** Jeg skal hjelpe deg umiddelbart."
             ]
             import random
@@ -1692,40 +1692,40 @@ class IntelligentHelpdeskAI:
 
         if sentiment["emotion"] == "frustrated":
             if sentiment["frustration_level"] > 1:
-                return "😔 **Jeg forstår at dette er frustrerende.** La meg hjelpe deg å løse dette en gang for alle."
-            return "💙 **Jeg forstår at dette er irriterende.** La oss finne en løsning sammen."
+                return " **Jeg forstår at dette er frustrerende.** La meg hjelpe deg å løse dette en gang for alle."
+            return " **Jeg forstår at dette er irriterende.** La oss finne en løsning sammen."
 
         if sentiment["emotion"] == "confused":
-            return "🤝 **Jeg skal forklare dette enkelt.** Ikke bekymre deg, vi tar det steg for steg."
+            return " **Jeg skal forklare dette enkelt.** Ikke bekymre deg, vi tar det steg for steg."
 
         topic_openings = {
-            "feide": "👋 **Feide-innlogging kan være tricky!** Jeg hjelper deg å komme inn.",
-            "wifi": "📡 **Nettverksproblemer er kjedelige!** La meg hjelpe deg å få nettet til å virke.",
-            "utskrift": "🖨️ **Skriverproblemer er ofte enkle å fikse!** La meg guide deg.",
-            "passord": "🔑 **Passordproblemer? Helt normalt!** Jeg hjelper deg tilbake på rett spor.",
-            "m365": "📧 **Microsoft 365 kan ha sine utfordringer.** La meg hjelpe deg.",
-            "nettleser": "🌐 **Nettleserproblemer? Jeg har løsningen!**"
+            "feide": " **Feide-innlogging kan være tricky!** Jeg hjelper deg å komme inn.",
+            "wifi": " **Nettverksproblemer er kjedelige!** La meg hjelpe deg å få nettet til å virke.",
+            "utskrift": "️ **Skriverproblemer er ofte enkle å fikse!** La meg guide deg.",
+            "passord": " **Passordproblemer? Helt normalt!** Jeg hjelper deg tilbake på rett spor.",
+            "m365": " **Microsoft 365 kan ha sine utfordringer.** La meg hjelpe deg.",
+            "nettleser": " **Nettleserproblemer? Jeg har løsningen!**"
         }
-        return topic_openings.get(topic, "👋 **Hei! Jeg er her for å hjelpe deg.**")
+        return topic_openings.get(topic, " **Hei! Jeg er her for å hjelpe deg.**")
 
     def _generate_clarification_request(self, entities: Dict, sentiment: Dict) -> str:
         parts = []
 
         if sentiment["emotion"] == "frustrated":
-            parts.append("💙 **Jeg merker at dette er frustrerende for deg.**")
+            parts.append(" **Jeg merker at dette er frustrerende for deg.**")
             parts.append("La meg hjelpe - jeg trenger bare litt mer info for å gi deg best mulig hjelp.")
             parts.append("")
         else:
-            parts.append("🤔 **Jeg vil gjerne hjelpe deg, men trenger litt mer informasjon.**")
+            parts.append(" **Jeg vil gjerne hjelpe deg, men trenger litt mer informasjon.**")
             parts.append("")
 
         understood = []
         if entities.get("os"):
-            understood.append(f"✅ System: {entities['os']}")
+            understood.append(f" System: {entities['os']}")
         if entities.get("browser"):
-            understood.append(f"✅ Nettleser: {entities['browser']}")
+            understood.append(f" Nettleser: {entities['browser']}")
         if entities.get("application"):
-            understood.append(f"✅ Program: {entities['application']}")
+            understood.append(f" Program: {entities['application']}")
 
         if understood:
             parts.append("**Dette har jeg forstått:**")
@@ -1733,19 +1733,19 @@ class IntelligentHelpdeskAI:
             parts.append("")
 
         parts.append("**Jeg kan hjelpe med:**")
-        parts.append("• 🔐 **Feide/Innlogging** - 'Kan ikke logge inn på Feide'")
-        parts.append("• 📡 **Wi-Fi/Nettverk** - 'Får ikke internett på PC-en'")
-        parts.append("• 🖨️ **Utskrift** - 'Skriveren vil ikke printe'")
-        parts.append("• 🔑 **Passord** - 'Har glemt passordet mitt'")
-        parts.append("• 📧 **Microsoft 365** - 'Teams krasjer hele tiden'")
-        parts.append("• 🌐 **Nettleser** - 'Chrome laster ikke nettsider'")
+        parts.append("•  **Feide/Innlogging** - 'Kan ikke logge inn på Feide'")
+        parts.append("•  **Wi-Fi/Nettverk** - 'Får ikke internett på PC-en'")
+        parts.append("• ️ **Utskrift** - 'Skriveren vil ikke printe'")
+        parts.append("•  **Passord** - 'Har glemt passordet mitt'")
+        parts.append("•  **Microsoft 365** - 'Teams krasjer hele tiden'")
+        parts.append("•  **Nettleser** - 'Chrome laster ikke nettsider'")
         parts.append("")
-        parts.append("**💡 Tips for best hjelp:**")
+        parts.append("** Tips for best hjelp:**")
         parts.append("• Beskriv problemet: 'Jeg kan ikke logge inn på Feide på PC-en min'")
         parts.append("• Inkluder feilmelding: 'Får feilmelding \"timeout\"'")
         parts.append("• Fortell hva du har prøvd: 'Har startet på nytt, men hjelper ikke'")
         parts.append("")
-        parts.append("**Prøv å beskrive problemet ditt med noen flere ord, så hjelper jeg deg! 😊**")
+        parts.append("**Prøv å beskrive problemet ditt med noen flere ord, så hjelper jeg deg! **")
 
         return "\n".join(parts)
 
@@ -1815,15 +1815,15 @@ class IntelligentHelpdeskAI:
     def _generate_success_message(self) -> str:
         import random
         messages = [
-            "🎉 **Fantastisk!** Jeg er så glad jeg kunne hjelpe deg!\n\nHvis du får andre problemer, er jeg her. Ha en fin dag! 😊",
-            "✨ **Perfekt!** Det var akkurat det jeg håpet på!\n\nHusk at jeg alltid er her hvis du trenger hjelp igjen. Lykke til! 🚀",
-            "🌟 **Supert!** Kjempe bra at det virket!\n\nFøl deg fri til å spørre meg igjen hvis du trenger noe. God dag videre! 💪"
+            " **Fantastisk!** Jeg er så glad jeg kunne hjelpe deg!\n\nHvis du får andre problemer, er jeg her. Ha en fin dag! ",
+            " **Perfekt!** Det var akkurat det jeg håpet på!\n\nHusk at jeg alltid er her hvis du trenger hjelp igjen. Lykke til! ",
+            " **Supert!** Kjempe bra at det virket!\n\nFøl deg fri til å spørre meg igjen hvis du trenger noe. God dag videre! "
         ]
         return random.choice(messages)
 
     def _generate_escalation_message(self, topic: str, entities: Dict) -> str:
         parts = []
-        parts.append("🤝 **Jeg tror det er best at vårt support-team tar over herfra.**")
+        parts.append(" **Jeg tror det er best at vårt support-team tar over herfra.**")
         parts.append("")
         parts.append("De har tilgang til flere verktøy og kan:")
         parts.append("• Se direkte på systemet ditt")
@@ -1831,7 +1831,7 @@ class IntelligentHelpdeskAI:
         parts.append("• Gjøre mer avanserte endringer")
         parts.append("• Gi deg personlig oppfølging")
         parts.append("")
-        parts.append("**📝 Når du oppretter en support-sak, inkluder:**")
+        parts.append("** Når du oppretter en support-sak, inkluder:**")
 
         if entities.get("error_message"):
             parts.append(f"• Feilmelding: '{entities['error_message']}'")
@@ -1845,19 +1845,19 @@ class IntelligentHelpdeskAI:
             parts.append(f"• Hva du har prøvd: {', '.join(entities['actions_tried'])}")
 
         parts.append("")
-        parts.append("Du kan opprette en sak ved å klikke på 'Saker' i menyen. 👆")
+        parts.append("Du kan opprette en sak ved å klikke på 'Saker' i menyen. ")
         parts.append("")
-        parts.append("Vårt team svarer vanligvis innen 1-2 timer! 💙")
+        parts.append("Vårt team svarer vanligvis innen 1-2 timer! ")
         return "\n".join(parts)
 
     def _generate_human_escalation_message(self) -> str:
         return (
-            "🤝 **Selvfølgelig! La meg sette deg i kontakt med vårt support-team.**\n\n"
+            " **Selvfølgelig! La meg sette deg i kontakt med vårt support-team.**\n\n"
             "De er ekte mennesker som har mer erfaring og tilgang til flere verktøy enn meg.\n\n"
-            "**📝 Opprett en support-sak her:**\n"
+            "** Opprett en support-sak her:**\n"
             "Klikk på 'Saker' i menyen, og teamet vårt tar kontakt med deg så fort som mulig!\n\n"
             "Gjennomsnittlig responstid: 1-2 timer ⏰\n\n"
-            "Jeg håper de kan hjelpe deg bedre enn jeg kunne! 💙"
+            "Jeg håper de kan hjelpe deg bedre enn jeg kunne! "
         )
 
 
@@ -1961,7 +1961,7 @@ def reset_chat():
 
     return jsonify({
         "status": "ok",
-        "message": "Samtalen er tilbakestilt. Jeg husker ikke vår tidligere dialog nå! 🔄"
+        "message": "Samtalen er tilbakestilt. Jeg husker ikke vår tidligere dialog nå! "
     })
 
 @bp.route("/forgot-password", methods=["GET", "POST"])

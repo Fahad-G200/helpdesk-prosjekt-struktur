@@ -262,15 +262,15 @@ backend/
 
 ## Sikkerheits-checklist
 
-- ✅ Passordhashing (Werkzeug)
-- ✅ Rollebasert tilgangskontroll
-- ✅ Sesjonshåndtering
-- ✅ Filtype-validering
-- ✅ SQL-injection-beskyttelse (ORM)
-- ✅ CSRF-beskyttelse (Flask-WTF)
-- ⚠️ HTTPS (ikke implementert, anbefales for produksjon)
-- ⚠️ Rate limiting (ikke implementert)
-- ⚠️ 2FA (ikke implementert)
+-  Passordhashing (Werkzeug)
+-  Rollebasert tilgangskontroll
+-  Sesjonshåndtering
+-  Filtype-validering
+-  SQL-injection-beskyttelse (ORM)
+-  CSRF-beskyttelse (Flask-WTF)
+-  HTTPS (ikke implementert, anbefales for produksjon)
+-  Rate limiting (ikke implementert)
+-  2FA (ikke implementert)
 
 ---
 

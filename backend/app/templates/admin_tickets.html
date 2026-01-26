@@ -2,7 +2,7 @@
 {% block content %}
 
 <div class="card">
-  <h1>🎫 Sakshåndtering</h1>
+  <h1> Sakshåndtering</h1>
   <p class="muted">Administrer alle support-saker</p>
 </div>
 
@@ -19,7 +19,7 @@
           style="background:#ef4444;"
           onclick="return confirm('Slette valgte saker permanent?');"
         >
-          🗑️ Slett valgte
+          ️ Slett valgte
         </button>
       </div>
 
@@ -86,7 +86,7 @@
               {% if (t.status or '') != 'Lukket' %}
               <form method="post" action="{{ url_for('main.assign_ticket_to_support', ticket_id=t.id) }}" style="display:inline;">
                 <input type="hidden" name="assigned_to" value="{{ session.get('user') }}">
-                <button type="submit" style="background:#3b82f6; padding:6px 10px; font-size:12px;">📌 Meg</button>
+                <button type="submit" style="background:#3b82f6; padding:6px 10px; font-size:12px;"> Meg</button>
               </form>
 
               <form method="post" action="{{ url_for('main.change_ticket_priority', ticket_id=t.id) }}" style="display:inline;">
@@ -96,7 +96,7 @@
                   <option {% if (t.priority or '') == 'Høy' %}selected{% endif %}>Høy</option>
                   <option {% if (t.priority or '') == 'Kritisk' %}selected{% endif %}>Kritisk</option>
                 </select>
-                <button type="submit" style="background:#f59e0b; padding:6px 10px; font-size:12px;">⚠️</button>
+                <button type="submit" style="background:#f59e0b; padding:6px 10px; font-size:12px;"></button>
               </form>
 
               <form method="post" action="{{ url_for('main.close_ticket_view', ticket_id=t.id) }}" style="display:inline;">
@@ -105,7 +105,7 @@
               {% endif %}
 
               <form method="post" action="{{ url_for('main.delete_ticket_permanently', ticket_id=t.id) }}" style="display:inline;" onsubmit="return confirm('Slette sak #{{ t.id }} permanent?');">
-                <button type="submit" style="background:#ef4444; padding:6px 10px; font-size:12px;">🗑️</button>
+                <button type="submit" style="background:#ef4444; padding:6px 10px; font-size:12px;">️</button>
               </form>
             </div>
           </td>

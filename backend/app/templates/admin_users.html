@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="card">
-  <h1>👥 Brukerhåndtering</h1>
+  <h1> Brukerhåndtering</h1>
   <p class="muted">Administrer alle brukere i systemet</p>
 </div>
 
@@ -26,9 +26,9 @@
         </td>
         <td style="padding:12px;">
           {% if u.role == 'support' %}
-            <span style="background:#3b82f6; color:#fff; padding:4px 8px; border-radius:4px; font-size:12px;">🛡️ Support</span>
+            <span style="background:#3b82f6; color:#fff; padding:4px 8px; border-radius:4px; font-size:12px;">️ Support</span>
           {% else %}
-            <span style="background:#64748b; color:#fff; padding:4px 8px; border-radius:4px; font-size:12px;">👤 User</span>
+            <span style="background:#64748b; color:#fff; padding:4px 8px; border-radius:4px; font-size:12px;"> User</span>
           {% endif %}
         </td>
         <td style="padding:12px; color:#94a3b8;">{{ u.email or '—' }}</td>
@@ -38,7 +38,7 @@
           {% if u.username != 'admin' and u.username != session.get("user") %}
             <div style="display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap;">
               <form method="post" action="{{ url_for('main.admin_reset_password', username=u.username) }}" style="display:inline;">
-                <button type="submit" style="background:#8b5cf6; padding:6px 12px; font-size:12px;">🔑 Nytt passord</button>
+                <button type="submit" style="background:#8b5cf6; padding:6px 12px; font-size:12px;"> Nytt passord</button>
               </form>
               
               {% if u.role == 'user' %}
@@ -52,7 +52,7 @@
               {% endif %}
               
               <form method="post" action="{{ url_for('main.delete_user', username=u.username) }}" style="display:inline;" onsubmit="return confirm('Slette bruker {{ u.username }}? Dette kan ikke angres!');">
-                <button type="submit" style="background:#ef4444; padding:6px 12px; font-size:12px;">🗑️ Slett</button>
+                <button type="submit" style="background:#ef4444; padding:6px 12px; font-size:12px;">️ Slett</button>
               </form>
             </div>
           {% else %}
@@ -66,7 +66,7 @@
 </div>
 
 <div class="card" style="background:rgba(59,130,246,.1); border-color:#3b82f6;">
-  <h3>📊 Statistikk</h3>
+  <h3> Statistikk</h3>
   <p><strong>Totalt brukere:</strong> {{ users|length }}</p>
   <p><strong>Support-brukere:</strong> {{ users|selectattr('role', 'equalto', 'support')|list|length }}</p>
   <p><strong>Vanlige brukere:</strong> {{ users|selectattr('role', 'equalto', 'user')|list|length }}</p>

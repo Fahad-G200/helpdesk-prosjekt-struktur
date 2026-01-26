@@ -141,7 +141,7 @@
             <!-- Vedlegg -->
             {% if t.attachments and t.attachments|length > 0 %}
             <div class="attachments-section">
-              <strong style="font-size: 13px;">📎 Vedlegg:</strong>
+              <strong style="font-size: 13px;"> Vedlegg:</strong>
               <div class="attachments-grid">
                 {% for att in t.attachments %}
                   {% set filename_lower = att.original_filename.lower() %}
@@ -158,7 +158,7 @@
                     <!-- Annen filtype - vis som lenke -->
                     <div class="attachment-item">
                       <div class="attachment-file">
-                        <span>📄</span>
+                        <span></span>
                         <a href="{{ url_for('main.download_attachment', attachment_id=att.id) }}">{{ att.original_filename[:20] }}{% if att.original_filename|length > 20 %}...{% endif %}</a>
                       </div>
                     </div>

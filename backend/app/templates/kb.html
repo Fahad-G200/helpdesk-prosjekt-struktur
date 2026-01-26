@@ -149,7 +149,7 @@
 </style>
 
 <div class="kb-header">
-  <h1>📚 Kunnskapsbase</h1>
+  <h1> Kunnskapsbase</h1>
   <p>Finn svar og løsninger på vanlige problemer</p>
 </div>
 
@@ -162,7 +162,7 @@
         {% if article.cover_url %}
           <img src="{{ article.cover_url }}" alt="{{ article.title }}">
         {% else %}
-          📄
+          
         {% endif %}
       </div>
       <div class="kb-card-body">
@@ -184,7 +184,7 @@
 
 <div class="kb-levels">
   <div class="kb-level-card" style="background: linear-gradient(to bottom, rgba(34, 197, 94, 0.1), transparent); border-color: #22c55e;">
-    <h2>🟢 Nivå 1 – Selvbetjening</h2>
+    <h2> Nivå 1 – Selvbetjening</h2>
     <p>Dette er ting du kan prøve før du kontakter support.</p>
     <ul>
       <li><strong>Feide:</strong> Sjekk brukernavn/passord, velg riktig organisasjon, prøv inkognito-modus</li>
@@ -194,7 +194,7 @@
   </div>
 
   <div class="kb-level-card" style="background: linear-gradient(to bottom, rgba(202, 138, 4, 0.1), transparent); border-color: #ca8a04;">
-    <h2>🟡 Nivå 2 – Videre feilsøking</h2>
+    <h2> Nivå 2 – Videre feilsøking</h2>
     <p>Samle denne informasjonen før du går videre:</p>
     <ul>
       <li>Tidspunkt for feilen</li>
@@ -205,7 +205,7 @@
   </div>
 
   <div class="kb-level-card" style="background: linear-gradient(to bottom, rgba(239, 68, 68, 0.1), transparent); border-color: #ef4444;">
-    <h2>🔴 Nivå 3 – Send inn sak</h2>
+    <h2> Nivå 3 – Send inn sak</h2>
     <p>Hvis nivå 1 og 2 ikke løser problemet, opprett en supportsak med god beskrivelse.</p>
     <a class="btn" href="{{ url_for('main.tickets') }}" style="display: inline-block;">Opprett / se saker</a>
   </div>

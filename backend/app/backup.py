@@ -59,14 +59,14 @@ def create_backup() -> bool:
         # Bekreft at backup ble opprettet
         if backup_path.exists():
             size_mb = backup_path.stat().st_size / (1024 * 1024)
-            logger.info(f"✅ Backup opprettet: {backup_filename} ({size_mb:.2f} MB)")
+            logger.info(f" Backup opprettet: {backup_filename} ({size_mb:.2f} MB)")
             return True
         else:
-            logger.error("❌ Backup feilet: fil ble ikke opprettet")
+            logger.error(" Backup feilet: fil ble ikke opprettet")
             return False
             
     except Exception as e:
-        logger.error(f"❌ Feil under backup: {e}")
+        logger.error(f" Feil under backup: {e}")
         return False
 
 
@@ -83,7 +83,7 @@ def cleanup_old_backups() -> None:
             to_delete = backups[:-MAX_BACKUPS]  # Alle unntatt de siste
             for old_backup in to_delete:
                 old_backup.unlink()
-                logger.info(f"🗑️  Slettet gammel backup: {old_backup.name}")
+                logger.info(f"️  Slettet gammel backup: {old_backup.name}")
             
             logger.info(f"Beholder {MAX_BACKUPS} nyeste backups")
         else:
@@ -104,7 +104,7 @@ def list_backups() -> None:
             logger.info("Ingen backups funnet")
             return
         
-        logger.info(f"\n📦 Tilgjengelige backups ({len(backups)}):")
+        logger.info(f"\n Tilgjengelige backups ({len(backups)}):")
         logger.info("-" * 60)
         
         for backup in backups:
@@ -143,11 +143,11 @@ def restore_backup(backup_filename: str) -> bool:
         
         # Gjenopprett fra backup
         shutil.copy2(backup_path, DB_PATH)
-        logger.info(f"✅ Database gjenopprettet fra: {backup_filename}")
+        logger.info(f" Database gjenopprettet fra: {backup_filename}")
         return True
         
     except Exception as e:
-        logger.error(f"❌ Feil ved gjenoppretting: {e}")
+        logger.error(f" Feil ved gjenoppretting: {e}")
         return False
 
 
@@ -155,7 +155,7 @@ if __name__ == "__main__":
     import sys
     
     logger.info("=" * 60)
-    logger.info("🔄 Helpdesk Database Backup System")
+    logger.info(" Helpdesk Database Backup System")
     logger.info("=" * 60)
     
     # Hvis argument er gitt, håndter restore
@@ -175,7 +175,7 @@ if __name__ == "__main__":
         if create_backup():
             cleanup_old_backups()
             list_backups()
-            logger.info("\n✅ Backup fullført")
+            logger.info("\n Backup fullført")
         else:
-            logger.error("\n❌ Backup feilet")
+            logger.error("\n Backup feilet")
             sys.exit(1)

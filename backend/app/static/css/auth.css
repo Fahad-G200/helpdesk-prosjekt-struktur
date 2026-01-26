@@ -52,7 +52,7 @@ body{
   background-size: cover;
   background-position: center;
 
-  /* ✅ ENDRING: mørkere + blur + mindre kontrast */
+  /*  ENDRING: mørkere + blur + mindre kontrast */
   opacity: .42;
   filter: blur(10px) brightness(.55) contrast(.78) saturate(.85);
   transform: scale(1.06);

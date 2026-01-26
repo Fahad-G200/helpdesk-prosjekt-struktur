@@ -195,7 +195,7 @@
       <img src="{{ article.cover_url }}" alt="{{ article.title }}">
     </div>
     {% else %}
-    <div class="article-cover">📄</div>
+    <div class="article-cover"></div>
     {% endif %}
 
     <h1 class="article-title">{{ article.title }}</h1>
@@ -237,7 +237,7 @@
 
   {% if article.content.count('## ') > 0 or article.content.count('### ') > 0 %}
   <div class="article-toc" id="toc">
-    <div class="article-toc-title">📖 Innholdsfortegnelse</div>
+    <div class="article-toc-title"> Innholdsfortegnelse</div>
     <ul></ul>
   </div>
   {% endif %}
@@ -250,7 +250,7 @@
     {% if role == "support" %}
     <div class="article-actions">
       <a href="{{ url_for('main.edit_article_view', article_id=article.id) }}" class="btn">✏️ Rediger</a>
-      <a href="{{ url_for('main.delete_article', article_id=article.id) }}" class="btn" onclick="return confirm('Slette denne artikkelen?');">🗑️ Slett</a>
+      <a href="{{ url_for('main.delete_article', article_id=article.id) }}" class="btn" onclick="return confirm('Slette denne artikkelen?');">️ Slett</a>
     </div>
     {% endif %}
   </div>

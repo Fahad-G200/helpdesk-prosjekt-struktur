@@ -1,12 +1,12 @@
 # IT Helpdesk – Vg2 Prosjekt
 
-## 📌 Om prosjektet
+##  Om prosjektet
 
 En fullstendig helpdesk-løsning for skole eller bedrift. Brukere kan melde inn IT-problemer, få hjelp fra support og lese løsninger i kunnskapsbasen. Prosjektet viser kompetanse i **drift**, **brukerstøtte** og **utvikling**.
 
 ---
 
-## 🚀 Kom i gang
+##  Kom i gang
 
 ### Forutsetninger
 - Python 3.8+ og pip
@@ -52,7 +52,7 @@ http://127.0.0.1:8080
 
 ---
 
-## 👥 Brukerroller
+##  Brukerroller
 
 | Rolle | Tilganger |
 |-------|-----------|
@@ -62,7 +62,7 @@ http://127.0.0.1:8080
 
 ---
 
-## ✨ Hovedfunksjoner
+##  Hovedfunksjoner
 
 - **Saksystem (Tickets)** – opprett, lukk, vurder, last opp vedlegg (jpg/png/pdf)
 - **Kunnskapsbase (KB)** – admin kan opprett/rediger/slette artikler
@@ -73,7 +73,7 @@ http://127.0.0.1:8080
 
 ---
 
-## 🎬 DEMO-FLYT
+##  DEMO-FLYT
 
 ### Bruker-perspektiv
 1. Åpne http://127.0.0.1:5000/login
@@ -98,7 +98,7 @@ http://127.0.0.1:8080
 
 ---
 
-## 📚 Kompetansemål (LK20 – Vg2 IT)
+##  Kompetansemål (LK20 – Vg2 IT)
 
 ### **Drift** – Administrere og drifte IT-løsninger
 
@@ -159,7 +159,7 @@ http://127.0.0.1:8080
 
 ---
 
-## 🔒 Sikkerhet og Personvern
+##  Sikkerhet og Personvern
 
 - **Autentisering:** Brukernavn + passord (Werkzeug-hashing, salt)
 - **Autorisasjon:** Rollebasert tilgangskontroll (RBAC)
@@ -172,23 +172,23 @@ Se [docs/personvern.md](docs/personvern.md) for detaljer.
 
 ---
 
-## ✅ Testing
+##  Testing
 
 | Test | Status | Beskrivelse |
 |------|--------|-------------|
-| Innlogging | ✅ OK | User og admin kan logge inn/ut |
-| Roller | ✅ OK | User kan ikke se andre sin saker; support ser alle |
-| Tickets | ✅ OK | Opprett, lukk, vurder, endre status |
-| Vedlegg | ✅ OK | Last opp/ned jpg/pdf, validering av type |
-| KB Admin | ✅ OK | Support kan opprett/rediger/slette artikler |
-| Chatbot | ✅ OK | Svarer på spørsmål |
-| Passord | ✅ OK | Reset-funksjonalitet fungerer |
+| Innlogging |  OK | User og admin kan logge inn/ut |
+| Roller |  OK | User kan ikke se andre sin saker; support ser alle |
+| Tickets |  OK | Opprett, lukk, vurder, endre status |
+| Vedlegg |  OK | Last opp/ned jpg/pdf, validering av type |
+| KB Admin |  OK | Support kan opprett/rediger/slette artikler |
+| Chatbot |  OK | Svarer på spørsmål |
+| Passord |  OK | Reset-funksjonalitet fungerer |
 
 Se [docs/testplan.md](docs/testplan.md) for full testkjøring.
 
 ---
 
-## 🤖 KI-bruk i prosjektet
+##  KI-bruk i prosjektet
 
 KI (ChatGPT) ble brukt som **læringsstøtte**:
 - Forstå Flask/Jinja/SQLAlchemy-konsepter
@@ -206,7 +206,7 @@ Se [docs/ai-logg.md](docs/ai-logg.md) for detaljer.
 
 ---
 
-## 📁 Prosjektstruktur
+##  Prosjektstruktur
 
 ```
 helpdesk-prosjekt/
@@ -230,7 +230,7 @@ Se [docs/struktur.md](docs/struktur.md) for detaljert arkitektur-oversikt.
 
 ---
 
-## 📖 Dokumentasjon
+##  Dokumentasjon
 
 - **krav.md** – Behovskartlegging og funksjonelle krav
 - **arkitektur.md** – Systemarkitektur og design
@@ -243,6 +243,6 @@ Se [docs/struktur.md](docs/struktur.md) for detaljert arkitektur-oversikt.
 
 ---
 
-## 📞 Support
+##  Support
 
 For feilsøking eller spørsmål, se [docs/feilsoking.md](docs/feilsoking.md).
