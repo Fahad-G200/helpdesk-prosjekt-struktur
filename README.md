@@ -246,3 +246,42 @@ Se [docs/struktur.md](docs/struktur.md) for detaljert arkitektur-oversikt.
 ##  Support
 
 For feilsøking eller spørsmål, se [docs/feilsoking.md](docs/feilsoking.md).
+
+# FILE: README.md
+
+# IT Helpdesk (v1.0)
+Et helpdesk-system laget for skoleprosjekt (ITK02). Løsningen lar brukere sende inn saker, laste opp vedlegg, bruke kunnskapsbase (KB), og gir support/admin verktøy for å håndtere saker og innhold.
+
+## Demo / visning
+**Brukerflyt**
+1. Registrer / logg inn
+2. Les Kunnskapsbase (nivå 1–2)
+3. Opprett sak (nivå 3) + last opp vedlegg (skjermbilde/PDF)
+4. Se status og varsler
+
+**Support/Admin-flyt**
+1. Se alle saker (admin/support)
+2. Se vedlegg til saken
+3. Lukke saker
+4. Administrere KB-artikler
+5. Administrere brukere (rolle/tilgang)
+
+---
+
+## Teknologi
+- Backend: **Flask (Python)**
+- Database: **SQLite**
+- Frontend: **Jinja templates + CSS**
+- Filvedlegg: lagres på disk i uploads-mappe + registreres i DB
+- Varsling: in-app (notifications), e-post/SMS valgfritt (konfig)
+
+---
+
+## Kjøring lokalt
+### 1) Installer
+```bash
+python -m venv venv
+source venv/bin/activate   # mac/linux
+# venv\Scripts\activate    # windows
+
+pip install -r requirements.txt

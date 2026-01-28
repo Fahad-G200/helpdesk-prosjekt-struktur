@@ -1,6 +1,5 @@
 # IT Helpdesk – Prosjekt ferdigstillelse
 
-##  Vurderingsklart (Karakter 6)
 
 Prosjektet er **fullstendig ferdigstilt** og klart for vurdering.
 
@@ -88,6 +87,84 @@ flask run
 | Deployment |  Docker klart |
 | KI-bruk |  Dokumentert |
 
-**Versjon:** 1.0.0  
-**Dato:** 26. januar 2026  
-**Estimat karakter:** 6 (Høy kompetanse)
+---
+
+```md
+# FILE: TODO.md
+
+# To-do (videre arbeid)
+
+## Stabilitet / kvalitet
+- [ ] Legge inn tydeligere feilmeldinger i UI ved exceptions (ingen “white screen”)
+- [ ] Legge inn logging til fil (rotating log) for enklere feilsøking
+
+## Brukerstøtte / funksjoner
+- [ ] Egen side for chatbot (ikke bare widget)
+- [ ] Ryddigere KB med bilder/ikoner og kategorier
+- [ ] Bedre admin-side for systeminnstillinger (faktisk lagring i DB)
+
+## Sikkerhet
+- [ ] Rate limiting på login (hindrer brute force)
+- [ ] Bedre passord-reset flyt (admin genererer reset, bruker setter nytt passord trygt)
+
+## UI
+- [ ] Konsistent “app-layout” på alle innloggede sider
+- [ ] Bedre vedlegg-visning (thumbnails for jpg/png, link for pdf/doc)
+
+## Testing
+- [ ] Lage en liten test-sjekkliste for hver release (smoke test)
+
+# FILE: TESTPLAN.md
+
+# Testplan (v1.0)
+
+## Mål
+Sikre at systemet fungerer for både bruker og support/admin, og at viktige funksjoner ikke krasjer.
+
+---
+
+## 1) Innlogging og registrering
+- [ ] Registrere ny bruker (unik username)
+- [ ] Logge inn med riktig passord
+- [ ] Feil passord gir tydelig feilmelding (ikke crash)
+- [ ] Logg ut fungerer
+
+## 2) Tickets (bruker)
+- [ ] Opprette ny sak med tittel/beskrivelse/kategori/prioritet/enhet
+- [ ] Saken vises i “Mine saker”
+- [ ] Status vises riktig
+
+## 3) Vedlegg
+- [ ] Bruker laster opp PNG/JPG/PDF
+- [ ] Vedlegg lagres og kan åpnes av:
+  - sakseier (bruker)
+  - support/admin
+- [ ] Andre brukere får ikke tilgang (403/ingen tilgang)
+
+## 4) Varsler
+- [ ] Support får varsel når ny sak opprettes
+- [ ] Bruker får varsel når sak lukkes
+- [ ] Varsler markeres som lest når man åpner varslingssiden
+
+## 5) Support/Admin
+- [ ] Support kan se alle saker
+- [ ] Support kan lukke en sak
+- [ ] Vurdering (rating) kan sendes av bruker etter lukking (1 gang)
+
+## 6) Kunnskapsbase (KB)
+- [ ] KB-siden viser artikler
+- [ ] Admin kan opprette ny artikkel
+- [ ] Admin kan redigere artikkel
+- [ ] Admin kan slette artikkel
+
+---
+
+## Smoke test før innlevering
+1. Start app
+2. Logg inn
+3. Opprett sak
+4. Last opp vedlegg
+5. Lukk saken som admin
+6. Åpne varsler
+7. Åpne KB og verifiser at artikler vises
+
