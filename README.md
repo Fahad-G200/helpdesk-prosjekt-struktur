@@ -4,6 +4,32 @@
 
 En fullstendig helpdesk-løsning for skole eller bedrift. Brukere kan melde inn IT-problemer, få hjelp fra support og lese løsninger i kunnskapsbasen. Prosjektet viser kompetanse i **drift**, **brukerstøtte** og **utvikling**.
 
+## Kobling til kompetansemål
+
+### Driftsstøtte
+- Administrasjon av brukere, roller og tilganger dekker kompetansemålet:
+  *«administrere brukere, tilganger og rettigheter i relevante systemer»*
+- Logging, sikkerhetstiltak og backup dekker:
+  *«planlegge, drifte og implementere IT-løsninger som ivaretar informasjonssikkerhet»*
+- Docker-oppsett og lokal drift viser forståelse for:
+  *«utforske og beskrive komponenter i en driftsarkitektur»*
+
+### Brukerstøtte
+- Ticketsystemet og eskalering mellom nivåer dekker:
+  *«utøve brukerstøtte og veilede i relevant programvare»*
+- Kunnskapsbasen og chatboten dekker:
+  *«kartlegge behovet for og utvikle veiledninger for brukere»*
+- Bruk av tydelig språk og struktur viser:
+  *«tilpasse kommunikasjonsform og fagterminologi i møte med brukere»*
+
+### Utvikling
+- Flask, routing, templates og database dekker:
+  *«designe og implementere IT-tjenester»*
+- Bruk av Git, commits og changelog dekker:
+  *«beskrive og anvende relevante versjonskontrollsystemer»*
+- Databasedesign for brukere, saker og vedlegg dekker:
+  *«modellere og opprette databaser for informasjonsflyt i systemer»*
+
 ---
 
 ##  Kom i gang
@@ -70,6 +96,17 @@ http://127.0.0.1:8080
 - **Tilgangskontroll** – rollebasert sikkerhet
 - **Innstillinger** – E-post, SMS, varsler (Twilio-integrasjon)
 - **Aktivitetslogg** – Audit trail for sikkerhet
+
+---
+
+## Demo- og brukerflyt
+
+1. Bruker logger inn og oppretter en ny sak
+2. Saken lagres i systemet og blir synlig for support
+3. Support ser saken i dashboard og vurderer prioritet
+4. Support kan kommunisere, legge ved filer og lukke saken
+5. Bruker får varsling og kan se status på sin sak
+6. Hvis mulig løses problemet via chatbot eller kunnskapsbase før eskalering
 
 ---
 
@@ -285,3 +322,27 @@ source venv/bin/activate   # mac/linux
 # venv\Scripts\activate    # windows
 
 pip install -r requirements.txt
+
+## Refleksjon og begrunnede valg
+
+I dette prosjektet har jeg tatt bevisste tekniske og funksjonelle valg for å etterligne en realistisk IT-helpdesk i en organisasjon.
+
+Jeg valgte å implementere roller (bruker, support og admin) for å simulere ekte tilgangsstyring og ansvarsfordeling. Dette gjør løsningen mer realistisk enn en enkel demo, og viser forståelse for hvordan brukere, rettigheter og tilganger administreres i praksis.
+
+Ticketsystemet er bygget slik at brukere kan opprette saker, mens support kan se, prioritere og lukke saker. Dette ble valgt for å speile en ekte arbeidsflyt innen brukerstøtte, der saker eskaleres og håndteres systematisk.
+
+Chatboten ble implementert som første støttenivå (nivå 1) for å gi brukerne rask hjelp uten menneskelig involvering. Løsningen er bevisst holdt enkel og regelbasert, siden målet er å demonstrere forståelse av feilsøkingsflyt – ikke å lage en fullverdig kommersiell AI.
+
+Jeg har også valgt å fokusere på sikkerhet og struktur fremfor avansert grafikk. Dette inkluderer tilgangskontroll, sikker filopplasting og logging av hendelser. Dette valget ble tatt fordi prosjektet først og fremst skal vise faglig forståelse, ikke bare visuelt design.
+
+## Begrensninger og videre arbeid
+
+Dette prosjektet er en versjon 1.0 og har bevisste begrensninger.
+
+Chatboten er regelbasert og ikke koblet til en ekte språkmodell. I en videreutvikling ville dette blitt erstattet med en mer avansert NLP-løsning for bedre forståelse av fritekst.
+
+Systemet bruker lokal database og er ikke satt opp med ekte skylagring. I en produksjonsløsning ville dette vært erstattet med en skytjeneste og redundans.
+
+Designet er funksjonelt, men ikke fullt optimalisert for universell utforming. Videre arbeid ville inkludert bedre tilgjengelighet og testing mot flere brukergrupper.
+
+Disse begrensningene er akseptable innenfor rammen av et skoleprosjekt, og valgene er gjort for å prioritere faglig forståelse og stabil funksjonalitet.
