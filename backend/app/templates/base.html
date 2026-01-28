@@ -14,7 +14,7 @@
       <!-- SIDEBAR -->
       <aside class="sidebar">
         <div class="brand">
-          <div class="logo">️</div>
+          <div class="logo">🛠️</div>
           <div>
             <div class="title">IT Helpdesk</div>
             <div class="subtitle">Oversikt og støtte</div>
@@ -23,19 +23,19 @@
 
         <nav class="nav">
           <a href="{{ url_for('main.dashboard') }}" class="{% if ep == 'main.dashboard' %}active{% endif %}">
-            <span class="icon"></span> Dashboard
+            <span class="icon">📊</span> Dashboard
           </a>
 
           <a href="{{ url_for('main.kb') }}" class="{% if ep == 'main.kb' %}active{% endif %}">
-            <span class="icon"></span> Kunnskapsbase
+            <span class="icon">📚</span> Kunnskapsbase
           </a>
 
           <a href="{{ url_for('main.tickets') }}" class="{% if ep == 'main.tickets' %}active{% endif %}">
-            <span class="icon"></span> Mine saker
+            <span class="icon">🎫</span> Mine saker
           </a>
 
           <a href="{{ url_for('main.notifications_page') }}" class="{% if ep == 'main.notifications_page' %}active{% endif %}">
-            <span class="icon"></span> Varsler
+            <span class="icon">🔔</span> Varsler
             {% if notif_count and notif_count > 0 %}
               <span class="badge">{{ notif_count }}</span>
             {% endif %}
@@ -52,23 +52,23 @@
             </div>
 
             <a href="{{ url_for('main.admin_users') }}" class="{% if ep == 'main.admin_users' %}active{% endif %}">
-              <span class="icon"></span> Brukere
+              <span class="icon">👥</span> Brukere
             </a>
 
             <a href="{{ url_for('main.admin_tickets') }}" class="{% if ep == 'main.admin_tickets' %}active{% endif %}">
-              <span class="icon"></span> Saker
+              <span class="icon">🗂️</span> Saker
             </a>
 
             <a href="{{ url_for('main.admin_kb') }}" class="{% if ep == 'main.admin_kb' %}active{% endif %}">
-              <span class="icon"></span> KB Admin
+              <span class="icon">📖</span> KB Admin
             </a>
 
             <a href="{{ url_for('main.activity_log') }}" class="{% if ep == 'main.activity_log' %}active{% endif %}">
-              <span class="icon"></span> Aktivitetslogg
+              <span class="icon">📜</span> Aktivitetslogg
             </a>
 
             <a href="{{ url_for('main.admin_settings') }}" class="{% if ep == 'main.admin_settings' %}active{% endif %}">
-              <span class="icon"></span> Systeminnstillinger
+              <span class="icon">🛠️</span> Systeminnstillinger
             </a>
           {% endif %}
         </nav>
@@ -166,22 +166,18 @@
         const banner = document.getElementById('cookieBanner');
         const acceptBtn = document.getElementById('cookieAccept');
         const rejectBtn = document.getElementById('cookieReject');
-        
-        // Sjekk hvis bruker allerede har samtykket
+
         const hasConsent = localStorage.getItem('cookie_consent');
-        
-        // Vis banner hvis ikke samtykke finnes
+
         if (!hasConsent) {
           banner.style.display = 'flex';
         }
-        
-        // Godta cookies
+
         acceptBtn.addEventListener('click', function() {
           localStorage.setItem('cookie_consent', 'accepted');
           banner.style.display = 'none';
         });
-        
-        // Avslå cookies
+
         rejectBtn.addEventListener('click', function() {
           localStorage.setItem('cookie_consent', 'rejected');
           banner.style.display = 'none';
