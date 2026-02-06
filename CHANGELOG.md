@@ -315,3 +315,23 @@ Alle viktige endringer i dette prosjektet dokumenteres her.
 ### Improved
 - Admin-menyen fungerer nå konsekvent uten å endre eksisterende UI eller design
 - Backend og templates er nå korrekt synkronisert
+
+## 2026-02-06
+### Removed
+- Fjernet admin-funksjon **Systeminnstillinger** (ruter, DB-funksjoner og menypunkt)
+- Fjernet **KB Admin** (kunnskapsbase-administrasjon) fra admin-meny og tilhørende routes/templates
+- Fjernet teksten/valget **“Vis interne varsler i applikasjonen”** fra innstillinger
+
+### Changed
+- Ryddet opp i backend-koden ved å fjerne ubrukt kode knyttet til system settings og KB-admin
+- Fjernet emojis fra UI/tekst (beholdt hammer-ikonet)
+- Forenklet kodebase for nybegynner ved å legge inn tydeligere kommentarer og redusere “støy” (uten å endre brukerflyt)
+
+### Fixed
+- Forhindret `BuildError` / 500-feil ved å fjerne `url_for(...)`-lenker som pekte på ruter som ikke lenger finnes
+- Sikret at appen fortsatt starter og at navigasjonen fungerer etter opprydding
+
+### Notes
+- Ingen endringer i selve funksjonaliteten du fortsatt bruker (tickets, vedlegg, varsler, innlogging)
+- Endringene er kun opprydding og fjerning av funksjoner du ikke vil ha i prosjektet
+
