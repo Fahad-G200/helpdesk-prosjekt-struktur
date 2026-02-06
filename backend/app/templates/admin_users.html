@@ -26,7 +26,7 @@
         </td>
         <td style="padding:12px;">
           {% if u.role == 'support' %}
-            <span style="background:#3b82f6; color:#fff; padding:4px 8px; border-radius:4px; font-size:12px;">️ Support</span>
+            <span style="background:#3b82f6; color:#fff; padding:4px 8px; border-radius:4px; font-size:12px;">Support</span>
           {% else %}
             <span style="background:#64748b; color:#fff; padding:4px 8px; border-radius:4px; font-size:12px;"> User</span>
           {% endif %}
@@ -43,16 +43,16 @@
               
               {% if u.role == 'user' %}
               <form method="post" action="{{ url_for('main.promote_user', username=u.username) }}" style="display:inline;">
-                <button type="submit" style="background:#10b981; padding:6px 12px; font-size:12px;">⬆️ Promote</button>
+                <button type="submit" style="background:#10b981; padding:6px 12px; font-size:12px;">Promote</button>
               </form>
               {% else %}
               <form method="post" action="{{ url_for('main.demote_user', username=u.username) }}" style="display:inline;">
-                <button type="submit" style="background:#f59e0b; padding:6px 12px; font-size:12px;">⬇️ Demote</button>
+                <button type="submit" style="background:#f59e0b; padding:6px 12px; font-size:12px;">Demote</button>
               </form>
               {% endif %}
               
               <form method="post" action="{{ url_for('main.delete_user', username=u.username) }}" style="display:inline;" onsubmit="return confirm('Slette bruker {{ u.username }}? Dette kan ikke angres!');">
-                <button type="submit" style="background:#ef4444; padding:6px 12px; font-size:12px;">️ Slett</button>
+                <button type="submit" style="background:#ef4444; padding:6px 12px; font-size:12px;">Slett</button>
               </form>
             </div>
           {% else %}

@@ -23,26 +23,26 @@
 
         <nav class="nav">
           <a href="{{ url_for('main.dashboard') }}" class="{% if ep == 'main.dashboard' %}active{% endif %}">
-            <span class="icon">📊</span> Dashboard
+            <span class="icon"></span> Dashboard
           </a>
 
           <a href="{{ url_for('main.kb') }}" class="{% if ep == 'main.kb' %}active{% endif %}">
-            <span class="icon">📚</span> Kunnskapsbase
+            <span class="icon"></span> Kunnskapsbase
           </a>
 
           <a href="{{ url_for('main.tickets') }}" class="{% if ep == 'main.tickets' %}active{% endif %}">
-            <span class="icon">🎫</span> Mine saker
+            <span class="icon"></span> Mine saker
           </a>
 
           <a href="{{ url_for('main.notifications_page') }}" class="{% if ep == 'main.notifications_page' %}active{% endif %}">
-            <span class="icon">🔔</span> Varsler
+            <span class="icon"></span> Varsler
             {% if notif_count and notif_count > 0 %}
               <span class="badge">{{ notif_count }}</span>
             {% endif %}
           </a>
 
           <a href="{{ url_for('main.settings') }}" class="{% if ep == 'main.settings' %}active{% endif %}">
-            <span class="icon">⚙️</span> Innstillinger
+            <span class="icon"></span> Innstillinger
           </a>
 
           <!-- ADMIN SECTION - ONLY FOR SUPPORT -->
@@ -52,23 +52,15 @@
             </div>
 
             <a href="{{ url_for('main.admin_users') }}" class="{% if ep == 'main.admin_users' %}active{% endif %}">
-              <span class="icon">👥</span> Brukere
+              <span class="icon"></span> Brukere
             </a>
 
             <a href="{{ url_for('main.admin_tickets') }}" class="{% if ep == 'main.admin_tickets' %}active{% endif %}">
-              <span class="icon">🗂️</span> Saker
-            </a>
-
-            <a href="{{ url_for('main.admin_kb') }}" class="{% if ep == 'main.admin_kb' %}active{% endif %}">
-              <span class="icon">📖</span> KB Admin
+              <span class="icon"></span> Saker
             </a>
 
             <a href="{{ url_for('main.activity_log') }}" class="{% if ep == 'main.activity_log' %}active{% endif %}">
-              <span class="icon">📜</span> Aktivitetslogg
-            </a>
-
-            <a href="{{ url_for('main.admin_settings') }}" class="{% if ep == 'main.admin_settings' %}active{% endif %}">
-              <span class="icon">🛠️</span> Systeminnstillinger
+              <span class="icon"></span> Aktivitetslogg
             </a>
           {% endif %}
         </nav>

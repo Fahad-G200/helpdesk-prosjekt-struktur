@@ -771,23 +771,6 @@ def delete_user(username: str):
 # Ingen UI-endringer – vi bare sørger for at lenkene fungerer.
 
 
-@bp.route("/admin/system")
-def admin_system():
-    user = current_user()
-    if not user:
-        return redirect(url_for("main.login"))
-    if current_role() != "support":
-        abort(403)
-
-    return redirect(url_for("main.admin_settings"))
-
-
-# Alias-navn (i tilfelle base.html bruker andre url_for-navn/URL-er)
-@bp.route("/admin/system-settings")
-def admin_system_settings():
-    return admin_system()
-
-
 @bp.route("/admin/kb-admin")
 def kb_admin():
     return admin_kb()
@@ -803,9 +786,6 @@ def admin_saker():
     return admin_tickets()
 
 
-@bp.route("/admin/systeminnstillinger")
-def systeminnstillinger():
-    return admin_system()
 # -----------------------------
 # ADMIN: Ticket Management
 # -----------------------------
@@ -1028,47 +1008,6 @@ def delete_article(article_id: int):
 
 
 # -----------------------------
-# ADMIN: System Settings
-# -----------------------------
-@bp.route("/admin/settings", methods=["GET", "POST"])
-def admin_settings():
-    user = current_user()
-    if not user or current_role() != "support":
-        abort(403)
-
-    from .db import get_system_settings, set_system_settings
-
-    if request.method == "POST":
-        system_name = (request.form.get("system_name") or "").strip() or "IT Helpdesk"
-        support_email = (request.form.get("support_email") or "").strip() or "support@helpdesk.no"
-        max_file_size = (request.form.get("max_file_size") or "").strip() or "16"
-
-        try:
-            set_system_settings(system_name, support_email, max_file_size)
-            flash("Innstillinger lagret.")
-            try:
-                log_activity(user, "Endret systeminnstillinger")
-            except Exception:
-                pass
-            return redirect(url_for("main.admin_settings"))
-        except Exception as e:
-            logger.error(f"Error saving system settings: {e}")
-            flash("Kunne ikke lagre innstillinger.")
-
-    try:
-        settings = get_system_settings()
-    except Exception as e:
-        logger.error(f"Error loading system settings: {e}")
-        settings = {
-            "system_name": "IT Helpdesk",
-            "support_email": "support@helpdesk.no",
-            "max_file_size": "16",
-        }
-    
-    return render_template("admin_settings.html", settings=settings) 
-
-
-# -----------------------------
 # ADMIN: Bulk Actions
 # -----------------------------
 @bp.route("/admin/tickets/bulk-close", methods=["POST"])
@@ -1119,11 +1058,6 @@ def bulk_delete_tickets():
 # -----------------------------
 # Alias-ruter (norske sidebar-lenker)
 # -----------------------------
-@bp.route("/admin/systeminnstillinger")
-def admin_systeminnstillinger_alias():
-    return redirect(url_for("main.admin_settings"))
-
-
 @bp.route("/admin/saker")
 def admin_saker_alias():
     return redirect(url_for("main.admin_tickets"))
@@ -1654,7 +1588,7 @@ class IntelligentHelpdeskAI:
             conversation_state["solutions_given"] = "intermediate"
 
         else:
-            response_parts.append("**⚙️ Dette er mer avanserte løsninger:**")
+            response_parts.append("**Dette er mer avanserte løsninger:**")
             response_parts.append("")
             for i, solution in enumerate(topic_data["solutions"]["advanced"], 1):
                 response_parts.append(f"{i}. {solution}")
@@ -1663,7 +1597,7 @@ class IntelligentHelpdeskAI:
         response_parts.append("")
 
         if message_count == 1:
-            response_parts.append("**❓ For å hjelpe deg bedre:**")
+            response_parts.append("**For å hjelpe deg bedre:**")
             questions = topic_data.get("questions", [])[:2]
             for q in questions:
                 response_parts.append(f"• {q}")
@@ -1683,9 +1617,9 @@ class IntelligentHelpdeskAI:
     def _generate_opening(self, topic: str, sentiment: Dict, entities: Dict) -> str:
         if sentiment["urgency"] == "high":
             urgency_openers = [
-                "⚡ **Jeg ser dette haster!** La meg hjelpe deg raskt.",
+                " **Jeg ser dette haster!** La meg hjelpe deg raskt.",
                 " **Forstår at dette er viktig.** La oss løse det nå.",
-                "⏰ **OK, dette må fikses fort.** Jeg skal hjelpe deg umiddelbart."
+                " **OK, dette må fikses fort.** Jeg skal hjelpe deg umiddelbart."
             ]
             import random
             return random.choice(urgency_openers)
@@ -1701,7 +1635,7 @@ class IntelligentHelpdeskAI:
         topic_openings = {
             "feide": " **Feide-innlogging kan være tricky!** Jeg hjelper deg å komme inn.",
             "wifi": " **Nettverksproblemer er kjedelige!** La meg hjelpe deg å få nettet til å virke.",
-            "utskrift": "️ **Skriverproblemer er ofte enkle å fikse!** La meg guide deg.",
+            "utskrift": " **Skriverproblemer er ofte enkle å fikse!** La meg guide deg.",
             "passord": " **Passordproblemer? Helt normalt!** Jeg hjelper deg tilbake på rett spor.",
             "m365": " **Microsoft 365 kan ha sine utfordringer.** La meg hjelpe deg.",
             "nettleser": " **Nettleserproblemer? Jeg har løsningen!**"
@@ -1856,7 +1790,7 @@ class IntelligentHelpdeskAI:
             "De er ekte mennesker som har mer erfaring og tilgang til flere verktøy enn meg.\n\n"
             "** Opprett en support-sak her:**\n"
             "Klikk på 'Saker' i menyen, og teamet vårt tar kontakt med deg så fort som mulig!\n\n"
-            "Gjennomsnittlig responstid: 1-2 timer ⏰\n\n"
+            "Gjennomsnittlig responstid: 1-2 timer\n\n"
             "Jeg håper de kan hjelpe deg bedre enn jeg kunne! "
         )
 
