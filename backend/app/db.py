@@ -229,6 +229,7 @@ def update_preferences(
 ) -> None:
     conn = _conn()
     cur = conn.cursor()
+    # SMS sending is removed; these columns are kept for legacy UI/state only.
     cur.execute(
         """
         UPDATE users
@@ -1076,5 +1077,4 @@ def delete_user_db(username: str):
     cur.execute("DELETE FROM users WHERE username=?", (username,))
     conn.commit()
     conn.close()
-
 

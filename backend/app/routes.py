@@ -14,7 +14,6 @@ import uuid
 from datetime import datetime
 from typing import Dict, Tuple, Optional
 from .email_service import send_email
-from .sms_service import send_sms
 from .db import create_reset_code, verify_reset_code, consume_reset_code, set_password_hash
 
 from .config import Config
@@ -235,6 +234,7 @@ def settings():
     if request.method == "POST":
         notify_email = 1 if request.form.get("notify_email") else 0
         notify_inapp = 1 if request.form.get("notify_inapp") else 0
+        # SMS sending is removed; we keep these fields only so the UI stays unchanged.
         notify_sms = 1 if request.form.get("notify_sms") else 0
         phone = request.form.get("phone", "").strip() or None
         email = request.form.get("email", "").strip() or None
