@@ -133,7 +133,7 @@ Prosjektet er nå **vurderingsklart** på nivå **6 (Høy kompetanse)**.
 
 **Mål 2: Implementasjon**
 -  Flask-app (48+ ruter, 2000+ linjer kode)
--  SQLAlchemy ORM (7 datamodeller)
+-  SQLite-database (7 tabeller)
 -  Jinja2 templates (20+ HTML-filer)
 -  HTML/CSS/JavaScript (responsiv design)
 

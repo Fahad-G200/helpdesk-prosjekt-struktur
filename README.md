@@ -84,7 +84,7 @@ http://127.0.0.1:8080
 |-------|-----------|
 | **User** | Opprette saker, se egne saker, last opp vedlegg, lese KB, vurdere saker |
 | **Support** | Se alle saker, endre status/prioritet, administrere KB-artikler |
-| **Admin** | Full tilgang + brukerhåndtering, systeminnstillinger, aktivitetslogg |
+| **Admin** | Full tilgang + brukerhåndtering, aktivitetslogg |
 
 ---
 
@@ -94,7 +94,7 @@ http://127.0.0.1:8080
 - **Kunnskapsbase (KB)** – admin kan opprett/rediger/slette artikler
 - **Chatbot** – tekstbasert assistanse for vanlige spørsmål
 - **Tilgangskontroll** – rollebasert sikkerhet
-- **Innstillinger** – E-post, SMS, varsler (Twilio-integrasjon)
+- **Innstillinger** – E-post og varsler
 - **Aktivitetslogg** – Audit trail for sikkerhet
 
 ---
@@ -183,7 +183,6 @@ http://127.0.0.1:8080
 
 **Mål 2: Implementasjon i Python**
 - Flask-applikasjon med 48+ ruter
-- SQLAlchemy ORM for database (SQLite)
 - Jinja2 for templating (HTML)
 - CSS/JavaScript for brukergrensesnitt
 - Autentisering (login/register), passordreset
@@ -250,7 +249,6 @@ helpdesk-prosjekt/
 ├── backend/
 │   ├── app/
 │   │   ├── routes.py        # 48+ Flask-ruter
-│   │   ├── models.py        # SQLAlchemy-modeller
 │   │   ├── db.py            # Database-initialisering
 │   │   ├── templates/       # Jinja2 HTML
 │   │   └── static/          # CSS, JS
@@ -310,7 +308,7 @@ Et helpdesk-system laget for skoleprosjekt (ITK02). Løsningen lar brukere sende
 - Database: **SQLite**
 - Frontend: **Jinja templates + CSS**
 - Filvedlegg: lagres på disk i uploads-mappe + registreres i DB
-- Varsling: in-app (notifications), e-post/SMS valgfritt (konfig)
+- Varsling: in-app (notifications), e-post valgfritt (konfig)
 
 ---
 

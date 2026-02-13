@@ -9,14 +9,10 @@ backend/
 ├── app/
 │   ├── __init__.py              # Flask-initialisering
 │   ├── routes.py                # 48+ Flask-ruter (alle endpoints)
-│   ├── models.py                # SQLAlchemy-modeller
 │   ├── db.py                    # Database-initialisering
 │   ├── config.py                # Konfiguppsett
-│   ├── login.py                 # Innloggingslogikk
 │   ├── email_service.py         # E-post (Flask-Mail)
-│   ├── sms_service.py           # SMS (Twilio)
 │   ├── get_user.py              # Hjelpefunksjon for brukerhenting
-│   ├── chatbot.js               # Chatbot-backend
 │   │
 │   ├── templates/               # Jinja2 HTML-templates
 │   │   ├── base.html            # Hoved-layout (innlogget)
@@ -31,7 +27,6 @@ backend/
 │   │   ├── admin_users.html     # Brukerhåndtering
 │   │   ├── admin_tickets.html   # Saksadministrasjon
 │   │   ├── admin_kb.html        # KB-administrasjon
-│   │   ├── admin_settings.html  # Systeminnstillinger
 │   │   ├── settings.html        # Brukerinnstillinger
 │   │   ├── chatbot.html         # Chat-grensesnitt
 │   │   ├── notifications.html   # Varsler
@@ -47,11 +42,10 @@ backend/
 │   │   └── images/
 │   │
 │   ├── uploads/                 # Bruker-vedlegg
-│   └── database.db              # SQLite-database
+│   └── helpdesk.db              # SQLite-database
 │
 ├── requirements.txt             # Python-pakker
 ├── init_db.py                   # Database-setup
-└── run.py                       # Startstarter
 ```
 
 ---
@@ -137,8 +131,8 @@ backend/
 
 ### Support/Admin-funksjoner
 - `GET /admin/tickets` – Se alle saker
-- `POST /admin/tickets/<id>/assign` – Tildel sak
-- `POST /admin/tickets/<id>/priority` – Endre prioritet
+- `POST /tickets/<id>/assign` – Tildel sak
+- `POST /tickets/<id>/priority` – Endre prioritet
 - `POST /admin/tickets/bulk-close` – Lukk flere
 - `POST /admin/tickets/bulk-delete` – Slett flere
 - `GET /admin/users` – Brukerliste
@@ -150,8 +144,6 @@ backend/
 - `GET/POST /admin/kb/new` – Opprett artikkel
 - `GET/POST /kb/<id>/edit` – Rediger artikkel
 - `POST /kb/<id>/delete` – Slett artikkel
-- `GET /admin/settings` – Systeminnstillinger
-- `POST /admin/settings` – Lagre system-innstillinger
 - `GET /admin/activity` – Aktivitetslogg
 
 ### Chatbot
@@ -191,10 +183,9 @@ backend/
 | **Frontend** | HTML5, CSS3, JavaScript (vanilla) | Modern |
 | **Backend** | Python, Flask | 3.8+, 3.0.0 |
 | **Template-engine** | Jinja2 | (Flask) |
-| **ORM** | SQLAlchemy | 3.1.1 |
 | **Database** | SQLite | 3+ |
 | **Auth** | Werkzeug (hashing) | 3.0.1 |
-| **E-post** | Flask-Mail, Twilio | 0.9.1, 9.0.0 |
+| **E-post** | Flask-Mail | 0.9.1 |
 | **Containerisering** | Docker, Docker Compose | latest |
 | **Versjonskontroll** | Git, GitHub | - |
 
@@ -217,7 +208,6 @@ backend/
    ```
    services/
    ├── email_service.py   # E-post
-   ├── sms_service.py     # SMS (Twilio)
    ├── chatbot_service.py # Chatbot-logikk
    └── file_service.py    # Vedlegg-håndtering
    ```
@@ -266,8 +256,7 @@ backend/
 -  Rollebasert tilgangskontroll
 -  Sesjonshåndtering
 -  Filtype-validering
--  SQL-injection-beskyttelse (ORM)
--  CSRF-beskyttelse (Flask-WTF)
+-  SQL-injection-beskyttelse
 -  HTTPS (ikke implementert, anbefales for produksjon)
 -  Rate limiting (ikke implementert)
 -  2FA (ikke implementert)

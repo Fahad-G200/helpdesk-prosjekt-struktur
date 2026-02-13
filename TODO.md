@@ -56,7 +56,7 @@ Prosjektet er **fullstendig ferdigstilt** og klart for vurdering.
 
 ### Utvikling
 - [x] Kravanalyse & design
-- [x] Implementasjon (Flask, SQLAlchemy, Jinja2)
+- [x] Implementasjon (Flask, SQLite, Jinja2)
 - [x] Versjonskontroll (Git, GitHub)
 
 ---

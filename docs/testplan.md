@@ -28,7 +28,7 @@ Sikre at helpdesk-løsningen fungerer slik spesifikasjon og krav beskriver.
 | 7 | **Vedlegg – opplasting** | 1. Opprett sak<br>2. Last opp JPG/PDF-fil<br>3. Klikk "Upload" | Fil valideres og lagres | Fil synlig i sak-detaljer |  OK |
 | 8 | **Vedlegg – validering** | 1. Prøv å laste opp .exe/.zip-fil | Feilmelding, fil ikke akseptert | "Filtypen ikke tillatt" |  OK |
 | 9 | **Vedlegg – nedlasting** | 1. Åpne sak med vedlegg<br>2. Klikk på nedlasting-knapp | Fil lastes ned til datamaskin | Fil mottatt som JPG/PDF |  OK |
-| 10 | **Lukk sak (bruker)** | 1. Logg inn som user<br>2. Åpne egen åpen sak<br>3. Klikk "Lukk sak" | Status endres til "Lukket" | Sak låst, kan ikke endres |  OK |
+| 10 | **Lukk sak (support)** | 1. Logg inn som support<br>2. Åpne en åpen sak<br>3. Klikk "Lukk sak" | Status endres til "Lukket" | Sak låst, kan ikke endres |  OK |
 | 11 | **Vurder sak** | 1. Lukket sak vises<br>2. Velg rating (1-5 stjerner)<br>3. Klikk "Send" | Vurdering lagres, "Tusen takk"-melding | Rating synlig i sak |  OK |
 | 12 | **Kunnskapsbase (bruker)** | 1. Logg inn som user<br>2. Gå til "Kunnskapsbase"<br>3. Klikk på artikkel | Artikkel-innhold vises | Lesbar, formatert korrekt |  OK |
 | 13 | **KB Admin – opprett artikel** | 1. Logg inn som `admin`<br>2. Gå til Admin → KB Admin<br>3. Opprett ny artikel (tittel, innhold)<br>4. Publiser | Artikkel lagres og synlig for alle | Artikkel ID generert, i DB |  OK |
