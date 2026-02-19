@@ -1,1 +1,0 @@
-cur.execute("SELECT username, pw_hash, role, notify_email, notify_inapp FROM users WHERE username = ?", (username,))
